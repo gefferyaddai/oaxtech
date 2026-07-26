@@ -143,27 +143,6 @@ excluded from the sitemap and Article schema.
 
 ---
 
-## Content that was deliberately NOT built
-
-The mockups contain figures that would have been invented. None of them appear
-anywhere in the code:
-
-- "100+ Projects Completed", "5.0 Client Rating", "120+", "98% Client
-  Satisfaction"
-- The "Chris P. — Spargo" testimonial
-- Trust-strip companies: Prairie Fitness, Northline Supply Co., Summit
-  Construction, Rocky View Dental. **The trust strip shows Spargo and GHSA
-  only** — the two confirmed projects. Add others to `trustedBy` in
-  `src/data/projects.ts` only with written permission.
-- The "More Solutions We've Built" projects (Summit Construction, Ops360,
-  GrowthLab) from the earlier Our Work mockup
-
-Where a testimonial belonged, the page says a client story is coming and
-explains that nothing will be invented. Spargo results are described
-qualitatively — no user counts, revenue, savings or launch statistics.
-
-NASDAQ Trading Automation is described at a high level only: no algorithms,
-credentials, source code, trade data or private technical detail.
 
 ---
 
