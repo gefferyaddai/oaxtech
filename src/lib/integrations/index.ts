@@ -1,0 +1,181 @@
+/**
+ * ============================================================================
+ * INTEGRATION ADAPTERS
+ * ============================================================================
+ *
+ * Every external service sits behind an adapter with one rule:
+ *
+ *   If the service is not configured, say so. Never report success.
+ *
+ * The site builds and runs with zero environment variables set. In that state
+ * every adapter returns `{ ok: false, reason: "not_configured" }` and the UI
+ * shows an honest "not connected yet" message instead of a fake confirmation.
+ *
+ * Server-only: none of these values are prefixed NEXT_PUBLIC_, so no key here
+ * is ever sent to the browser.
+ */
+
+export type IntegrationResult =
+  | { ok: true; detail?: string }
+  | { ok: false; reason: "not_configured" | "failed"; detail?: string };
+
+const NOT_CONFIGURED = (service: string): IntegrationResult => ({
+  ok: false,
+  reason: "not_configured",
+  detail: `${service} is not configured. Set the required environment variables (see .env.example) to enable it.`,
+});
+
+/* -------------------------------------------------------------------------- */
+/* Configuration probes                                                        */
+/* -------------------------------------------------------------------------- */
+
+export const integrationStatus = {
+  email: () => Boolean(process.env.EMAIL_API_KEY && process.env.EMAIL_TO_ADDRESS),
+  calendar: () => Boolean(process.env.CALENDAR_API_KEY),
+  storage: () => Boolean(process.env.STORAGE_BUCKET && process.env.STORAGE_ACCESS_KEY),
+  database: () => Boolean(process.env.DATABASE_URL),
+  payments: () => Boolean(process.env.PAYMENTS_SECRET_KEY),
+  auth: () => Boolean(process.env.AUTH_SECRET && process.env.AUTH_PROVIDER_URL),
+  analytics: () => Boolean(process.env.NEXT_PUBLIC_ANALYTICS_ID),
+  spamProtection: () => Boolean(process.env.SPAM_PROTECTION_SECRET),
+};
+
+/* -------------------------------------------------------------------------- */
+/* Email delivery                                                              */
+/* -------------------------------------------------------------------------- */
+
+export interface EmailMessage {
+  subject: string;
+  /** Plain-text body. Values are already validated and escaped upstream. */
+  body: string;
+  replyTo?: string;
+}
+
+export async function sendEmail(message: EmailMessage): Promise<IntegrationResult> {
+  if (!integrationStatus.email()) return NOT_CONFIGURED("Email delivery");
+
+  // ---------------------------------------------------------------------
+  // Wire the real provider here (Resend, Postmark, SES, SendGrid...).
+  // Keep the shape: return { ok: true } only after the provider confirms.
+  // ---------------------------------------------------------------------
+  try {
+    // const res = await fetch("https://api.provider.com/send", { ... });
+    // if (!res.ok) return { ok: false, reason: "failed", detail: await res.text() };
+    void message;
+    return {
+      ok: false,
+      reason: "not_configured",
+      detail: "Email credentials are present but no provider client is wired up yet.",
+    };
+  } catch (error) {
+    return { ok: false, reason: "failed", detail: (error as Error).message };
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Calendar scheduling                                                         */
+/* -------------------------------------------------------------------------- */
+
+export interface BookingRequest {
+  service: string;
+  /** ISO date, yyyy-mm-dd */
+  date: string;
+  /** 24h local time, HH:mm */
+  time: string;
+  timeZone: string;
+  name: string;
+  email: string;
+}
+
+export async function createCalendarBooking(request: BookingRequest): Promise<IntegrationResult> {
+  if (!integrationStatus.calendar()) return NOT_CONFIGURED("Calendar scheduling");
+  void request;
+  return {
+    ok: false,
+    reason: "not_configured",
+    detail: "Calendar credentials are present but no scheduling client is wired up yet.",
+  };
+}
+
+/* -------------------------------------------------------------------------- */
+/* File storage                                                                */
+/* -------------------------------------------------------------------------- */
+
+export interface StoredFile {
+  /** Private object key. Never rendered to the browser. */
+  key: string;
+}
+
+export async function storeUpload(
+  file: { name: string; size: number; type: string },
+): Promise<IntegrationResult & { file?: StoredFile }> {
+  if (!integrationStatus.storage()) return NOT_CONFIGURED("File storage");
+  void file;
+  // Uploads must land in a PRIVATE bucket. Never return a public URL.
+  return {
+    ok: false,
+    reason: "not_configured",
+    detail: "Storage credentials are present but no storage client is wired up yet.",
+  };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Spam protection                                                             */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Integration point for Turnstile / hCaptcha / reCAPTCHA.
+ * With no provider configured this returns `true` so local development works,
+ * but it logs loudly so the gap is visible before launch.
+ */
+export async function verifySpamToken(token: string | undefined): Promise<boolean> {
+  if (!integrationStatus.spamProtection()) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("[spam-protection] Not configured — skipping verification.");
+    }
+    return true;
+  }
+  if (!token) return false;
+  // const res = await fetch(VERIFY_URL, { method: "POST", body: ... });
+  return false;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Database / persistence                                                      */
+/* -------------------------------------------------------------------------- */
+
+export async function persistSubmission(
+  kind: "contact" | "quote" | "booking" | "newsletter",
+  payload: unknown,
+): Promise<IntegrationResult> {
+  if (!integrationStatus.database()) return NOT_CONFIGURED("Database");
+  void kind;
+  void payload;
+  return {
+    ok: false,
+    reason: "not_configured",
+    detail: "DATABASE_URL is present but no database client is wired up yet.",
+  };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Payments                                                                    */
+/* -------------------------------------------------------------------------- */
+
+export function paymentsEnabled(): boolean {
+  return integrationStatus.payments();
+}
+
+/* -------------------------------------------------------------------------- */
+/* Shared submission outcome                                                   */
+/* -------------------------------------------------------------------------- */
+
+export type SubmissionOutcome =
+  /** Everything a configured service needed to do was done. */
+  | { status: "delivered" }
+  /** Input was valid, but no delivery service is configured yet. */
+  | { status: "not_configured"; detail: string }
+  /** Something genuinely went wrong. */
+  | { status: "error"; detail: string }
+  /** Field-level validation failed. */
+  | { status: "invalid"; fieldErrors: Record<string, string[]> };

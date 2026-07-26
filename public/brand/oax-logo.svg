@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 44" width="200" height="44" role="img" aria-label="OAX Tech">
+  <!-- ====================================================================
+       PLACEHOLDER LOGO — REPLACE WITH THE OFFICIAL OAX TECH VECTOR FILE.
+       The official logo was only available embedded in low-resolution
+       mockup screenshots, so it has deliberately NOT been redrawn here.
+       Drop the real oax-logo.svg in at this exact path; no code changes
+       are needed.
+       ==================================================================== -->
+  <text x="0" y="30"
+        font-family="'Space Grotesk Variable','Space Grotesk',system-ui,sans-serif"
+        font-size="21" font-weight="600" letter-spacing="3.2" fill="#0A0C11">OAX TECH</text>
+</svg>
