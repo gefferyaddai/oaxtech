@@ -40,7 +40,7 @@ export function Header() {
   }, [openMenu]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-paper/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-line bg-cream/90 backdrop-blur-md">
       <div className="container-page flex h-[var(--header-height)] items-center justify-between gap-4">
         <Logo />
 

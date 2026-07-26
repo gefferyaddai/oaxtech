@@ -22,48 +22,67 @@ const config: Config = {
     },
     extend: {
       colors: {
-        /* Surfaces — warm white through to very light grey */
+        /* Light surfaces — Warm Cream page, White cards ------------------- */
+        /* Warm Cream — the main light background (body, plain sections) */
+        cream: "#F2F0EA",
+        /* White — cards and panels that sit on cream or on dark */
         paper: "#FFFFFF",
-        mist: "#F8F9FB",
-        haze: "#F1F3F7",
-        /* Restrained cobalt tint used for highlighted bands */
-        tint: "#EDF2FF",
+        /* One step below cream — alternating section bands */
+        mist: "#EBE8E0",
+        /* Two steps below cream — hover / pressed / disabled fills */
+        haze: "#E2DED4",
+        /* Electric Blue wash for highlighted bands */
+        tint: "#E6EDFF",
 
-        /* Typography — charcoal through to near-black */
-        ink: "#0A0C11",
-        charcoal: "#2B313B",
-        slate: "#525C6B",
-        muted: "#7A8494",
+        /* Typography — Deep Ink down to Muted Grey ------------------------ */
+        ink: "#090B12",
+        charcoal: "#2A2F3C",
+        slate: "#4E5566",
+        /* Muted Grey. AA on the dark surfaces; decorative only on cream. */
+        muted: "#9298A7",
 
-        /* Restrained cobalt-blue accent */
+        /* Electric Blue — buttons, links, highlights and CTAs ------------- */
         cobalt: {
-          DEFAULT: "#1A5CFF",
-          hover: "#124BDB",
-          press: "#0F3FB8",
-          soft: "#E8EFFF",
-          border: "#C3D5FF",
+          DEFAULT: "#2867FF",
+          hover: "#1B52DB",
+          press: "#1642B4",
+          soft: "#E6EDFF",
+          border: "#BED0FF",
         },
 
-        /* Thin light-grey borders */
+        /* Violet — AI-related gradients and decorative accents ------------ */
+        violet: {
+          DEFAULT: "#8B5CF6",
+          hover: "#7C46F0",
+          soft: "#F1EBFE",
+          border: "#D9C9FC",
+        },
+
+        /* Thin borders, warmed so they sit correctly on cream ------------- */
         line: {
-          DEFAULT: "#E4E8EF",
-          strong: "#D3D9E3",
-          subtle: "#EFF2F6",
+          DEFAULT: "#E3DFD5",
+          strong: "#D0CBBE",
+          subtle: "#EBE8E1",
         },
 
-        /* Dark, space-inspired CTA sections and footers */
+        /* Dark surfaces — Deep Ink, Dark Navy, Card Navy ------------------ */
         space: {
-          DEFAULT: "#05060A",
-          raised: "#0B0E15",
-          line: "#1B202B",
-          text: "#A8B0BF",
+          /* Deep Ink — dark sections, navigation, footers */
+          DEFAULT: "#090B12",
+          /* Dark Navy — AI sections and elevated dark surfaces */
+          raised: "#10131D",
+          /* Card Navy — pricing cards and dashboard panels */
+          card: "#12151F",
+          line: "#232838",
+          /* Muted Grey — secondary text on dark */
+          text: "#9298A7",
         },
 
         /* Status — never the only signal; always paired with text/icon */
         success: { DEFAULT: "#0F7A4A", soft: "#E4F5EC" },
         warning: { DEFAULT: "#9A6100", soft: "#FDF1DC" },
         danger: { DEFAULT: "#B3261E", soft: "#FCEBEA" },
-        info: { DEFAULT: "#1A5CFF", soft: "#E8EFFF" },
+        info: { DEFAULT: "#2867FF", soft: "#E6EDFF" },
       },
 
       fontFamily: {
@@ -112,11 +131,11 @@ const config: Config = {
 
       boxShadow: {
         /* Deliberately subtle — the mockups rely on borders, not drop shadows */
-        xs: "0 1px 2px 0 rgb(10 12 17 / 0.04)",
-        card: "0 1px 3px 0 rgb(10 12 17 / 0.04), 0 1px 2px -1px rgb(10 12 17 / 0.03)",
-        "card-hover": "0 8px 24px -6px rgb(10 12 17 / 0.10), 0 2px 6px -2px rgb(10 12 17 / 0.05)",
-        float: "0 16px 40px -12px rgb(10 12 17 / 0.16)",
-        ring: "0 0 0 1px rgb(228 232 239 / 1)",
+        xs: "0 1px 2px 0 rgb(9 11 18 / 0.04)",
+        card: "0 1px 3px 0 rgb(9 11 18 / 0.04), 0 1px 2px -1px rgb(9 11 18 / 0.03)",
+        "card-hover": "0 8px 24px -6px rgb(9 11 18 / 0.10), 0 2px 6px -2px rgb(9 11 18 / 0.05)",
+        float: "0 16px 40px -12px rgb(9 11 18 / 0.16)",
+        ring: "0 0 0 1px rgb(227 223 213 / 1)",
       },
 
       transitionDuration: { DEFAULT: "160ms" },

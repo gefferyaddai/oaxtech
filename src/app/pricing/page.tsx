@@ -173,7 +173,7 @@ export default function PricingPage() {
                   </ButtonLink>
                 </div>
               </div>
-              <div className="rounded-xl border border-space-line bg-space-raised p-5">
+              <div className="rounded-xl border border-space-line bg-space-card p-5">
                 <p className="text-xs font-medium text-white">What a custom quote covers</p>
                 <ul className="mt-4 space-y-2.5">
                   {[

@@ -31,7 +31,7 @@ export function PageHero({
   eyebrow, title, description, actions, bullets, visual, breadcrumb, className, centered,
 }: PageHeroProps) {
   return (
-    <section className={cn("relative overflow-hidden border-b border-line bg-paper", className)}>
+    <section className={cn("relative overflow-hidden border-b border-line bg-cream", className)}>
       <OrbitalBackdrop className="opacity-70" />
       <Container className="relative py-12 md:py-16 lg:py-20">
         {breadcrumb}

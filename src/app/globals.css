@@ -28,10 +28,14 @@
     --font-body: "Inter Variable";
 
     /* Token mirrors, so non-Tailwind CSS (SVG strokes, gradients) stays in sync */
-    --color-ink: #0a0c11;
-    --color-cobalt: #1a5cff;
-    --color-line: #e4e8ef;
-    --color-space: #05060a;
+    --color-ink: #090b12;
+    --color-cobalt: #2867ff;
+    --color-violet: #8b5cf6;
+    --color-cream: #f2f0ea;
+    --color-line: #e3dfd5;
+    --color-space: #090b12;
+    --color-space-raised: #10131d;
+    --color-space-card: #12151f;
 
     --container: 1200px;
     --header-height: 4.5rem;
@@ -49,7 +53,7 @@
   }
 
   body {
-    background-color: theme("colors.paper");
+    background-color: theme("colors.cream");
     color: theme("colors.slate");
     font-family: var(--font-body), system-ui, sans-serif;
     font-size: theme("fontSize.base[0]");
@@ -160,6 +164,13 @@
     border: 1px solid theme("colors.line.DEFAULT");
     border-radius: theme("borderRadius.xl");
   }
+  /* Card Navy — pricing cards and dashboard panels on dark sections */
+  .card-dark {
+    background-color: theme("colors.space.card");
+    border: 1px solid theme("colors.space.line");
+    border-radius: theme("borderRadius.xl");
+    color: theme("colors.space.text");
+  }
   .card-interactive {
     transition: box-shadow 180ms ease, border-color 180ms ease, transform 180ms ease;
   }
@@ -206,7 +217,7 @@
   textarea.field-control { min-height: 7rem; resize: vertical; line-height: 1.6; }
   select.field-control {
     appearance: none;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%237A8494' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%239298A7' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
     padding-right: 2.25rem;
@@ -258,6 +269,27 @@
   .surface-space {
     background-color: theme("colors.space.DEFAULT");
     color: theme("colors.space.text");
+  }
+
+  /* AI sections — Dark Navy base with a violet/electric-blue decorative wash */
+  .surface-ai {
+    background-color: theme("colors.space.raised");
+    background-image:
+      radial-gradient(60% 90% at 15% 0%, rgb(139 92 246 / 0.22), transparent 70%),
+      radial-gradient(50% 80% at 95% 20%, rgb(40 103 255 / 0.18), transparent 70%);
+    color: theme("colors.space.text");
+  }
+
+  /* Violet → Electric Blue gradient for AI headings and decorative accents */
+  .text-gradient-ai {
+    background-image: linear-gradient(
+      100deg,
+      theme("colors.violet.DEFAULT"),
+      theme("colors.cobalt.DEFAULT")
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 }
 

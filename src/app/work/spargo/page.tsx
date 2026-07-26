@@ -70,7 +70,7 @@ export default function SpargoCaseStudyPage() {
       />
 
       {/* Facts strip -------------------------------------------------------- */}
-      <section className="border-b border-line bg-paper py-6">
+      <section className="border-b border-line bg-cream py-6">
         <Container>
           <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {study.facts.map((fact) => (

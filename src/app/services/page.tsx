@@ -67,7 +67,7 @@ export default function ServicesPage() {
           <section
             key={service.slug}
             id={service.slug}
-            className={cn("section border-b border-line", alternate ? "bg-mist" : "bg-paper")}
+            className={cn("section border-b border-line", alternate ? "bg-mist" : "bg-cream")}
           >
             <Container>
               <div

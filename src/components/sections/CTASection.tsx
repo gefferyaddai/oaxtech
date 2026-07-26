@@ -34,7 +34,7 @@ export function CTASection({ title, description, actions, className, inset }: CT
 
   if (inset) {
     return (
-      <section className={cn("bg-paper py-10 lg:py-14", className)}>
+      <section className={cn("bg-cream py-10 lg:py-14", className)}>
         <Container>
           <div className="overflow-hidden rounded-3xl bg-space">{body}</div>
         </Container>

@@ -52,7 +52,7 @@ function Sparkline({ className, tone = "cobalt" }: { className?: string; tone?: 
       <polyline
         points={points}
         fill="none"
-        stroke={tone === "cobalt" ? "var(--color-cobalt)" : "rgba(122,132,148,0.5)"}
+        stroke={tone === "cobalt" ? "var(--color-cobalt)" : "rgba(146,152,167,0.5)"}
         strokeWidth="2"
         vectorEffect="non-scaling-stroke"
         strokeLinecap="round"
@@ -221,7 +221,7 @@ export function WorkHeroVisual() {
 
       {/* Tablet, dark */}
       <div className="hidden w-28 shrink-0 overflow-hidden rounded-xl border border-space-line bg-space p-1.5 shadow-float sm:block">
-        <div className="rounded-lg bg-space-raised p-2">
+        <div className="rounded-lg bg-space-card p-2">
           <div className="mb-2 h-1.5 w-2/3 rounded-full bg-white/20" aria-hidden="true" />
           <div className="h-12">
             <Sparkline />
