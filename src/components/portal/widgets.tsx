@@ -277,7 +277,7 @@ export function RevisionsWidget() {
 export function MessagesWidget() {
   return (
     <PortalCard title="Messages">
-      <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[0.8fr_1.2fr]">
         <ul className="space-y-2">
           {demoThreads.map((thread, index) => (
             <li key={index}>

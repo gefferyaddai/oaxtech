@@ -17,8 +17,8 @@ export function CTASection({ title, description, actions, className, inset }: CT
   const body = (
     <div className="relative overflow-hidden">
       <StarField />
-      <OrbitalBackdrop variant="dark" className="opacity-80" showNodes={false} />
-      <div className="relative grid items-center gap-8 px-6 py-12 sm:px-10 lg:grid-cols-[1.3fr_auto] lg:gap-12 lg:px-14 lg:py-16">
+      <OrbitalBackdrop variant="dark" className="opacity-80" showNodes={false} animated />
+      <div className="relative grid grid-cols-1 items-center gap-8 px-6 py-12 sm:px-10 lg:grid-cols-[1.3fr_auto] lg:gap-12 lg:px-14 lg:py-16">
         <div>
           <h2 className="text-display-md text-white">{title}</h2>
           {description && (

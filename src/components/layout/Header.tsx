@@ -17,11 +17,21 @@ function isActive(pathname: string, href: string): boolean {
 export function Header() {
   const pathname = usePathname();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
 
   // Close the dropdown on route change, outside click, or Escape.
   useEffect(() => setOpenMenu(null), [pathname]);
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 8);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     if (!openMenu) return;
@@ -40,7 +50,12 @@ export function Header() {
   }, [openMenu]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-cream/90 backdrop-blur-md">
+    <header
+      className={cn(
+        "sticky top-0 z-50 border-b bg-cream/90 backdrop-blur-md transition-shadow duration-300",
+        scrolled ? "border-line shadow-[0_1px_0_0_rgb(9_11_18_/_0.04),0_12px_24px_-16px_rgb(9_11_18_/_0.18)]" : "border-transparent",
+      )}
+    >
       <div className="container-page flex h-[var(--header-height)] items-center justify-between gap-4">
         <Logo />
 

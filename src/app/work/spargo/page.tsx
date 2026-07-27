@@ -144,7 +144,7 @@ export default function SpargoCaseStudyPage() {
       <section className="section border-y border-line bg-mist">
         <Container>
           <SectionHeading title="OAX Tech's Solution" />
-          <div className="mt-10 grid items-center gap-8 lg:grid-cols-[1fr_auto_1fr] lg:gap-10">
+          <div className="mt-10 grid grid-cols-1 items-center gap-8 lg:grid-cols-[1fr_auto_1fr] lg:gap-10">
             <ul className="space-y-6">
               {study.solution.slice(0, 2).map((item) => (
                 <li key={item.label}>
@@ -157,7 +157,7 @@ export default function SpargoCaseStudyPage() {
 
             <div className="order-first flex justify-center gap-2 lg:order-none">
               <PhoneFrame title="Compare prices" className="hidden translate-y-4 sm:block" />
-              <PhoneFrame title="Find better prices" featured lines={4} />
+              <PhoneFrame title="Find better prices" featured />
               <PhoneFrame title="Smart list" className="hidden translate-y-4 sm:block" />
             </div>
 
@@ -213,7 +213,7 @@ export default function SpargoCaseStudyPage() {
             {study.screens.map((screen) => (
               <li key={screen.title} className="card overflow-hidden">
                 <div className="flex justify-center border-b border-line bg-paper p-5">
-                  <PhoneFrame title={screen.title} lines={3} />
+                  <PhoneFrame title={screen.title} eyebrow="Screen" />
                 </div>
                 <div className="p-4">
                   <p className="font-display text-sm font-semibold text-ink">{screen.title}</p>
@@ -232,7 +232,7 @@ export default function SpargoCaseStudyPage() {
           <ul className="mt-10 space-y-4">
             {study.challenges.map((item) => (
               <li key={item.challenge} className="card overflow-hidden">
-                <div className="grid items-center gap-6 p-5 sm:p-6 lg:grid-cols-[1fr_auto_1fr]">
+                <div className="grid grid-cols-1 items-center gap-6 p-5 sm:p-6 lg:grid-cols-[1fr_auto_1fr]">
                   <div>
                     <p className="font-display text-sm font-semibold text-ink">{item.challenge}</p>
                     <p className="mt-1.5 text-sm leading-relaxed text-slate">
@@ -282,7 +282,7 @@ export default function SpargoCaseStudyPage() {
       {/* Testimonial placeholder -------------------------------------------- */}
       <section className="py-12 lg:py-16">
         <Container>
-          <div className="grid items-center gap-8 rounded-3xl bg-tint p-8 sm:p-10 lg:grid-cols-[1.4fr_1fr]">
+          <div className="grid grid-cols-1 items-center gap-8 rounded-3xl bg-tint p-8 sm:p-10 lg:grid-cols-[1.4fr_1fr]">
             <div>
               <Icon name="MessageSquare" className="mb-4 h-7 w-7 text-cobalt" />
               <p className="font-display text-display-xs text-ink">{study.testimonial.quote}</p>
@@ -294,7 +294,7 @@ export default function SpargoCaseStudyPage() {
               )}
             </div>
             <div className="hidden justify-center lg:flex">
-              <PhoneFrame title="Find better prices. Save more today." featured lines={3} />
+              <PhoneFrame title="Find better prices. Save more today." featured />
             </div>
           </div>
         </Container>

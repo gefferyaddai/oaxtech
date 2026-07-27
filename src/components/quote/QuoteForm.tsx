@@ -72,7 +72,7 @@ export function QuoteForm({ defaultPackage }: { defaultPackage?: string }) {
   }
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[1.4fr_0.6fr]">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.4fr_0.6fr]">
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="card p-5 sm:p-6">
         {/* Contact ---------------------------------------------------------- */}
         <h2 className="font-display text-lg font-semibold text-ink">Contact Information</h2>

@@ -21,7 +21,7 @@ export function Footer() {
   return (
     <footer className="surface-space relative overflow-hidden">
       <Container className="relative py-12 lg:py-16">
-        <div className="grid gap-10 lg:grid-cols-[1.4fr_repeat(4,1fr)] lg:gap-8">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(4,1fr)] lg:gap-8">
           <div>
             <Logo variant="light" width={124} />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-space-text">

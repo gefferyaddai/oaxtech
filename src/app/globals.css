@@ -4,19 +4,21 @@
 
 /* ---------------------------------------------------------------------------
    Self-hosted variable fonts. No third-party font requests, no layout shift.
-   Space Grotesk = geometric display face. Inter = body / UI face.
-   Both are subset to latin + common punctuation (98KB total).
+   Bricolage Grotesque = display face — an ink-trap grotesque with enough
+   character to read as OAX Tech's own, not a stock template face.
+   Public Sans = body / UI face — built for dense, legible interface text.
+   Both are subset to latin (67KB total).
 --------------------------------------------------------------------------- */
 @font-face {
-  font-family: "Space Grotesk Variable";
-  src: url("/fonts/SpaceGrotesk-Variable.woff2") format("woff2-variations");
-  font-weight: 300 700;
+  font-family: "Bricolage Grotesque Variable";
+  src: url("/fonts/BricolageGrotesque-Variable.woff2") format("woff2-variations");
+  font-weight: 200 800;
   font-display: swap;
   font-style: normal;
 }
 @font-face {
-  font-family: "Inter Variable";
-  src: url("/fonts/Inter-Variable.woff2") format("woff2-variations");
+  font-family: "Public Sans Variable";
+  src: url("/fonts/PublicSans-Variable.woff2") format("woff2-variations");
   font-weight: 100 900;
   font-display: swap;
   font-style: normal;
@@ -24,8 +26,8 @@
 
 @layer base {
   :root {
-    --font-display: "Space Grotesk Variable";
-    --font-body: "Inter Variable";
+    --font-display: "Bricolage Grotesque Variable";
+    --font-body: "Public Sans Variable";
 
     /* Token mirrors, so non-Tailwind CSS (SVG strokes, gradients) stays in sync */
     --color-ink: #090b12;
@@ -54,6 +56,11 @@
 
   body {
     background-color: theme("colors.cream");
+    background-image:
+      radial-gradient(circle at 15% 0%, rgb(40 103 255 / 0.08), transparent 30%),
+      radial-gradient(circle at 85% 8%, rgb(139 92 246 / 0.06), transparent 28%),
+      linear-gradient(180deg, #f7f4ee 0%, #f2f0ea 42%, #f7f4ee 100%);
+    background-attachment: fixed;
     color: theme("colors.slate");
     font-family: var(--font-body), system-ui, sans-serif;
     font-size: theme("fontSize.base[0]");
@@ -114,24 +121,32 @@
     font-weight: 500;
     line-height: 1;
     white-space: nowrap;
-    transition-property: background-color, color, border-color, box-shadow, opacity;
+    transition-property: background-color, color, border-color, box-shadow, opacity, transform;
     transition-duration: 160ms;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
     /* 44px min target keeps every button comfortably tappable */
     min-height: 2.75rem;
     padding: 0.75rem 1.25rem;
     font-size: theme("fontSize.sm[0]");
   }
   .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+  .btn:active:not(:disabled) { transform: scale(0.97); }
 
   .btn-sm { min-height: 2.25rem; padding: 0.5rem 0.875rem; font-size: theme("fontSize.xs[0]"); }
   .btn-lg { min-height: 3.125rem; padding: 0.9375rem 1.625rem; font-size: theme("fontSize.base[0]"); }
 
   .btn-primary { background-color: theme("colors.cobalt.DEFAULT"); color: #fff; }
-  .btn-primary:hover:not(:disabled) { background-color: theme("colors.cobalt.hover"); }
+  .btn-primary:hover:not(:disabled) {
+    background-color: theme("colors.cobalt.hover");
+    box-shadow: 0 10px 24px -8px rgb(40 103 255 / 0.45);
+  }
   .btn-primary:active:not(:disabled) { background-color: theme("colors.cobalt.press"); }
 
   .btn-dark { background-color: theme("colors.ink"); color: #fff; }
-  .btn-dark:hover:not(:disabled) { background-color: #1b2029; }
+  .btn-dark:hover:not(:disabled) {
+    background-color: #1b2029;
+    box-shadow: 0 10px 24px -8px rgb(9 11 18 / 0.45);
+  }
 
   .btn-outline {
     background-color: theme("colors.paper");
@@ -163,6 +178,7 @@
     background-color: theme("colors.paper");
     border: 1px solid theme("colors.line.DEFAULT");
     border-radius: theme("borderRadius.xl");
+    box-shadow: 0 18px 45px rgb(9 11 18 / 0.06);
   }
   /* Card Navy — pricing cards and dashboard panels on dark sections */
   .card-dark {
@@ -170,13 +186,15 @@
     border: 1px solid theme("colors.space.line");
     border-radius: theme("borderRadius.xl");
     color: theme("colors.space.text");
+    box-shadow: 0 18px 45px rgb(9 11 18 / 0.2);
   }
   .card-interactive {
-    transition: box-shadow 180ms ease, border-color 180ms ease, transform 180ms ease;
+    transition: box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1), border-color 220ms ease, transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
   }
   .card-interactive:hover {
-    border-color: theme("colors.line.strong");
-    box-shadow: theme("boxShadow.card-hover");
+    border-color: theme("colors.cobalt.border");
+    box-shadow: theme("boxShadow.card-hover"), 0 0 0 1px rgb(40 103 255 / 0.06);
+    transform: translateY(-3px);
   }
 
   /* Forms ---------------------------------------------------------------- */
@@ -223,13 +241,24 @@
     padding-right: 2.25rem;
   }
 
-  /* Eyebrow label used above section headings throughout the mockups */
+  /* Kicker label above section headings — a tick mark + word, not a generic
+     tracked-uppercase eyebrow. The mark echoes the orbital node motif. */
   .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     font-size: theme("fontSize.2xs[0]");
     font-weight: 600;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: theme("colors.cobalt.DEFAULT");
+  }
+  .eyebrow::before {
+    content: "";
+    width: 1.125rem;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.55;
   }
 
   /* Section rhythm */
@@ -271,26 +300,30 @@
     color: theme("colors.space.text");
   }
 
-  /* AI sections — Dark Navy base with a violet/electric-blue decorative wash */
-  .surface-ai {
-    background-color: theme("colors.space.raised");
-    background-image:
-      radial-gradient(60% 90% at 15% 0%, rgb(139 92 246 / 0.22), transparent 70%),
-      radial-gradient(50% 80% at 95% 20%, rgb(40 103 255 / 0.18), transparent 70%);
-    color: theme("colors.space.text");
+  /* Orbital hub — pulsing ring behind the signature hero/CTA node */
+  .orbit-hub::before {
+    content: "";
+    position: absolute;
+    inset: -0.5rem;
+    border-radius: inherit;
+    border: 1px solid theme("colors.cobalt.DEFAULT");
+    opacity: 0.35;
+    animation: orbit-pulse 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
   }
+}
 
-  /* Violet → Electric Blue gradient for AI headings and decorative accents */
-  .text-gradient-ai {
-    background-image: linear-gradient(
-      100deg,
-      theme("colors.violet.DEFAULT"),
-      theme("colors.cobalt.DEFAULT")
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
+@keyframes orbit-pulse {
+  0% { transform: scale(0.94); opacity: 0.4; }
+  70% { opacity: 0; }
+  100% { transform: scale(1.22); opacity: 0; }
+}
+
+@keyframes orbit-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orbit-travel {
+  to { offset-distance: 100%; }
 }
 
 /* Honour the OS-level reduced-motion setting everywhere */

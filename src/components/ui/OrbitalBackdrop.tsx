@@ -5,6 +5,8 @@ interface OrbitalBackdropProps {
   variant?: "light" | "dark";
   /** Show the small node dots that sit on the orbital paths. */
   showNodes?: boolean;
+  /** Slow, continuous rotation — off by default so it can be opted in per-section. */
+  animated?: boolean;
 }
 
 /**
@@ -13,8 +15,10 @@ interface OrbitalBackdropProps {
  * Purely decorative, so it is aria-hidden and never sits above content. It
  * scales with its container via preserveAspectRatio="none" on the outer ring
  * only, keeping stroke weights visually consistent across breakpoints.
+ * `animated` spins the whole ring assembly around its own center at a barely
+ * perceptible pace; `prefers-reduced-motion` freezes it globally.
  */
-export function OrbitalBackdrop({ className, variant = "light", showNodes = true }: OrbitalBackdropProps) {
+export function OrbitalBackdrop({ className, variant = "light", showNodes = true, animated = false }: OrbitalBackdropProps) {
   const stroke = variant === "dark" ? "rgba(255,255,255,0.14)" : "rgba(10,12,17,0.10)";
   const node = variant === "dark" ? "rgba(255,255,255,0.55)" : "rgba(26,92,255,0.55)";
   const nodeDim = variant === "dark" ? "rgba(255,255,255,0.25)" : "rgba(10,12,17,0.22)";
@@ -27,13 +31,17 @@ export function OrbitalBackdrop({ className, variant = "light", showNodes = true
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <g stroke={stroke} strokeWidth="1">
+        <g
+          stroke={stroke}
+          strokeWidth="1"
+          style={animated ? { transformOrigin: "400px 250px", animation: "orbit-spin 200s linear infinite" } : undefined}
+        >
           <ellipse cx="400" cy="250" rx="330" ry="170" transform="rotate(-14 400 250)" />
           <ellipse cx="400" cy="250" rx="250" ry="215" transform="rotate(22 400 250)" />
           <ellipse cx="400" cy="250" rx="370" ry="110" transform="rotate(8 400 250)" />
         </g>
         {showNodes && (
-          <g>
+          <g style={animated ? { transformOrigin: "400px 250px", animation: "orbit-spin 200s linear infinite" } : undefined}>
             <circle cx="112" cy="196" r="4" fill={node} />
             <circle cx="690" cy="300" r="4" fill={node} />
             <circle cx="404" cy="42" r="3" fill={nodeDim} />

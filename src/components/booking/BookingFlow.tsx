@@ -195,7 +195,7 @@ export function BookingFlow() {
             </div>
           )}
 
-          <div className="mt-5 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr_0.8fr]">
             <div>
               <div className="flex items-center justify-between">
                 <button
@@ -344,7 +344,7 @@ export function BookingFlow() {
 
       {/* Step 3 — details ---------------------------------------------------- */}
       {step === 2 && (
-        <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-5 grid gap-5 lg:grid-cols-[1.4fr_0.6fr]">
+        <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[1.4fr_0.6fr]">
           <div className="card p-5 sm:p-6">
             <h2 className="font-display text-lg font-semibold text-ink">Tell Us About You</h2>
 

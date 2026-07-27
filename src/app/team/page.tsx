@@ -139,7 +139,7 @@ export default function TeamPage() {
 
       <section className="section bg-tint">
         <Container>
-          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
             <div>
               <p className="eyebrow">Grow with OAX Tech</p>
               <h2 className="mt-3 text-display-sm">Grow With OAX Tech</h2>

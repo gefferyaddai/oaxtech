@@ -78,7 +78,7 @@ export default function HomePage() {
       {/* About preview ------------------------------------------------------ */}
       <section className="section">
         <Container>
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
             <div>
               <h2 className="text-display-sm">About OAX Tech</h2>
               <p className="mt-4 text-base leading-relaxed text-slate">

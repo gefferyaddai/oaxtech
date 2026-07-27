@@ -88,8 +88,8 @@ src/
 widths, spacing, radii, shadows, breakpoints) and `src/app/globals.css` (button,
 card and form primitives). Changing the brand is a single-file edit.
 
-**Fonts** are self-hosted variable WOFF2, subset to latin — Space Grotesk
-(display) and Inter (body), 98 KB total. No third-party font requests.
+**Fonts** are self-hosted variable WOFF2, subset to latin — Bricolage Grotesque
+(display) and Public Sans (body), 67 KB total. No third-party font requests.
 
 ---
 

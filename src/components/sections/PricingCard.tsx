@@ -12,7 +12,7 @@ export function PricingCard({ pkg, className }: PricingCardProps) {
   return (
     <article
       className={cn(
-        "card relative flex h-full flex-col",
+        "card card-interactive relative flex h-full flex-col",
         pkg.featured && "border-cobalt shadow-card-hover",
         className,
       )}

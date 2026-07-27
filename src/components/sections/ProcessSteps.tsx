@@ -25,8 +25,8 @@ export function ProcessSteps({ steps, className, numbered = true }: ProcessSteps
         style={{ gridArea: "1 / 1 / 2 / -1" }}
       />
       {steps.map((step) => (
-        <li key={step.label} className="relative flex flex-col items-center text-center xl:flex-1">
-          <span className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full border border-line bg-paper text-cobalt">
+        <li key={step.label} className="group relative flex flex-col items-center text-center xl:flex-1">
+          <span className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full border border-line bg-paper text-cobalt shadow-card transition-all duration-300 ease-out group-hover:-translate-y-1 group-hover:border-cobalt-border group-hover:shadow-card-hover">
             <Icon name={step.icon} className="h-5 w-5" />
           </span>
           <p className="font-display text-sm font-semibold text-ink">

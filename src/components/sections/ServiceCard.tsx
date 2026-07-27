@@ -10,8 +10,12 @@ interface ServiceCardProps {
 
 export function ServiceCard({ service, className }: ServiceCardProps) {
   return (
-    <article className={cn("card card-interactive group flex h-full flex-col p-5 sm:p-6", className)}>
-      <span className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-lg bg-cobalt-soft text-cobalt">
+    <article className={cn("card card-interactive group relative flex h-full flex-col overflow-hidden p-5 sm:p-6", className)}>
+      <span
+        className="pointer-events-none absolute -right-3 -top-3 h-16 w-16 rounded-full bg-cobalt/0 transition-colors duration-300 group-hover:bg-cobalt/[0.06]"
+        aria-hidden="true"
+      />
+      <span className="relative mb-5 inline-flex h-11 w-11 items-center justify-center rounded-lg bg-cobalt-soft text-cobalt transition-transform duration-300 ease-out group-hover:-rotate-6 group-hover:scale-105">
         <Icon name={service.icon} className="h-5 w-5" />
       </span>
       <h3 className="font-display text-lg font-semibold text-ink">{service.shortTitle}</h3>
@@ -55,25 +59,34 @@ export function FeatureGrid({ items, columns = 4, className, variant = "card" }:
 
   return (
     <ul className={cn("grid gap-4", cols, className)}>
-      {items.map((item) => (
+      {items.map((item, index) => (
         <li
           key={item.label}
           className={cn(
-            "flex h-full flex-col",
-            variant === "card" ? "card p-5" : "gap-1",
+            "group relative flex h-full flex-col",
+            variant === "card" && "card card-interactive overflow-hidden p-5",
+            variant === "plain" && "gap-1 border-t border-line pt-4",
           )}
         >
+          {variant === "card" && (
+            <span
+              className="pointer-events-none absolute -right-2 -top-3 select-none font-display text-4xl font-semibold text-ink/[0.04]"
+              aria-hidden="true"
+            >
+              {String(index + 1).padStart(2, "0")}
+            </span>
+          )}
           <span
             className={cn(
-              "mb-3 inline-flex items-center justify-center text-cobalt",
+              "relative mb-3 inline-flex items-center justify-center text-cobalt transition-transform duration-300 ease-out group-hover:-translate-y-0.5",
               variant === "card" ? "h-10 w-10 rounded-lg bg-cobalt-soft" : "h-8 w-8",
             )}
           >
             <Icon name={item.icon} className="h-5 w-5" />
           </span>
-          <p className="font-display text-sm font-semibold text-ink">{item.label}</p>
+          <p className="relative font-display text-sm font-semibold text-ink">{item.label}</p>
           {item.description && (
-            <p className="mt-1.5 text-sm leading-relaxed text-slate">{item.description}</p>
+            <p className="relative mt-1.5 text-sm leading-relaxed text-slate">{item.description}</p>
           )}
         </li>
       ))}

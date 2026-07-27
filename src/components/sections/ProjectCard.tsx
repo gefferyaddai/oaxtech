@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
+import { OrbitalBackdrop } from "@/components/ui/OrbitalBackdrop";
 import type { Project } from "@/data/projects";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +18,7 @@ interface ProjectCardProps {
  */
 export function ProjectCard({ project, reversed, className }: ProjectCardProps) {
   return (
-    <article className={cn("card overflow-hidden", className)}>
+    <article className={cn("card card-interactive overflow-hidden", className)}>
       <div
         className={cn(
           "grid gap-0 lg:grid-cols-2",
@@ -91,7 +92,10 @@ export function ProjectCard({ project, reversed, className }: ProjectCardProps) 
  * Lightweight, built-in-HTML preview of each project.
  *
  * Deliberately NOT a large screenshot: it keeps page weight low, avoids layout
- * shift, and means no important text lives inside an image.
+ * shift, and means no important text lives inside an image. Rather than a
+ * mocked-up browser window standing in for content that isn't there, the
+ * preview surfaces the project's own real highlights against the orbital
+ * motif that carries the rest of the site.
  */
 function ProjectPreview({ project }: { project: Project }) {
   const dark = project.slug === "nasdaq-trading-automation";
@@ -99,86 +103,35 @@ function ProjectPreview({ project }: { project: Project }) {
   return (
     <div
       className={cn(
-        "relative flex min-h-[280px] items-center justify-center overflow-hidden p-6 sm:p-8",
-        dark ? "bg-space" : "bg-mist",
+        "group/preview relative flex min-h-[280px] flex-col justify-center gap-7 overflow-hidden p-6 sm:p-8",
+        dark ? "bg-space" : "bg-[linear-gradient(180deg,rgba(247,244,238,0.98),rgba(238,233,223,0.94))]",
       )}
     >
-      <div
-        className={cn(
-          "w-full max-w-sm rounded-xl border shadow-card",
-          dark ? "border-space-line bg-space-raised" : "border-line bg-paper",
-        )}
-      >
-        <div
-          className={cn(
-            "flex items-center gap-1.5 border-b px-3 py-2.5",
-            dark ? "border-space-line" : "border-line-subtle",
-          )}
-        >
-          <span className="h-2 w-2 rounded-full bg-danger/60" />
-          <span className="h-2 w-2 rounded-full bg-warning/60" />
-          <span className="h-2 w-2 rounded-full bg-success/60" />
-          <span
-            className={cn(
-              "ml-2 truncate text-2xs",
-              dark ? "text-space-text" : "text-muted",
-            )}
-          >
-            {project.name}
-          </span>
-        </div>
+      <OrbitalBackdrop variant={dark ? "dark" : "light"} showNodes={false} className="opacity-70" />
 
-        <div className="space-y-3 p-4">
-          <div
-            className={cn(
-              "h-2 w-3/5 rounded-full",
-              dark ? "bg-white/15" : "bg-line-strong",
-            )}
-          />
-          <div
-            className={cn("h-2 w-2/5 rounded-full", dark ? "bg-white/10" : "bg-line")}
-          />
-          <div className="grid grid-cols-3 gap-2 pt-1">
-            {project.highlights.map((h) => (
-              <div
-                key={h.label}
-                className={cn(
-                  "rounded-lg border p-2.5",
-                  dark ? "border-space-line bg-space" : "border-line bg-mist",
-                )}
-              >
-                <Icon
-                  name={h.icon}
-                  className={cn("h-4 w-4", dark ? "text-cobalt" : "text-cobalt")}
-                />
-                <p
-                  className={cn(
-                    "mt-1.5 text-[0.6875rem] leading-tight",
-                    dark ? "text-space-text" : "text-slate",
-                  )}
-                >
-                  {h.label}
-                </p>
-              </div>
-            ))}
-          </div>
-          <div
-            className={cn(
-              "flex h-16 items-end gap-1 rounded-lg border p-2",
-              dark ? "border-space-line bg-space" : "border-line bg-mist",
-            )}
-            aria-hidden="true"
-          >
-            {[38, 52, 44, 68, 58, 80, 72, 92].map((h, i) => (
-              <span
-                key={i}
-                className="flex-1 rounded-sm bg-cobalt/70"
-                style={{ height: `${h}%` }}
-              />
-            ))}
-          </div>
-        </div>
+      <div className="relative">
+        <p className={cn("eyebrow", dark && "text-white/90")}>{project.eyebrow}</p>
+        <p className={cn("mt-2 font-display text-xl font-semibold", dark ? "text-white" : "text-ink")}>
+          {project.name}
+        </p>
       </div>
+
+      <ul className="relative grid grid-cols-3 gap-3">
+        {project.highlights.map((h) => (
+          <li
+            key={h.label}
+            className={cn(
+              "flex flex-col items-center gap-2 rounded-xl border p-3 text-center shadow-card transition-transform duration-300 ease-out group-hover/preview:-translate-y-0.5",
+              dark ? "border-space-line bg-space-card" : "border-line bg-paper",
+            )}
+          >
+            <Icon name={h.icon} className="h-5 w-5 text-cobalt" />
+            <p className={cn("text-[0.65rem] font-medium leading-tight", dark ? "text-space-text" : "text-slate")}>
+              {h.label}
+            </p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -191,20 +144,16 @@ interface CompactProjectCardProps {
 export function CompactProjectCard({ project }: CompactProjectCardProps) {
   return (
     <article className="card card-interactive group flex h-full flex-col overflow-hidden">
-      <div className="border-b border-line bg-mist p-5">
-        <div className="rounded-lg border border-line bg-paper p-3">
-          <div className="mb-2.5 h-1.5 w-2/5 rounded-full bg-line-strong" />
-          <div className="flex gap-1.5">
-            {project.highlights.slice(0, 3).map((h) => (
-              <span
-                key={h.label}
-                className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-cobalt-soft text-cobalt"
-              >
-                <Icon name={h.icon} className="h-3.5 w-3.5" />
-              </span>
-            ))}
-          </div>
-        </div>
+      <div className="relative flex items-center justify-center gap-3 overflow-hidden border-b border-line bg-[linear-gradient(180deg,rgba(247,244,238,0.95),rgba(238,233,223,0.9))] py-8">
+        <OrbitalBackdrop showNodes={false} className="opacity-60" />
+        {project.highlights.slice(0, 3).map((h) => (
+          <span
+            key={h.label}
+            className="relative inline-flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-paper text-cobalt shadow-card transition-transform duration-300 ease-out group-hover:-translate-y-0.5"
+          >
+            <Icon name={h.icon} className="h-5 w-5" />
+          </span>
+        ))}
       </div>
       <div className="flex flex-1 flex-col p-5">
         <p className="eyebrow">{project.eyebrow}</p>

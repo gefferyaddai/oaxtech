@@ -199,7 +199,7 @@ export default function MarketingSeoPage() {
       {/* Local SEO ----------------------------------------------------------- */}
       <section className="section bg-tint">
         <Container>
-          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
             <div>
               <p className="eyebrow">Local SEO</p>
               <h2 className="mt-3 text-display-sm">Local SEO for Calgary Businesses</h2>
@@ -247,7 +247,7 @@ export default function MarketingSeoPage() {
       {/* Sample report — clearly labelled illustrative ------------------------ */}
       <section className="section border-t border-line bg-mist">
         <Container>
-          <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-14">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-14">
             <div>
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cobalt-border bg-cobalt-soft px-3 py-1.5">
                 <Icon name="Info" className="h-3.5 w-3.5 text-cobalt" />
