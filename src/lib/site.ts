@@ -28,8 +28,9 @@ export interface SocialLink {
  * narrow every `url` to the literal type `null` — these become real strings.
  */
 const SOCIAL_LINKS: SocialLink[] = [
-  { label: "LinkedIn", url: null },
-  { label: "Instagram", url: null },
+  { label: "LinkedIn", url: "https://www.linkedin.com/company/oax-tech/" },
+  { label: "Instagram", url: "https://www.instagram.com/oax.tech/" },
+  /** PLACEHOLDER: no X / Twitter profile confirmed yet. */
   { label: "X / Twitter", url: null },
 ];
 
@@ -70,7 +71,7 @@ export const siteConfig = {
     hours: "By appointment" as Placeholder<string>,
   },
 
-  /** PLACEHOLDER: every social URL is unconfirmed. */
+  /** LinkedIn and Instagram confirmed. X / Twitter still unconfirmed. */
   socials: SOCIAL_LINKS,
 
   /* --- CONFIRMED PROJECT LINKS -------------------------------------------- */
