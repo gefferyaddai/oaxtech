@@ -48,6 +48,9 @@ export const siteConfig = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://oaxtech.com",
 
   /* --- CONFIRMED ---------------------------------------------------------- */
+  /** Year the business was established. Drives the copyright range and schema. */
+  foundedYear: 2024,
+
   location: {
     city: "Calgary",
     region: "Alberta",
@@ -94,6 +97,17 @@ export const PLACEHOLDER_LABELS = {
   social: "Profile link to be added",
   hours: "Hours to be confirmed",
 } as const;
+
+/**
+ * Copyright range: "2024" in the founding year, "2024–2026" thereafter.
+ * Uses an en dash, the correct character for a span of years.
+ */
+export function copyrightYears(now: Date = new Date()): string {
+  const current = now.getFullYear();
+  return current > siteConfig.foundedYear
+    ? `${siteConfig.foundedYear}–${current}`
+    : `${siteConfig.foundedYear}`;
+}
 
 /** Returns a mailto: href only when a real address is configured. */
 export function mailtoHref(): string | null {

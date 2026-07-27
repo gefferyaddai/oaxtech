@@ -74,6 +74,8 @@ function organizationSchema() {
     },
   };
 
+  schema.foundingDate = String(siteConfig.foundedYear);
+
   if (siteConfig.contact.email) schema.email = siteConfig.contact.email;
   if (siteConfig.contact.phone) schema.telephone = siteConfig.contact.phone;
 

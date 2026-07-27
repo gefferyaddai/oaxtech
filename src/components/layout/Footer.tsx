@@ -3,7 +3,7 @@ import { Container } from "@/components/layout/Container";
 import { Logo } from "@/components/layout/Logo";
 import { Icon } from "@/components/ui/Icon";
 import { footerNav, legalNav } from "@/data/navigation";
-import { PLACEHOLDER_LABELS, mailtoHref, siteConfig, telHref } from "@/lib/site";
+import { PLACEHOLDER_LABELS, copyrightYears, mailtoHref, siteConfig, telHref } from "@/lib/site";
 
 const socialIcons: Record<string, string> = {
   LinkedIn: "Linkedin",
@@ -113,7 +113,7 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col gap-4 border-t border-space-line pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-space-text/80">
-            © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
+            © {copyrightYears()} {siteConfig.name}. All rights reserved.
           </p>
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
             {legalNav.map((link) => (
