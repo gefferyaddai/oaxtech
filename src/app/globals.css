@@ -310,6 +310,13 @@
     opacity: 0.35;
     animation: orbit-pulse 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
   }
+
+  /* Magnetic pointer-follow wrapper — see useMagnetic. The transition is what
+     gives the pull its spring; JS only ever sets the raw transform. */
+  .magnetic {
+    transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
 }
 
 @keyframes orbit-pulse {

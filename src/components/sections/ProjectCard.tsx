@@ -18,7 +18,10 @@ interface ProjectCardProps {
  */
 export function ProjectCard({ project, reversed, className }: ProjectCardProps) {
   return (
-    <article className={cn("card card-interactive overflow-hidden", className)}>
+    <article
+      className={cn("card card-interactive overflow-hidden", className)}
+      style={{ viewTransitionName: `project-${project.slug}` }}
+    >
       <div
         className={cn(
           "grid gap-0 lg:grid-cols-2",

@@ -10,6 +10,8 @@ import { ProcessStepsRow } from "@/components/sections/ProcessSteps";
 import { FeatureGrid, ServiceCard } from "@/components/sections/ServiceCard";
 import { ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
+import { MagneticWrap } from "@/components/ui/MagneticWrap";
+import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { HeroDashboard } from "@/components/sections/HeroVisuals";
 import { publishedArticles } from "@/data/articles";
@@ -43,9 +45,11 @@ export default function HomePage() {
         description="We design high-performing websites, build custom software, and create marketing and SEO strategies that help businesses grow."
         actions={
           <>
-            <ButtonLink href="/book" variant="dark" size="lg" iconLeft="Calendar">
-              Book a Free Consultation
-            </ButtonLink>
+            <MagneticWrap>
+              <ButtonLink href="/book" variant="dark" size="lg" iconLeft="Calendar">
+                Book a Free Consultation
+              </ButtonLink>
+            </MagneticWrap>
             <ButtonLink href="/work" variant="outline" size="lg">
               Explore Our Work
             </ButtonLink>
@@ -104,8 +108,10 @@ export default function HomePage() {
         <Container>
           <SectionHeading eyebrow="What we do" title="Services That Drive Growth" />
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {services.map((service) => (
-              <ServiceCard key={service.slug} service={service} />
+            {services.map((service, index) => (
+              <Reveal key={service.slug} delay={index * 80}>
+                <ServiceCard service={service} />
+              </Reveal>
             ))}
           </div>
           <p className="mt-8 text-center text-sm text-slate">
@@ -136,8 +142,10 @@ export default function HomePage() {
             }
           />
           <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {featured.map((project) => (
-              <CompactProjectCard key={project.slug} project={project} />
+            {featured.map((project, index) => (
+              <Reveal key={project.slug} delay={index * 80}>
+                <CompactProjectCard project={project} />
+              </Reveal>
             ))}
           </div>
         </Container>

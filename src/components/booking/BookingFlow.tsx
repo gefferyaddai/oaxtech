@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormOutcome, submitForm } from "@/components/forms/FormStatus";
@@ -38,6 +39,14 @@ const SERVICE_OPTIONS = [
 ];
 
 const STEPS = ["Service", "Date & Time", "Your Details", "Confirmation"] as const;
+
+/** Each step slides in from the direction implied by Back/Continue and fades. */
+const stepVariants = {
+  enter: { opacity: 0, x: 16 },
+  center: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -16 },
+};
+const stepTransition = { duration: 0.25, ease: [0.16, 1, 0.3, 1] as const };
 
 export function BookingFlow() {
   const [step, setStep] = useState(0);
@@ -153,9 +162,19 @@ export function BookingFlow() {
         })}
       </ol>
 
+      <MotionConfig reducedMotion="user">
+      <AnimatePresence mode="wait" initial={false}>
       {/* Step 1 — service ---------------------------------------------------- */}
       {step === 0 && (
-        <div className="card mt-5 p-5 sm:p-6">
+        <motion.div
+          key="step-0"
+          variants={stepVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={stepTransition}
+          className="card mt-5 p-5 sm:p-6"
+        >
           <h2 className="font-display text-lg font-semibold text-ink">Choose a Service</h2>
           <div className="mt-5">
             <RadioCardGroup
@@ -177,12 +196,20 @@ export function BookingFlow() {
               Continue
             </Button>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Step 2 — date and time ---------------------------------------------- */}
       {step === 1 && (
-        <div className="card mt-5 p-5 sm:p-6">
+        <motion.div
+          key="step-1"
+          variants={stepVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={stepTransition}
+          className="card mt-5 p-5 sm:p-6"
+        >
           <h2 className="font-display text-lg font-semibold text-ink">Select a Date and Time</h2>
 
           {IS_SAMPLE_AVAILABILITY && (
@@ -339,12 +366,22 @@ export function BookingFlow() {
               Continue
             </Button>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Step 3 — details ---------------------------------------------------- */}
       {step === 2 && (
-        <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[1.4fr_0.6fr]">
+        <motion.form
+          key="step-2"
+          variants={stepVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={stepTransition}
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+          className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[1.4fr_0.6fr]"
+        >
           <div className="card p-5 sm:p-6">
             <h2 className="font-display text-lg font-semibold text-ink">Tell Us About You</h2>
 
@@ -436,12 +473,20 @@ export function BookingFlow() {
               </a>
             </p>
           </div>
-        </form>
+        </motion.form>
       )}
 
       {/* Step 4 — outcome ---------------------------------------------------- */}
       {step === 3 && (
-        <div className="card mt-5 p-5 sm:p-6">
+        <motion.div
+          key="step-3"
+          variants={stepVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={stepTransition}
+          className="card mt-5 p-5 sm:p-6"
+        >
           <h2 className="font-display text-lg font-semibold text-ink">Confirmation</h2>
           <div className="mt-5">
             <FormOutcome
@@ -487,8 +532,10 @@ export function BookingFlow() {
               Return home
             </ButtonLink>
           </div>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
+      </MotionConfig>
     </div>
   );
 }

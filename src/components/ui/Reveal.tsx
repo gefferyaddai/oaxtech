@@ -22,7 +22,7 @@ interface RevealProps {
  * content — a page shouldn't make the visitor wait for their own copy twice.
  */
 export function Reveal({ children, className, delay = 0, as: Tag = "div" }: RevealProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
 
@@ -49,7 +49,9 @@ export function Reveal({ children, className, delay = 0, as: Tag = "div" }: Reve
 
   return (
     <Tag
-      ref={ref}
+      // A dynamic tag union makes the ref type intersection impossibly strict;
+      // every branch is a plain HTMLElement at runtime, which is all this needs.
+      ref={ref as never}
       style={{ transitionDelay: visible ? `${delay}ms` : "0ms" }}
       className={cn(
         "transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",

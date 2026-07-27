@@ -6,6 +6,7 @@ import { ProjectCard } from "@/components/sections/ProjectCard";
 import { EmptyState } from "@/components/ui/States";
 import { ButtonLink } from "@/components/ui/Button";
 import { PROJECT_CATEGORIES, type Project, type ProjectCategory } from "@/data/projects";
+import { withViewTransition } from "@/lib/view-transition";
 
 type Filter = "All Projects" | ProjectCategory;
 
@@ -46,7 +47,7 @@ export function WorkFilter({ projects }: WorkFilterProps) {
       <FilterTabs
         options={FILTERS}
         active={active}
-        onChange={setActive}
+        onChange={(next) => withViewTransition(() => setActive(next))}
         label="Filter projects by category"
         counts={counts}
       />
