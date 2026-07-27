@@ -95,7 +95,7 @@ export function PortalSidebar() {
       {/* Fixed rail */}
       <aside className="hidden w-64 shrink-0 flex-col bg-space p-4 lg:flex">
         <div className="px-2 py-3">
-          <Logo variant="light" height={56} />
+          <Logo variant="light" width={112} />
         </div>
         <nav aria-label="Client portal" className="mt-6 flex-1 overflow-y-auto">
           <NavList pathname={pathname} />
@@ -125,7 +125,7 @@ export function PortalSidebar() {
             className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col bg-space p-4 animate-fade-in"
           >
             <div className="flex items-center justify-between px-2 py-2">
-              <Logo variant="light" height={52} />
+              <Logo variant="light" width={104} />
               <button
                 type="button"
                 onClick={close}
