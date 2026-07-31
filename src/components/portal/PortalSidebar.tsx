@@ -9,6 +9,9 @@ import { portalNav } from "@/data/navigation";
 import { signOutAction } from "@/lib/portal/actions";
 import { cn } from "@/lib/utils";
 
+/** Everything inside the drawer that can hold focus, in DOM order. */
+const FOCUSABLE = 'a[href], button:not([disabled])';
+
 function NavList({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
   return (
     <ul className="space-y-0.5">
@@ -87,21 +90,29 @@ export function PortalMobileNav() {
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const close = useCallback(() => setOpen(false), []);
   useEffect(() => close(), [pathname, close]);
 
   useEffect(() => {
     if (!open) return;
+    const trigger = triggerRef.current;
     const { overflow } = document.body.style;
     document.body.style.overflow = "hidden";
+
+    /*
+     * Move focus into the dialog. Without this, focus stays on the trigger —
+     * outside the panel — so the Tab trap below never matches and the first
+     * Tab escapes to the content behind the overlay. The close button is the
+     * entry point rather than the first focusable, which is the home link.
+     */
+    closeButtonRef.current?.focus();
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") close();
       if (event.key !== "Tab" || !panelRef.current) return;
-      const focusable = panelRef.current.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled])',
-      );
+      const focusable = panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE);
       if (!focusable.length) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
@@ -118,6 +129,9 @@ export function PortalMobileNav() {
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = overflow;
+      // Hand focus back to whatever opened the dialog, so keyboard users
+      // resume where they left off instead of at the top of the document.
+      if (trigger?.isConnected) trigger.focus();
     };
   }, [open, close]);
 
@@ -147,6 +161,7 @@ export function PortalMobileNav() {
             <div className="flex items-center justify-between px-2 py-2">
               <Logo variant="light" width={104} />
               <button
+                ref={closeButtonRef}
                 type="button"
                 onClick={close}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-space-line text-white"
