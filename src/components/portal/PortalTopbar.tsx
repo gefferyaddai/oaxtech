@@ -1,11 +1,11 @@
-import { PortalSidebar } from "@/components/portal/PortalSidebar";
+import { PortalMobileNav } from "@/components/portal/PortalSidebar";
 import { Icon } from "@/components/ui/Icon";
 import { demoProjects } from "@/data/portal-demo";
 
 export function PortalTopbar({ sessionLabel }: { sessionLabel: string }) {
   return (
     <header className="flex h-16 shrink-0 items-center gap-3 border-b border-line bg-paper px-4 sm:px-6">
-      <PortalSidebar />
+      <PortalMobileNav />
       <p className="font-display text-sm font-semibold text-ink">Client Portal</p>
 
       <div className="ml-auto flex items-center gap-2 sm:gap-3">
