@@ -17,11 +17,26 @@ import {
   demoRevisions,
   demoSupportRequests,
   demoThreads,
+  type DemoProject,
 } from "@/data/portal-demo";
 import { cn } from "@/lib/utils";
 
 const tone = (t: string): BadgeTone => t as BadgeTone;
-const project = demoProjects[0]!;
+
+/**
+ * Shown if `demoProjects` is ever empty. This used to be `demoProjects[0]!`,
+ * which runs at module scope — an empty array would have thrown on import and
+ * taken down every portal screen rather than just this widget.
+ */
+const NO_PROJECT: DemoProject = {
+  id: "no-project",
+  name: "No active project",
+  progressPercent: 0,
+  phase: "No project data available",
+  status: "—",
+};
+
+const project = demoProjects[0] ?? NO_PROJECT;
 
 /* -- Summary tiles --------------------------------------------------------- */
 export function SummaryTiles() {
