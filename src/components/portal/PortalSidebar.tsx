@@ -37,15 +37,56 @@ function NavList({ pathname, onNavigate }: { pathname: string; onNavigate?: () =
   );
 }
 
+function SignOutButton({ className }: { className?: string }) {
+  return (
+    <form action={signOutAction}>
+      <button
+        type="submit"
+        className={cn(
+          "flex min-h-[2.75rem] w-full items-center gap-3 rounded-lg px-3 text-sm text-space-text transition-colors hover:bg-white/5 hover:text-white",
+          className,
+        )}
+      >
+        <Icon name="LogOut" className="h-4.5 w-4.5 shrink-0" />
+        Sign Out
+      </button>
+    </form>
+  );
+}
+
 /**
- * Portal navigation. A fixed rail on large screens; on smaller screens it
- * collapses into a drawer with the same focus-trap and Escape handling as the
- * main site menu.
+ * The fixed navigation rail, shown from `lg` up. Rendered once, by the portal
+ * layout. The small-screen equivalent is `PortalMobileNav`, which the topbar
+ * owns — the two are deliberately separate components so neither the rail nor
+ * the drawer can end up in the DOM twice.
  */
 export function PortalSidebar() {
   const pathname = usePathname();
+
+  return (
+    <aside className="hidden w-64 shrink-0 flex-col bg-space p-4 lg:flex">
+      <div className="px-2 py-3">
+        <Logo variant="light" width={112} />
+      </div>
+      <nav aria-label="Client portal" className="mt-6 flex-1 overflow-y-auto">
+        <NavList pathname={pathname} />
+      </nav>
+      <div className="mt-4 border-t border-space-line pt-4">
+        <SignOutButton />
+      </div>
+    </aside>
+  );
+}
+
+/**
+ * Small-screen portal navigation: a trigger plus a modal drawer. Rendered once,
+ * by the topbar, and hidden from `lg` up where the rail takes over.
+ */
+export function PortalMobileNav() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const close = useCallback(() => setOpen(false), []);
   useEffect(() => close(), [pathname, close]);
@@ -83,6 +124,7 @@ export function PortalSidebar() {
   return (
     <>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen(true)}
         aria-expanded={open}
@@ -92,28 +134,6 @@ export function PortalSidebar() {
         <Icon name="Menu" className="h-5 w-5" label="Open portal menu" />
       </button>
 
-      {/* Fixed rail */}
-      <aside className="hidden w-64 shrink-0 flex-col bg-space p-4 lg:flex">
-        <div className="px-2 py-3">
-          <Logo variant="light" width={112} />
-        </div>
-        <nav aria-label="Client portal" className="mt-6 flex-1 overflow-y-auto">
-          <NavList pathname={pathname} />
-        </nav>
-        <div className="mt-4 border-t border-space-line pt-4">
-          <form action={signOutAction}>
-            <button
-              type="submit"
-              className="flex min-h-[2.75rem] w-full items-center gap-3 rounded-lg px-3 text-sm text-space-text transition-colors hover:bg-white/5 hover:text-white"
-            >
-              <Icon name="LogOut" className="h-4.5 w-4.5 shrink-0" />
-              Sign Out
-            </button>
-          </form>
-        </div>
-      </aside>
-
-      {/* Drawer */}
       {open && (
         <div className="fixed inset-0 z-[60] lg:hidden">
           <div className="absolute inset-0 bg-ink/50 animate-fade-in" onClick={close} aria-hidden="true" />
@@ -134,19 +154,11 @@ export function PortalSidebar() {
                 <Icon name="X" className="h-5 w-5" label="Close portal menu" />
               </button>
             </div>
-            <nav aria-label="Client portal" className="mt-5 flex-1 overflow-y-auto">
+            <nav aria-label="Client portal menu" className="mt-5 flex-1 overflow-y-auto">
               <NavList pathname={pathname} onNavigate={close} />
             </nav>
             <div className="mt-4 border-t border-space-line pt-4">
-              <form action={signOutAction}>
-                <button
-                  type="submit"
-                  className="flex min-h-[2.75rem] w-full items-center gap-3 rounded-lg px-3 text-sm text-space-text hover:text-white"
-                >
-                  <Icon name="LogOut" className="h-4.5 w-4.5 shrink-0" />
-                  Sign Out
-                </button>
-              </form>
+              <SignOutButton />
             </div>
           </div>
         </div>
