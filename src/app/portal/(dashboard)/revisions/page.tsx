@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { PortalPage } from "@/components/portal/PortalPage";
 import { RevisionsWidget } from "@/components/portal/widgets";
+
+export const metadata: Metadata = { title: "Revision Requests" };
 
 export default function Page() {
   return (
