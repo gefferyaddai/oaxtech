@@ -25,10 +25,29 @@ const project = demoProjects[0]!;
 
 /* -- Summary tiles --------------------------------------------------------- */
 export function SummaryTiles() {
+  // Derived, never hardcoded — a tile that contradicts the widget below it
+  // reads as a bug in the client's project, not in the demo data.
+  const openApprovals = demoApprovals.filter((approval) => approval.awaitingAction).length;
+  const nextMilestone = demoMilestones.find((milestone) => milestone.status !== "Completed");
+
   const tiles = [
     { label: "Project Progress", value: `${project.progressPercent}%`, note: project.phase, icon: "TrendingUp", status: project.status },
-    { label: "Next Milestone", value: "Design Review", note: "We're preparing for your review.", icon: "CalendarCheck", status: "Due soon" },
-    { label: "Open Approvals", value: "2", note: "Awaiting your review", icon: "CheckSquare", status: null },
+    {
+      /* No `status` here: the tile renders status in success-green, which would
+         contradict the tone the milestones table gives the same value. */
+      label: "Next Milestone",
+      value: nextMilestone?.name ?? "None scheduled",
+      note: nextMilestone?.dueLabel ?? "No upcoming milestones.",
+      icon: "CalendarCheck",
+      status: null,
+    },
+    {
+      label: "Open Approvals",
+      value: `${openApprovals}`,
+      note: openApprovals === 1 ? "Design awaiting your review" : "Designs awaiting your review",
+      icon: "CheckSquare",
+      status: null,
+    },
     { label: "Outstanding Balance", value: "See invoice", note: "View your latest invoice", icon: "Receipt", status: null },
   ];
   return (
