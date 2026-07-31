@@ -9,9 +9,19 @@ export function PortalTopbar({ sessionLabel }: { sessionLabel: string }) {
       <p className="font-display text-sm font-semibold text-ink">Client Portal</p>
 
       <div className="ml-auto flex items-center gap-2 sm:gap-3">
+        {/*
+          Every control below is inert in demo mode, so each one is disabled and
+          says why. A control that looks live but silently does nothing is worse
+          than one that is visibly unavailable.
+        */}
         <label className="hidden sm:block">
           <span className="sr-only">Select project</span>
-          <select className="field-control min-h-[2.25rem] py-1.5 text-xs" defaultValue={demoProjects[0]?.name}>
+          <select
+            className="field-control min-h-[2.25rem] py-1.5 text-xs"
+            defaultValue={demoProjects[0]?.name}
+            disabled
+            title="Project switching becomes available once the portal is connected"
+          >
             {demoProjects.map((project) => (
               <option key={project.id}>{project.name}</option>
             ))}
@@ -20,13 +30,17 @@ export function PortalTopbar({ sessionLabel }: { sessionLabel: string }) {
 
         <button
           type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md text-slate transition-colors hover:bg-mist"
+          disabled
+          title="Notifications become available once the portal is connected"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-md text-slate transition-colors hover:bg-mist disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:bg-transparent"
         >
           <Icon name="Bell" className="h-5 w-5" label="Notifications" />
         </button>
         <button
           type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md text-slate transition-colors hover:bg-mist"
+          disabled
+          title="Help becomes available once the portal is connected"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-md text-slate transition-colors hover:bg-mist disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:bg-transparent"
         >
           <Icon name="HelpCircle" className="h-5 w-5" label="Help" />
         </button>
