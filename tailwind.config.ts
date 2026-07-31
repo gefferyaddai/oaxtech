@@ -38,8 +38,11 @@ const config: Config = {
         ink: "#090B12",
         charcoal: "#2A2F3C",
         slate: "#4E5566",
-        /* Muted Grey. AA on the dark surfaces; decorative only on cream. */
-        muted: "#9298A7",
+        /* Secondary text on LIGHT surfaces. The brand Muted Grey (#9298A7)
+           is only 2.4–2.9:1 here, so this is the same hue darkened until it
+           clears WCAG AA on white, cream and mist (4.7:1 at worst). The exact
+           brand value is kept for dark surfaces, as `space.text`. */
+        muted: "#5E6675",
 
         /* Electric Blue — buttons, links, highlights and CTAs ------------- */
         cobalt: {
@@ -114,6 +117,9 @@ const config: Config = {
 
       /* Spacing rhythm for section padding */
       spacing: {
+        /* 18px. Not in Tailwind's default scale, but `h-4.5`/`w-4.5` is used
+           for icons that sit between the 16px and 20px steps. */
+        4.5: "1.125rem",
         "section-sm": "3rem",
         section: "4.5rem",
         "section-lg": "6rem",
