@@ -25,6 +25,13 @@ import { integrationStatus } from "@/lib/integrations";
 
 const DEMO_COOKIE = "oax_portal_demo";
 
+/**
+ * The cookie is scoped to /portal, so every write AND the delete must carry
+ * the same path. Deleting without it emits `Path=/`, which the browser treats
+ * as a different cookie entirely — the real session would survive sign-out.
+ */
+const DEMO_COOKIE_PATH = "/portal";
+
 export interface PortalSession {
   /** True when this session is a demonstration, not a real signed-in user. */
   isDemo: boolean;
@@ -54,14 +61,14 @@ const demoAdapter: AuthAdapter = {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      path: "/portal",
+      path: DEMO_COOKIE_PATH,
       maxAge: 60 * 60 * 4,
     });
     return { ok: true };
   },
   async signOut() {
     const store = await cookies();
-    store.delete(DEMO_COOKIE);
+    store.delete({ name: DEMO_COOKIE, path: DEMO_COOKIE_PATH });
   },
   async getSession() {
     const store = await cookies();
