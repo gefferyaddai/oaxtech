@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { SiteChrome } from "@/components/layout/SiteChrome";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -92,9 +93,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main" className="skip-link">
           Skip to main content
         </a>
-        <Header />
+        {/* Marketing chrome is suppressed on app surfaces — see SiteChrome. */}
+        <SiteChrome>
+          <Header />
+        </SiteChrome>
         <main id="main">{children}</main>
-        <Footer />
+        <SiteChrome>
+          <Footer />
+        </SiteChrome>
         <script
           type="application/ld+json"
           // Serialized from a typed object above; no user input is interpolated.
