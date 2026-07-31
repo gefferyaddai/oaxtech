@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { PortalPage } from "@/components/portal/PortalPage";
 import {
   ActivityWidget,
@@ -13,6 +14,15 @@ import {
   SupportWidget,
 } from "@/components/portal/widgets";
 import { Icon } from "@/components/ui/Icon";
+
+/**
+ * `absolute` because a layout's title template does not apply to the page in
+ * its own segment — without this the root template wins and the portal's
+ * landing page is the only one missing "Client Portal".
+ */
+export const metadata: Metadata = {
+  title: { absolute: "Overview · Client Portal | OAX Tech" },
+};
 
 export default function PortalOverviewPage() {
   return (
