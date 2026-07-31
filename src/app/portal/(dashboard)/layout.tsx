@@ -5,8 +5,18 @@ import { PortalSidebar } from "@/components/portal/PortalSidebar";
 import { PortalTopbar } from "@/components/portal/PortalTopbar";
 import { getSession, isDemoMode } from "@/lib/portal/auth";
 
-/** The portal is never indexed. Also enforced by a header in next.config.ts. */
+/**
+ * The portal is never indexed. Also enforced by a header in next.config.ts.
+ *
+ * The template is spelled out in full (rather than leaning on the root
+ * layout's) because the closest ancestor template wins — a parent template is
+ * not re-applied to a child's result.
+ */
 export const metadata: Metadata = {
+  title: {
+    default: "Client Portal | OAX Tech",
+    template: "%s · Client Portal | OAX Tech",
+  },
   robots: { index: false, follow: false, nocache: true },
 };
 
