@@ -27,7 +27,8 @@ export function NewsletterForm() {
     setOutcome(null);
     const result = await submitForm("/api/newsletter", values);
     setOutcome(result);
-    if (result.status === "delivered") reset();
+    // Both outcomes mean the submission reached us, so clear the form.
+    if (result.status === "delivered" || result.status === "received") reset();
   }
 
   return (
