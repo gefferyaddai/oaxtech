@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { SupportView } from "@/components/admin/section-views";
-import { getClients, getSupportTickets, getTeam } from "@/lib/admin/repository";
+import { getClients, getSupportTickets, getTeam } from "@/lib/domain/repository";
 
 export const metadata: Metadata = { title: "Support" };
 
