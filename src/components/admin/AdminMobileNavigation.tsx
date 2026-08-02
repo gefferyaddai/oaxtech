@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AdminNavList, AdminSidebarFooter } from "@/components/admin/AdminSidebar";
 import { Logo } from "@/components/layout/Logo";
 import { Icon } from "@/components/ui/Icon";
-import type { AdminRole } from "@/lib/admin/types";
+import type { AdminRole } from "@/lib/domain/types";
 
 const FOCUSABLE = 'a[href], button:not([disabled])';
 
