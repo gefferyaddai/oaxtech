@@ -71,8 +71,17 @@ export async function handleSubmission<T extends { company_website?: string; spa
     );
   }
 
-  // Best-effort persistence; failure here must not block the reply.
-  await persistSubmission(kind, data);
+  /*
+   * A submission reaches OAX Tech through either of two independent channels:
+   * it is recorded in the submission store (where the admin reads it), or it is
+   * emailed to the team. Neither depends on the other.
+   *
+   * The reply must reflect whether it arrived by EITHER route. Reporting "not
+   * sent" purely because email is unconfigured would be wrong once the enquiry
+   * is sitting in the admin's Leads screen — and would push the visitor to
+   * contact us again through a channel we already have them on.
+   */
+  const captured = await persistSubmission(kind, data);
 
   const delivery = await sendEmail({
     subject: subject(data),
@@ -80,16 +89,18 @@ export async function handleSubmission<T extends { company_website?: string; spa
     replyTo: replyTo?.(data),
   });
 
-  if (delivery.ok) {
+  if (captured.ok || delivery.ok) {
     return NextResponse.json({ status: "delivered" });
   }
 
-  if (delivery.reason === "not_configured") {
+  // Neither channel worked. Report the configuration gap, not a false success.
+  if (captured.reason === "not_configured" || delivery.reason === "not_configured") {
     return NextResponse.json({
       status: "not_configured",
       detail:
         delivery.detail ??
-        "Email delivery isn't configured on this site yet, so this message wasn't sent.",
+        captured.detail ??
+        "This site isn't configured to receive messages yet, so this wasn't sent.",
     });
   }
 
