@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createCalendarBooking, integrationStatus } from "@/lib/integrations";
+import { createCalendarBooking, integrationStatus, persistSubmission } from "@/lib/integrations";
 import { bookingSchema, flattenFieldErrors } from "@/lib/validation/schemas";
 
 /**
@@ -34,7 +34,26 @@ export async function POST(request: Request) {
     );
   }
 
+  /*
+   * Capture FIRST, before any integration check.
+   *
+   * Previously this route returned early when no calendar was configured, which
+   * meant the request was validated and then thrown away — the visitor's
+   * details never reached anyone. Recording the lead and consultation is
+   * independent of whether a calendar can reserve the slot, so it happens
+   * regardless.
+   */
+  const captured = await persistSubmission("booking", data);
+
   if (!integrationStatus.calendar()) {
+    // We have the request; nothing has reserved the time.
+    if (captured.ok) {
+      return NextResponse.json({
+        status: "received",
+        detail:
+          "We've received your request and the team will be in touch to confirm. Note that no time slot has been reserved automatically — calendar scheduling isn't connected yet, so we'll confirm the exact time with you by email.",
+      });
+    }
     return NextResponse.json({
       status: "not_configured",
       detail:
@@ -52,6 +71,15 @@ export async function POST(request: Request) {
   });
 
   if (result.ok) return NextResponse.json({ status: "delivered" });
+
+  // The calendar is configured but failed. The request is still recorded.
+  if (captured.ok) {
+    return NextResponse.json({
+      status: "received",
+      detail:
+        "We've received your request, but the booking could not be added to our calendar automatically. The team will confirm your time by email.",
+    });
+  }
 
   return NextResponse.json({
     status: result.reason === "not_configured" ? "not_configured" : "error",
