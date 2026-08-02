@@ -11,7 +11,7 @@
  * substitute for authorisation.
  */
 
-import type { AdminRole } from "@/lib/admin/types";
+import type { AdminRole } from "@/lib/domain/types";
 
 export type Capability =
   /** Create or edit leads, clients, projects, tasks. */
