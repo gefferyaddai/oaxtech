@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ApprovalsView } from "@/components/admin/section-views";
-import { getApprovals, getProjects } from "@/lib/admin/repository";
+import { getApprovals, getProjects } from "@/lib/domain/repository";
 
 export const metadata: Metadata = { title: "Approvals" };
 
