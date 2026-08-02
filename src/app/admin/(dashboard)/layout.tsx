@@ -4,7 +4,7 @@ import type { SearchRecord } from "@/components/admin/AdminTopbar";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminTopbar } from "@/components/admin/AdminTopbar";
 import { DemoDataNotice } from "@/components/admin/primitives";
-import { ADMIN_DEMO_NOTICE } from "@/data/admin-demo-data";
+import { DEMO_NOTICE } from "@/data/demo-data";
 import { getAdminSession } from "@/lib/admin/auth";
 import {
   getClients,
@@ -12,7 +12,7 @@ import {
   getMessages,
   getProjects,
   isDemoData,
-} from "@/lib/admin/repository";
+} from "@/lib/domain/repository";
 
 /**
  * The admin is never indexed. Also enforced by a header in next.config.ts, so
@@ -85,7 +85,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           searchIndex={searchIndex}
           unreadCount={unreadCount}
         />
-        {isDemoData() && <DemoDataNotice notice={ADMIN_DEMO_NOTICE} />}
+        {isDemoData() && <DemoDataNotice notice={DEMO_NOTICE} />}
         {/* A <div>, not <main>: the root layout already provides #main and
             nesting main elements is invalid. */}
         <div className="min-w-0 flex-1">{children}</div>
