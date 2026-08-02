@@ -4,8 +4,8 @@ import { Icon } from "@/components/ui/Icon";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { getAdminSession } from "@/lib/admin/auth";
 import { capabilitiesFor } from "@/lib/admin/permissions";
-import { getSystemStatus } from "@/lib/admin/repository";
-import { ADMIN_ROLES } from "@/lib/admin/types";
+import { getSystemStatus } from "@/lib/domain/repository";
+import { ADMIN_ROLES } from "@/lib/domain/types";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Settings" };
