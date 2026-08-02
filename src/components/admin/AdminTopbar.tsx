@@ -7,7 +7,7 @@ import { AdminMobileNavigation } from "@/components/admin/AdminMobileNavigation"
 import { QuickCreateModal } from "@/components/admin/QuickCreateModal";
 import { Icon } from "@/components/ui/Icon";
 import { adminNavFlat } from "@/data/admin-navigation";
-import type { AdminRole } from "@/lib/admin/types";
+import type { AdminRole } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 
 /** A record the global search can resolve to. Supplied by the layout. */
