@@ -28,7 +28,7 @@
 
 import { cookies } from "next/headers";
 import { integrationStatus } from "@/lib/integrations";
-import { ADMIN_ROLES, type AdminRole } from "@/lib/admin/types";
+import { ADMIN_ROLES, type AdminRole } from "@/lib/domain/types";
 
 const ADMIN_COOKIE = "oax_admin_demo";
 
