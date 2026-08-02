@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ContentView } from "@/components/admin/section-views";
-import { getContent, getTeam } from "@/lib/admin/repository";
+import { getContent, getTeam } from "@/lib/domain/repository";
 
 export const metadata: Metadata = { title: "Website Content" };
 
