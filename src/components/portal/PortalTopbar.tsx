@@ -1,8 +1,15 @@
 import { PortalMobileNav } from "@/components/portal/PortalSidebar";
 import { Icon } from "@/components/ui/Icon";
-import { demoProjects } from "@/data/portal-demo";
+import type { Project } from "@/lib/domain/types";
 
-export function PortalTopbar({ sessionLabel }: { sessionLabel: string }) {
+export function PortalTopbar({
+  sessionLabel,
+  projects,
+}: {
+  sessionLabel: string;
+  /** The signed-in client's projects. Supplied by the layout, never imported. */
+  projects: Project[];
+}) {
   return (
     <header className="flex h-16 shrink-0 items-center gap-3 border-b border-line bg-paper px-4 sm:px-6">
       <PortalMobileNav />
@@ -18,11 +25,11 @@ export function PortalTopbar({ sessionLabel }: { sessionLabel: string }) {
           <span className="sr-only">Select project</span>
           <select
             className="field-control min-h-[2.25rem] py-1.5 text-xs"
-            defaultValue={demoProjects[0]?.name}
+            defaultValue={projects[0]?.name}
             disabled
             title="Project switching becomes available once the portal is connected"
           >
-            {demoProjects.map((project) => (
+            {projects.map((project) => (
               <option key={project.id}>{project.name}</option>
             ))}
           </select>
