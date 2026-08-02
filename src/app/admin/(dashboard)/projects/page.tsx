@@ -4,7 +4,7 @@ import { AdminCard, PageHeader } from "@/components/admin/primitives";
 import { ProjectsTable } from "@/components/admin/ProjectsTable";
 import { SectionBoundary } from "@/components/admin/SectionBoundary";
 import { Icon } from "@/components/ui/Icon";
-import { getClients, getProjects, getTeam } from "@/lib/admin/repository";
+import { getClients, getProjects, getTeam } from "@/lib/domain/repository";
 
 export const metadata: Metadata = { title: "Projects" };
 
