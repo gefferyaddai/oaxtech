@@ -37,7 +37,22 @@ export interface PortalSession {
   isDemo: boolean;
   /** Display label only. In demo mode this is a generic string, never a person. */
   label: string;
+  /**
+   * Which client this session may read. EVERY portal query is scoped by this —
+   * see src/lib/portal/repository.ts.
+   *
+   * It comes from the session and nowhere else. Never accept a client id from a
+   * URL, a query string or a form field: that would let one client read
+   * another's projects, files and invoices by editing a parameter.
+   */
+  clientId: string;
 }
+
+/**
+ * The client a demo session is signed in as. Once real authentication exists,
+ * this is resolved from the authenticated user's account instead.
+ */
+const DEMO_CLIENT_ID = "cl-1";
 
 export interface AuthAdapter {
   signIn(): Promise<{ ok: true } | { ok: false; message: string }>;
@@ -73,7 +88,7 @@ const demoAdapter: AuthAdapter = {
   async getSession() {
     const store = await cookies();
     if (store.get(DEMO_COOKIE)?.value !== "1") return null;
-    return { isDemo: true, label: "Demo Account" };
+    return { isDemo: true, label: "Demo Account", clientId: DEMO_CLIENT_ID };
   },
 };
 
