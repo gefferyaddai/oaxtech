@@ -14,7 +14,7 @@ import {
   YAxis,
 } from "recharts";
 import { formatMoney } from "@/lib/admin/format";
-import type { LeadSourcePoint, RevenuePoint } from "@/lib/admin/types";
+import type { LeadSourcePoint, RevenuePoint } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 
 /**
