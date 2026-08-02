@@ -6,7 +6,7 @@ import { Logo } from "@/components/layout/Logo";
 import { Icon } from "@/components/ui/Icon";
 import { adminNav } from "@/data/admin-navigation";
 import { signOutAdminAction } from "@/lib/admin/actions";
-import type { AdminRole } from "@/lib/admin/types";
+import type { AdminRole } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 
 /**
