@@ -33,19 +33,22 @@ import {
   demoInvoices,
   demoLeadSources,
   demoLeads,
+  demoMessageEntries,
   demoMessages,
+  demoMilestones,
   demoProjects,
   demoProposals,
   demoRevenueSeries,
+  demoRevisions,
   demoSubscribers,
   demoSupportTickets,
   demoTasks,
   demoTeam,
-} from "@/data/admin-demo-data";
+} from "@/data/demo-data";
+import { getStore, submissionsArePersisted } from "@/lib/domain/store";
 import { integrationStatus } from "@/lib/integrations";
 import type {
   ActivityEvent,
-  AdminFile,
   Approval,
   Client,
   Consultation,
@@ -54,14 +57,21 @@ import type {
   Lead,
   LeadSourcePoint,
   Message,
+  MessageEntry,
+  Milestone,
   Project,
+  ProjectFile,
   Proposal,
+  PhaseStep,
+  ProjectPhase,
   RevenuePoint,
+  Revision,
   Subscriber,
   SupportTicket,
   Task,
   TeamMemberRecord,
-} from "@/lib/admin/types";
+} from "@/lib/domain/types";
+import { PROJECT_PHASES } from "@/lib/domain/types";
 
 /**
  * True once a database is configured. While false, every read below returns
@@ -114,12 +124,19 @@ export async function getTeamLookup(): Promise<Map<string, TeamMemberRecord>> {
 /* Leads                                                                       */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Captured submissions first, then the demo fixtures.
+ *
+ * Anything a real person submitted through the website outranks invented
+ * sample data, so a genuine enquiry is never buried below it. Once a database
+ * is configured the fixtures drop away entirely.
+ */
 export async function getLeads(): Promise<Lead[]> {
-  if (isLive()) {
-    // Contact, quote and booking submissions all land here — see the note in
-    // src/lib/api-handler.ts about routing submissions into this table.
-  }
-  return copy(demoLeads);
+  const { leads } = await getStore().read();
+  const captured = leads
+    .slice()
+    .sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
+  return isLive() ? captured : [...captured, ...copy(demoLeads)];
 }
 
 export async function getLead(id: string): Promise<Lead | null> {
@@ -132,7 +149,8 @@ export async function getLead(id: string): Promise<Lead | null> {
 /* -------------------------------------------------------------------------- */
 
 export async function getConsultations(): Promise<Consultation[]> {
-  return copy(demoConsultations);
+  const { consultations } = await getStore().read();
+  return isLive() ? consultations : [...consultations, ...copy(demoConsultations)];
 }
 
 /** Sorted soonest-first, excluding anything already finished or cancelled. */
@@ -166,8 +184,50 @@ export async function getClientLookup(): Promise<Map<string, Client>> {
 /* Projects                                                                    */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Projects, with `nextMilestone` derived from the milestone list rather than
+ * stored. A hand-written value would eventually contradict the milestones a
+ * client sees in their portal.
+ */
 export async function getProjects(): Promise<Project[]> {
-  return copy(demoProjects);
+  const milestones = await getMilestones();
+  return copy(demoProjects).map((project) => ({
+    ...project,
+    nextMilestone:
+      milestones.find(
+        (milestone) => milestone.projectId === project.id && milestone.status !== "Completed",
+      )?.name ?? null,
+  }));
+}
+
+/* -------------------------------------------------------------------------- */
+/* Milestones & revisions                                                      */
+/* -------------------------------------------------------------------------- */
+
+export async function getMilestones(): Promise<Milestone[]> {
+  return copy(demoMilestones);
+}
+
+export async function getRevisions(): Promise<Revision[]> {
+  return copy(demoRevisions);
+}
+
+export async function getMessageEntries(): Promise<MessageEntry[]> {
+  return copy(demoMessageEntries);
+}
+
+/**
+ * The phase stepper shown in the portal, derived from the ordered phase list
+ * and the project's current phase. Deriving it means the stepper and the
+ * project's `phase` field can never disagree.
+ */
+export function phaseSteps(current: ProjectPhase): PhaseStep[] {
+  const index = PROJECT_PHASES.indexOf(current);
+  return PROJECT_PHASES.map((label, position) => ({
+    label,
+    state:
+      position < index ? "complete" : position === index ? "in-progress" : "upcoming",
+  }));
 }
 
 export async function getProject(id: string): Promise<Project | null> {
@@ -234,7 +294,7 @@ export async function getOutstandingInvoices(): Promise<Invoice[]> {
   return invoices.filter((invoice) => invoice.status === "Sent" || invoice.status === "Overdue");
 }
 
-export async function getFiles(): Promise<AdminFile[]> {
+export async function getFiles(): Promise<ProjectFile[]> {
   return copy(demoFiles);
 }
 
@@ -273,7 +333,8 @@ export async function getContent(): Promise<ContentItem[]> {
 }
 
 export async function getSubscribers(): Promise<Subscriber[]> {
-  return copy(demoSubscribers);
+  const { subscribers } = await getStore().read();
+  return isLive() ? subscribers : [...subscribers, ...copy(demoSubscribers)];
 }
 
 /* -------------------------------------------------------------------------- */
@@ -338,6 +399,11 @@ export interface SystemService {
 export function getSystemStatus(): SystemService[] {
   return [
     { label: "Database", configured: integrationStatus.database(), requires: "DATABASE_URL" },
+    {
+      label: "Submission capture",
+      configured: submissionsArePersisted(),
+      requires: "DATABASE_URL (a development file store is used locally)",
+    },
     { label: "Authentication", configured: integrationStatus.auth(), requires: "AUTH_SECRET, AUTH_PROVIDER_URL" },
     { label: "Email delivery", configured: integrationStatus.email(), requires: "EMAIL_API_KEY, EMAIL_TO_ADDRESS" },
     { label: "Calendar", configured: integrationStatus.calendar(), requires: "CALENDAR_API_KEY" },
