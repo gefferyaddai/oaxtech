@@ -11,7 +11,7 @@ import {
   INVOICE_STATUS_TONE,
   LEAD_STAGES,
   PRIORITIES,
-  type AdminFile,
+  type ProjectFile,
   type Approval,
   type Client,
   type Consultation,
@@ -24,7 +24,7 @@ import {
   type SupportTicket,
   type Task,
   type TeamMemberRecord,
-} from "@/lib/admin/types";
+} from "@/lib/domain/types";
 
 /** Shared lookup helper — every view needs to resolve ids to display names. */
 function lookup<T extends { id: string }>(rows: T[]): Map<string, T> {
@@ -70,7 +70,7 @@ export function LeadsView({
     { key: "service", header: "Service", sortValue: (row) => row.service, hideBelow: "md", cell: (row) => <span className="text-slate">{row.service}</span> },
     { key: "budget", header: "Budget", hideBelow: "lg", cell: (row) => (row.budget ? <span className="whitespace-nowrap text-slate">{row.budget}</span> : <Muted />) },
     { key: "stage", header: "Stage", sortValue: (row) => row.stage, cell: (row) => <StatusBadge tone={row.stage === "Converted" ? "success" : "info"}>{row.stage}</StatusBadge> },
-    { key: "source", header: "Source", sortValue: (row) => row.source, hideBelow: "xl", cell: (row) => <span className="text-slate">{row.source}</span> },
+    { key: "source", header: "Source", sortValue: (row) => row.source ?? "Unknown", hideBelow: "xl", cell: (row) => row.source ? <span className="text-slate">{row.source}</span> : <span className="text-muted" title="No form asks how the enquiry found us, and no analytics provider is connected">Unknown</span> },
     {
       key: "assignee",
       header: "Owner",
@@ -371,11 +371,11 @@ export function InvoicesView({ invoices, clients, autoOpenCreate }: { invoices: 
 /* Files                                                                       */
 /* -------------------------------------------------------------------------- */
 
-export function FilesView({ files, projects, team }: { files: AdminFile[]; projects: { id: string; name: string }[]; team: TeamMemberRecord[] }) {
+export function FilesView({ files, projects, team }: { files: ProjectFile[]; projects: { id: string; name: string }[]; team: TeamMemberRecord[] }) {
   const projectById = lookup(projects);
   const members = lookup(team);
 
-  const columns: Column<AdminFile>[] = [
+  const columns: Column<ProjectFile>[] = [
     { key: "name", header: "File", sortValue: (row) => row.name, cell: (row) => (<span className="flex items-center gap-2"><Icon name="FileText" className="h-4 w-4 shrink-0 text-muted" /><span className="truncate text-ink">{row.name}</span></span>) },
     { key: "kind", header: "Type", sortValue: (row) => row.kind, hideBelow: "sm", cell: (row) => <span className="text-slate">{row.kind}</span> },
     { key: "size", header: "Size", align: "right", sortValue: (row) => row.sizeBytes, hideBelow: "md", cell: (row) => <span className="whitespace-nowrap tabular-nums text-slate">{formatBytes(row.sizeBytes)}</span> },
