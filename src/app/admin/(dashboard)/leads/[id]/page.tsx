@@ -5,7 +5,7 @@ import { AdminCard, Avatar, PageHeader } from "@/components/admin/primitives";
 import { Icon } from "@/components/ui/Icon";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { formatDateWithYear } from "@/lib/admin/format";
-import { getConsultations, getLead, getTeamLookup } from "@/lib/admin/repository";
+import { getConsultations, getLead, getTeamLookup } from "@/lib/domain/repository";
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -59,7 +59,7 @@ export default async function LeadDetailPage({ params }: Params) {
               { label: "Phone", value: lead.phone ?? "Not provided" },
               { label: "Service", value: lead.service },
               { label: "Budget", value: lead.budget ?? "Not provided" },
-              { label: "Source", value: lead.source },
+              { label: "Source", value: lead.source ?? "Unknown — no attribution is collected" },
               { label: "Received", value: formatDateWithYear(lead.submittedAt) },
               { label: "Came from", value: ORIGIN_LABEL[lead.origin] },
             ].map((row) => (
