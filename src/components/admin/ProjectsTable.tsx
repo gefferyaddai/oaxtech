@@ -20,7 +20,7 @@ import {
   type Project,
   type ProjectStatus,
   type TeamMemberRecord,
-} from "@/lib/admin/types";
+} from "@/lib/domain/types";
 
 interface ProjectsTableProps {
   projects: Project[];
