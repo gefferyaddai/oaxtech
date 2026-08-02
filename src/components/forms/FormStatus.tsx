@@ -39,6 +39,8 @@ interface FormOutcomeProps {
   successTitle: string;
   successBody?: React.ReactNode;
   successAction?: React.ReactNode;
+  /** Heading for the `received` outcome. Defaults to a generic acknowledgement. */
+  receivedTitle?: string;
 }
 
 /**
@@ -54,11 +56,27 @@ export function FormOutcome({
   successTitle,
   successBody,
   successAction,
+  receivedTitle,
 }: FormOutcomeProps) {
   if (!outcome) return null;
 
   if (outcome.status === "delivered") {
     return <SuccessState title={successTitle} description={successBody} action={successAction} />;
+  }
+
+  /*
+   * Received, but not completed. Shown as a success — the enquiry did reach us
+   * — while stating exactly what did not happen, so the visitor is never left
+   * assuming a slot was reserved or a subscription confirmed.
+   */
+  if (outcome.status === "received") {
+    return (
+      <SuccessState
+        title={receivedTitle ?? "Received — thank you"}
+        description={outcome.detail}
+        action={successAction}
+      />
+    );
   }
 
   if (outcome.status === "not_configured") {
