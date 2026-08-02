@@ -7,7 +7,7 @@ import { Icon } from "@/components/ui/Icon";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { EmptyState } from "@/components/ui/States";
 import { formatDate } from "@/lib/admin/format";
-import type { Priority, Project, Task, TeamMemberRecord } from "@/lib/admin/types";
+import type { Priority, Project, Task, TeamMemberRecord } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 
 const PRIORITY_TONE: Record<Priority, "danger" | "warning" | "neutral"> = {
