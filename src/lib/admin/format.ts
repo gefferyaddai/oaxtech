@@ -7,7 +7,7 @@
  * outside the office's zone.
  */
 
-import { CURRENCY, type Cents, type IsoDate, type IsoDateTime } from "@/lib/admin/types";
+import { CURRENCY, type Cents, type IsoDate, type IsoDateTime } from "@/lib/domain/types";
 
 const LOCALE = "en-CA";
 /** OAX Tech operates out of Calgary. */
