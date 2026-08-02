@@ -11,8 +11,8 @@ import {
   getInvoices,
   getProjects,
   getSupportTickets,
-} from "@/lib/admin/repository";
-import { PROJECT_STATUS_TONE, INVOICE_STATUS_TONE } from "@/lib/admin/types";
+} from "@/lib/domain/repository";
+import { PROJECT_STATUS_TONE, INVOICE_STATUS_TONE } from "@/lib/domain/types";
 
 interface Params {
   params: Promise<{ id: string }>;
