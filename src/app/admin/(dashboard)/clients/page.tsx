@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ClientsView } from "@/components/admin/section-views";
-import { getClients } from "@/lib/admin/repository";
+import { getClients } from "@/lib/domain/repository";
 
 export const metadata: Metadata = { title: "Clients" };
 
