@@ -12,7 +12,7 @@ import {
   getLeads,
   getRevenueSeries,
   getTeam,
-} from "@/lib/admin/repository";
+} from "@/lib/domain/repository";
 import { integrationStatus } from "@/lib/integrations";
 
 export const metadata: Metadata = { title: "Analytics" };
