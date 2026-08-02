@@ -221,6 +221,16 @@ export function paymentsEnabled(): boolean {
 export type SubmissionOutcome =
   /** Everything a configured service needed to do was done. */
   | { status: "delivered" }
+  /**
+   * The submission reached OAX Tech and is recorded, but a service that would
+   * normally complete the job is not connected — so something the visitor
+   * might reasonably assume happened, did NOT. A booking is the clearest case:
+   * we have the request, but no calendar reserved the slot.
+   *
+   * This is a success for the visitor (we have their enquiry) that still has to
+   * state plainly what has not happened.
+   */
+  | { status: "received"; detail: string }
   /** Input was valid, but no delivery service is configured yet. */
   | { status: "not_configured"; detail: string }
   /** Something genuinely went wrong. */
