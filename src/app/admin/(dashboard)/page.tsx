@@ -29,7 +29,7 @@ import {
   getTasksNeedingAttention,
   getTeam,
   getUpcomingConsultations,
-} from "@/lib/admin/repository";
+} from "@/lib/domain/repository";
 
 export const metadata: Metadata = {
   title: { absolute: "Overview · Admin | OAX Tech" },
