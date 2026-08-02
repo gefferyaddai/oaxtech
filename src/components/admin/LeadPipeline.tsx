@@ -7,7 +7,7 @@ import { Icon } from "@/components/ui/Icon";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { EmptyState } from "@/components/ui/States";
 import { formatDate } from "@/lib/admin/format";
-import { LEAD_STAGES, type Lead, type LeadStage, type TeamMemberRecord } from "@/lib/admin/types";
+import { LEAD_STAGES, type Lead, type LeadStage, type TeamMemberRecord } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 
 interface LeadPipelineProps {
