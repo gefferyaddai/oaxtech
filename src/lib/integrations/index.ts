@@ -144,17 +144,65 @@ export async function verifySpamToken(token: string | undefined): Promise<boolea
 /* Database / persistence                                                      */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Routes a validated submission into the submission store.
+ *
+ * The mapping from form payload to domain record lives in
+ * `src/lib/domain/submissions.ts`; where it is written is decided by
+ * `src/lib/domain/store.ts`. This function only connects the two.
+ *
+ * The import is dynamic because this module is also reached from contexts that
+ * must not pull in `node:fs` — keeping it lazy means the store is only loaded
+ * when a submission is actually being persisted.
+ */
 export async function persistSubmission(
   kind: "contact" | "quote" | "booking" | "newsletter",
   payload: unknown,
 ): Promise<IntegrationResult> {
-  if (!integrationStatus.database()) return NOT_CONFIGURED("Database");
-  void kind;
-  void payload;
+  const [{ getStore }, mappers] = await Promise.all([
+    import("@/lib/domain/store"),
+    import("@/lib/domain/submissions"),
+  ]);
+  const store = getStore();
+
+  try {
+    switch (kind) {
+      case "quote": {
+        const lead = mappers.quoteToLead(payload as Parameters<typeof mappers.quoteToLead>[0]);
+        return toIntegrationResult(await store.addLead(lead));
+      }
+      case "contact": {
+        const lead = mappers.contactToLead(payload as Parameters<typeof mappers.contactToLead>[0]);
+        return toIntegrationResult(await store.addLead(lead));
+      }
+      case "booking": {
+        const { lead, consultation } = mappers.bookingToRecords(
+          payload as Parameters<typeof mappers.bookingToRecords>[0],
+        );
+        return toIntegrationResult(await store.addConsultation(consultation, lead));
+      }
+      case "newsletter": {
+        const subscriber = mappers.newsletterToSubscriber(
+          payload as Parameters<typeof mappers.newsletterToSubscriber>[0],
+        );
+        return toIntegrationResult(await store.addSubscriber(subscriber));
+      }
+    }
+  } catch (error) {
+    return { ok: false, reason: "failed", detail: (error as Error).message };
+  }
+}
+
+function toIntegrationResult(result: {
+  ok: boolean;
+  reason?: "not_configured" | "failed";
+  detail?: string;
+}): IntegrationResult {
+  if (result.ok) return { ok: true };
   return {
     ok: false,
-    reason: "not_configured",
-    detail: "DATABASE_URL is present but no database client is wired up yet.",
+    reason: result.reason ?? "failed",
+    detail: result.detail,
   };
 }
 
