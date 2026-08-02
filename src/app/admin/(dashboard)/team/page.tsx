@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { TeamView } from "@/components/admin/section-views";
-import { getTeam } from "@/lib/admin/repository";
+import { getTeam } from "@/lib/domain/repository";
 
 export const metadata: Metadata = { title: "Team" };
 
