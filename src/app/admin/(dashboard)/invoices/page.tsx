@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { InvoicesView } from "@/components/admin/section-views";
-import { getClients, getInvoices } from "@/lib/admin/repository";
+import { getClients, getInvoices } from "@/lib/domain/repository";
 
 export const metadata: Metadata = { title: "Invoices" };
 
