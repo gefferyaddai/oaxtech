@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ProposalsView } from "@/components/admin/section-views";
-import { getClients, getProposals } from "@/lib/admin/repository";
+import { getClients, getProposals } from "@/lib/domain/repository";
 
 export const metadata: Metadata = { title: "Proposals" };
 
