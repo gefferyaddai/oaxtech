@@ -1,15 +1,21 @@
 /**
  * ============================================================================
- * ADMIN DOMAIN MODELS
+ * DOMAIN MODELS — SHARED BY THE ADMIN AND THE CLIENT PORTAL
  * ============================================================================
  *
- * The single source of truth for every record the admin portal displays.
+ * The single source of truth for every business record on this site.
+ *
+ * Both surfaces read the SAME records. When a client approves a design in
+ * their portal, the admin's Approvals screen must be looking at that exact
+ * record — not a parallel copy with a different shape. That is why there is one
+ * `Project` here and not a `Project` plus a `DemoProject`.
  *
  * These types are storage-agnostic on purpose. Today they are satisfied by the
- * demo fixtures in `src/data/admin-demo-data.ts`; tomorrow they should be
- * satisfied by database rows. Nothing in the UI imports the fixtures directly —
- * everything goes through `src/lib/admin/repository.ts`, so swapping the source
- * is a change in one file.
+ * demo fixtures in `src/data/demo-data.ts`; tomorrow they should be satisfied
+ * by database rows. Nothing in the UI imports the fixtures directly — every
+ * read goes through `src/lib/domain/repository.ts` (org-wide, for the admin) or
+ * `src/lib/portal/repository.ts` (scoped to one client), so swapping the source
+ * is a change in two files.
  *
  * Money is stored in CENTS as an integer. Never use a float for currency.
  */
@@ -132,7 +138,13 @@ export interface Lead {
   /** Budget band as selected on the quote form. Free text, never parsed. */
   budget: string | null;
   stage: LeadStage;
-  source: LeadSource;
+  /**
+   * Marketing channel. NULL for anything captured from the website, because no
+   * form asks how the person found us and no analytics provider is connected —
+   * so there is nothing to derive it from. Displayed as "Unknown" rather than
+   * being guessed at.
+   */
+  source: LeadSource | null;
   origin: SubmissionOrigin;
   /** Team member id, or null when nobody has picked it up yet. */
   assigneeId: string | null;
@@ -216,7 +228,30 @@ export type ProjectPhase =
   | "Strategy"
   | "Design"
   | "Development"
+  | "Review"
   | "Launch";
+
+/**
+ * Ordered. The portal's phase stepper is DERIVED from this order and the
+ * project's current phase — phases before it are complete, the current one is
+ * in progress, the rest are upcoming. Storing a per-phase state as well would
+ * let the two disagree.
+ */
+export const PROJECT_PHASES: ProjectPhase[] = [
+  "Discovery",
+  "Strategy",
+  "Design",
+  "Development",
+  "Review",
+  "Launch",
+];
+
+export type PhaseState = "complete" | "in-progress" | "upcoming";
+
+export interface PhaseStep {
+  label: ProjectPhase;
+  state: PhaseState;
+}
 
 export interface Project {
   id: string;
@@ -226,10 +261,42 @@ export interface Project {
   /** 0–100. */
   progressPercent: number;
   phase: ProjectPhase;
+  /**
+   * Derived by the repository from the project's milestones — never stored.
+   * A hand-written value here would eventually contradict the milestone list.
+   */
   nextMilestone: string | null;
   deadline: IsoDate | null;
   ownerId: string;
   status: ProjectStatus;
+}
+
+/**
+ * A project as STORED. `Project` is the hydrated view the UI receives, with
+ * derived fields filled in by the repository. Keeping the two distinct means a
+ * fixture — or a database row — can never carry a stale derived value.
+ */
+export type ProjectRecord = Omit<Project, "nextMilestone">;
+
+/* -------------------------------------------------------------------------- */
+/* Milestones                                                                  */
+/* -------------------------------------------------------------------------- */
+
+export type MilestoneStatus = "Completed" | "Upcoming" | "Scheduled" | "Pending";
+
+export const MILESTONE_TONE: Record<MilestoneStatus, Tone> = {
+  Completed: "success",
+  Upcoming: "info",
+  Scheduled: "warning",
+  Pending: "neutral",
+};
+
+export interface Milestone {
+  id: string;
+  projectId: string;
+  name: string;
+  dueDate: IsoDate;
+  status: MilestoneStatus;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -262,6 +329,33 @@ export interface Approval {
   commentCount: number;
 }
 
+/* -------------------------------------------------------------------------- */
+/* Revisions                                                                   */
+/* -------------------------------------------------------------------------- */
+
+export type RevisionStatus = "Requested" | "In Review" | "Completed";
+
+export const REVISION_TONE: Record<RevisionStatus, Tone> = {
+  Requested: "warning",
+  "In Review": "info",
+  Completed: "success",
+};
+
+export interface Revision {
+  id: string;
+  projectId: string;
+  title: string;
+  priority: Priority;
+  status: RevisionStatus;
+  requestedAt: IsoDateTime;
+  commentCount: number;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Messages                                                                    */
+/* -------------------------------------------------------------------------- */
+
+/** A conversation thread. Individual messages are `MessageEntry`. */
 export interface Message {
   id: string;
   /** Thread subject. */
@@ -275,11 +369,22 @@ export interface Message {
   lastSender: "client" | "team";
 }
 
+/** One message inside a thread. */
+export interface MessageEntry {
+  id: string;
+  threadId: string;
+  from: "team" | "client";
+  body: string;
+  sentAt: IsoDateTime;
+}
+
 export type ProposalStatus = "Draft" | "Sent" | "Viewed" | "Accepted" | "Declined";
 
 export interface Proposal {
   id: string;
   reference: string;
+  /** Human-readable name, e.g. "Service Agreement". Shown in the portal. */
+  title: string;
   clientId: string;
   service: string;
   amount: Cents;
@@ -310,16 +415,36 @@ export interface Invoice {
   paidAt: IsoDate | null;
 }
 
-export interface AdminFile {
+/** Folders group a project's files. Counts are derived, never stored. */
+export type FileFolder =
+  | "Brand Assets"
+  | "Content"
+  | "Designs"
+  | "Development"
+  | "Final Deliverables";
+
+export const FILE_FOLDERS: FileFolder[] = [
+  "Brand Assets",
+  "Content",
+  "Designs",
+  "Development",
+  "Final Deliverables",
+];
+
+export interface ProjectFile {
   id: string;
   name: string;
   /** Extension-derived label, e.g. "PDF", "Figma". */
   kind: string;
   sizeBytes: number;
   projectId: string;
+  folder: FileFolder;
   uploadedById: string;
   uploadedAt: IsoDateTime;
-  /** Whether the client can see it in their portal. */
+  /**
+   * Whether the client can see it in their portal. The portal repository
+   * filters on this — an internal file must never reach a client.
+   */
   visibleToClient: boolean;
 }
 
