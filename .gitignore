@@ -11,3 +11,6 @@ npm-debug.log*
 next-env.d.ts
 tsconfig.tsbuildinfo
 /uploads-tmp
+
+# Development-only submission store (never committed, never deployed)
+.data/
