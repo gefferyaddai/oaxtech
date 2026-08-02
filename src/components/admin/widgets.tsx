@@ -4,14 +4,14 @@ import { Icon } from "@/components/ui/Icon";
 import { StatusBadge, type BadgeTone } from "@/components/ui/StatusBadge";
 import { EmptyState } from "@/components/ui/States";
 import { formatDate, formatRelative, formatTime } from "@/lib/admin/format";
-import type { SystemService } from "@/lib/admin/repository";
+import type { SystemService } from "@/lib/domain/repository";
 import type {
   ActivityEvent,
   ActivityKind,
   Consultation,
   ConsultationStatus,
   TeamMemberRecord,
-} from "@/lib/admin/types";
+} from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 
 /* -------------------------------------------------------------------------- */
