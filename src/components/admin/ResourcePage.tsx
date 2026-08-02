@@ -212,7 +212,7 @@ export function ResourcePage<T>({
             <span>
               No database is configured, so there is nowhere to save a new record yet. Set{" "}
               <code className="rounded bg-paper px-1">DATABASE_URL</code> and implement the write
-              in <code className="rounded bg-paper px-1">src/lib/admin/repository.ts</code> to
+              in <code className="rounded bg-paper px-1">src/lib/domain/repository.ts</code> to
               enable this form.
             </span>
           </p>
