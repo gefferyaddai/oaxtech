@@ -4,6 +4,7 @@ import { DemoBanner } from "@/components/portal/DemoBanner";
 import { PortalSidebar } from "@/components/portal/PortalSidebar";
 import { PortalTopbar } from "@/components/portal/PortalTopbar";
 import { getSession, isDemoMode } from "@/lib/portal/auth";
+import { getClientProjects } from "@/lib/portal/repository";
 
 /**
  * The portal is never indexed. Also enforced by a header in next.config.ts.
@@ -26,11 +27,14 @@ export default async function PortalLayout({ children }: { children: React.React
   // Protected layout: without a session every portal route redirects to login.
   if (!session) redirect("/portal/login");
 
+  // Fetched once here and passed down, so no component reaches for data itself.
+  const projects = await getClientProjects(session.clientId);
+
   return (
     <div className="flex min-h-[calc(100vh-var(--header-height))] bg-mist">
       <PortalSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
-        <PortalTopbar sessionLabel={session.label} />
+        <PortalTopbar sessionLabel={session.label} projects={projects} />
         {(isDemoMode() || session.isDemo) && <DemoBanner />}
         <div className="min-w-0 flex-1">{children}</div>
       </div>
