@@ -5,7 +5,7 @@ import { FormField } from "@/components/forms/Fields";
 import { Button } from "@/components/ui/Button";
 import { ErrorState } from "@/components/ui/States";
 import { enterAdminAction } from "@/lib/admin/actions";
-import { ADMIN_ROLES, type AdminRole } from "@/lib/admin/types";
+import { ADMIN_ROLES, type AdminRole } from "@/lib/domain/types";
 
 /**
  * Demo sign-in for the admin.
