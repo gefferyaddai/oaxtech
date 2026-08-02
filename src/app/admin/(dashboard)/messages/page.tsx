@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { MessagesView } from "@/components/admin/section-views";
-import { getClients, getMessages } from "@/lib/admin/repository";
+import { getClients, getMessages } from "@/lib/domain/repository";
 
 export const metadata: Metadata = { title: "Messages" };
 
