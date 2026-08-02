@@ -32,19 +32,27 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!integrationStatus.email() && !integrationStatus.database()) {
+  /*
+   * Record the address first. This used to return early when no mailing list
+   * was configured, discarding the sign-up entirely.
+   */
+  const stored = await persistSubmission("newsletter", parsed.data);
+
+  // A configured mailing list is what makes someone genuinely subscribed.
+  if (stored.ok && integrationStatus.email()) {
+    return NextResponse.json({ status: "delivered" });
+  }
+
+  if (stored.ok) {
     return NextResponse.json({
-      status: "not_configured",
+      status: "received",
       detail:
-        "The newsletter isn't connected to a mailing list yet, so this address has NOT been subscribed.",
+        "We've recorded your address. No mailing list is connected yet, so you are not subscribed and will not receive anything until it is — we'll confirm before sending you the first issue.",
     });
   }
 
-  const stored = await persistSubmission("newsletter", parsed.data);
-  if (stored.ok) return NextResponse.json({ status: "delivered" });
-
   return NextResponse.json({
     status: "not_configured",
-    detail: stored.detail ?? "The newsletter list isn't connected yet.",
+    detail: stored.detail ?? "The newsletter isn't connected to a mailing list yet.",
   });
 }
