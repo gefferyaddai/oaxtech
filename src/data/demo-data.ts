@@ -15,17 +15,21 @@
  * addresses use `example.com` (RFC 2606), so nothing can collide with a real
  * organisation or deliver mail to a real inbox.
  *
- * Nothing in the UI imports this file directly. It is reachable only through
- * `src/lib/admin/repository.ts`, so replacing it with database queries does not
- * touch a single component.
+ * ONE DATASET, TWO SURFACES. The admin sees all of it; the client portal sees
+ * only the slice belonging to the signed-in client. That is deliberate — it is
+ * how we prove both surfaces read the same records rather than two parallel
+ * fixtures that can drift apart.
  *
- * The admin shell reads `isAdminDemoMode()` and shows a persistent banner while
- * this data is what's being displayed.
+ * Nothing in the UI imports this file directly. It is reachable only through
+ * `src/lib/domain/repository.ts` (org-wide) and `src/lib/portal/repository.ts`
+ * (client-scoped), so replacing it with database queries does not touch a
+ * single component.
+ *
+ * Both shells show a persistent banner while this data is what's displayed.
  */
 
 import type {
   ActivityEvent,
-  AdminFile,
   Approval,
   Client,
   Consultation,
@@ -34,17 +38,21 @@ import type {
   Lead,
   LeadSourcePoint,
   Message,
-  Project,
+  MessageEntry,
+  Milestone,
+  ProjectRecord,
+  ProjectFile,
   Proposal,
   RevenuePoint,
+  Revision,
   Subscriber,
   SupportTicket,
   Task,
   TeamMemberRecord,
-} from "@/lib/admin/types";
+} from "@/lib/domain/types";
 
 /** Shown wherever the UI needs to state plainly that nothing here is real. */
-export const ADMIN_DEMO_NOTICE =
+export const DEMO_NOTICE =
   "Demo data. Every client, project, invoice and amount on this screen is invented for development — none of it is real business information.";
 
 /* -------------------------------------------------------------------------- */
@@ -109,13 +117,13 @@ export const demoClients: Client[] = [
 /* Projects                                                                    */
 /* -------------------------------------------------------------------------- */
 
-export const demoProjects: Project[] = [
-  { id: "pj-1", name: "Wellness Clinic Website", clientId: "cl-1", service: "Website Design & Development", progressPercent: 68, phase: "Design", nextMilestone: "Design Review", deadline: "2026-08-19", ownerId: "tm-2", status: "On Track" },
-  { id: "pj-2", name: "Brewing Brand Refresh", clientId: "cl-2", service: "Marketing & SEO", progressPercent: 45, phase: "Strategy", nextMilestone: "Content Plan Sign-off", deadline: "2026-08-28", ownerId: "tm-4", status: "Waiting on Client" },
-  { id: "pj-3", name: "Property Listings Platform", clientId: "cl-3", service: "Custom Software", progressPercent: 32, phase: "Development", nextMilestone: "API Integration", deadline: "2026-09-15", ownerId: "tm-1", status: "At Risk" },
-  { id: "pj-4", name: "Property Group Site Rebuild", clientId: "cl-3", service: "Website Design & Development", progressPercent: 88, phase: "Launch", nextMilestone: "Pre-launch QA", deadline: "2026-08-08", ownerId: "tm-2", status: "On Track" },
-  { id: "pj-5", name: "Outfitters Store Optimisation", clientId: "cl-4", service: "Marketing & SEO", progressPercent: 12, phase: "Discovery", nextMilestone: "Audit Delivery", deadline: "2026-09-30", ownerId: "tm-4", status: "On Hold" },
-  { id: "pj-6", name: "Accounting Portal Handover", clientId: "cl-5", service: "Custom Software", progressPercent: 100, phase: "Launch", nextMilestone: null, deadline: "2026-06-30", ownerId: "tm-3", status: "Completed" },
+export const demoProjects: ProjectRecord[] = [
+  { id: "pj-1", name: "Wellness Clinic Website", clientId: "cl-1", service: "Website Design & Development", progressPercent: 68, phase: "Design", deadline: "2026-08-19", ownerId: "tm-2", status: "On Track" },
+  { id: "pj-2", name: "Brewing Brand Refresh", clientId: "cl-2", service: "Marketing & SEO", progressPercent: 45, phase: "Strategy", deadline: "2026-08-28", ownerId: "tm-4", status: "Waiting on Client" },
+  { id: "pj-3", name: "Property Listings Platform", clientId: "cl-3", service: "Custom Software", progressPercent: 32, phase: "Development", deadline: "2026-09-15", ownerId: "tm-1", status: "At Risk" },
+  { id: "pj-4", name: "Property Group Site Rebuild", clientId: "cl-3", service: "Website Design & Development", progressPercent: 88, phase: "Launch", deadline: "2026-08-08", ownerId: "tm-2", status: "On Track" },
+  { id: "pj-5", name: "Outfitters Store Optimisation", clientId: "cl-4", service: "Marketing & SEO", progressPercent: 12, phase: "Discovery", deadline: "2026-09-30", ownerId: "tm-4", status: "On Hold" },
+  { id: "pj-6", name: "Accounting Portal Handover", clientId: "cl-5", service: "Custom Software", progressPercent: 100, phase: "Launch", deadline: "2026-06-30", ownerId: "tm-3", status: "Completed" },
 ];
 
 /* -------------------------------------------------------------------------- */
@@ -151,10 +159,10 @@ export const demoMessages: Message[] = [
 ];
 
 export const demoProposals: Proposal[] = [
-  { id: "pr-1", reference: "PRO-2026-014", clientId: "cl-1", service: "Website Design & Development", amount: 240000, status: "Sent", sentAt: "2026-07-21T10:00:00Z", validUntil: "2026-08-21" },
-  { id: "pr-2", reference: "PRO-2026-015", clientId: "cl-3", service: "Custom Software", amount: 1450000, status: "Viewed", sentAt: "2026-07-24T15:30:00Z", validUntil: "2026-08-24" },
-  { id: "pr-3", reference: "PRO-2026-016", clientId: "cl-4", service: "Marketing & SEO", amount: 380000, status: "Draft", sentAt: null, validUntil: null },
-  { id: "pr-4", reference: "PRO-2026-013", clientId: "cl-2", service: "Marketing & SEO", amount: 315000, status: "Accepted", sentAt: "2026-07-02T09:00:00Z", validUntil: "2026-08-02" },
+  { id: "pr-1", reference: "PRO-2026-014", title: "Project Proposal", clientId: "cl-1", service: "Website Design & Development", amount: 240000, status: "Sent", sentAt: "2026-07-21T10:00:00Z", validUntil: "2026-08-21" },
+  { id: "pr-2", reference: "PRO-2026-015", title: "Service Agreement", clientId: "cl-3", service: "Custom Software", amount: 1450000, status: "Viewed", sentAt: "2026-07-24T15:30:00Z", validUntil: "2026-08-24" },
+  { id: "pr-3", reference: "PRO-2026-016", title: "Scope of Work", clientId: "cl-4", service: "Marketing & SEO", amount: 380000, status: "Draft", sentAt: null, validUntil: null },
+  { id: "pr-4", reference: "PRO-2026-013", title: "Marketing Retainer Agreement", clientId: "cl-2", service: "Marketing & SEO", amount: 315000, status: "Accepted", sentAt: "2026-07-02T09:00:00Z", validUntil: "2026-08-02" },
 ];
 
 export const demoInvoices: Invoice[] = [
@@ -165,11 +173,11 @@ export const demoInvoices: Invoice[] = [
   { id: "in-5", reference: "INV-2026-032", clientId: "cl-3", projectId: "pj-3", amount: 620000, status: "Draft", issuedAt: "2026-07-30", dueAt: "2026-08-29", paidAt: null },
 ];
 
-export const demoFiles: AdminFile[] = [
-  { id: "fl-1", name: "homepage-concept-v2.fig", kind: "Figma", sizeBytes: 4_820_000, projectId: "pj-1", uploadedById: "tm-2", uploadedAt: "2026-07-28T09:50:00Z", visibleToClient: true },
-  { id: "fl-2", name: "content-plan-august.pdf", kind: "PDF", sizeBytes: 318_000, projectId: "pj-2", uploadedById: "tm-4", uploadedAt: "2026-07-27T14:10:00Z", visibleToClient: true },
-  { id: "fl-3", name: "api-integration-notes.md", kind: "Markdown", sizeBytes: 12_400, projectId: "pj-3", uploadedById: "tm-3", uploadedAt: "2026-07-26T16:35:00Z", visibleToClient: false },
-  { id: "fl-4", name: "launch-checklist.xlsx", kind: "Spreadsheet", sizeBytes: 96_200, projectId: "pj-4", uploadedById: "tm-2", uploadedAt: "2026-07-29T11:00:00Z", visibleToClient: true },
+export const demoFiles: ProjectFile[] = [
+  { id: "fl-1", name: "homepage-concept-v2.fig", folder: "Designs", kind: "Figma", sizeBytes: 4_820_000, projectId: "pj-1", uploadedById: "tm-2", uploadedAt: "2026-07-28T09:50:00Z", visibleToClient: true },
+  { id: "fl-2", name: "content-plan-august.pdf", folder: "Content", kind: "PDF", sizeBytes: 318_000, projectId: "pj-2", uploadedById: "tm-4", uploadedAt: "2026-07-27T14:10:00Z", visibleToClient: true },
+  { id: "fl-3", name: "api-integration-notes.md", folder: "Development", kind: "Markdown", sizeBytes: 12_400, projectId: "pj-3", uploadedById: "tm-3", uploadedAt: "2026-07-26T16:35:00Z", visibleToClient: false },
+  { id: "fl-4", name: "launch-checklist.xlsx", folder: "Final Deliverables", kind: "Spreadsheet", sizeBytes: 96_200, projectId: "pj-4", uploadedById: "tm-2", uploadedAt: "2026-07-29T11:00:00Z", visibleToClient: true },
 ];
 
 export const demoSupportTickets: SupportTicket[] = [
@@ -228,4 +236,51 @@ export const demoSubscribers: Subscriber[] = [
   { id: "sb-1", email: "reader1@example.com", subscribedAt: "2026-07-28T08:00:00Z", confirmed: true },
   { id: "sb-2", email: "reader2@example.com", subscribedAt: "2026-07-25T19:30:00Z", confirmed: true },
   { id: "sb-3", email: "reader3@example.com", subscribedAt: "2026-07-21T12:10:00Z", confirmed: false },
+];
+
+/* -------------------------------------------------------------------------- */
+/* Milestones                                                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Per project. `Project.nextMilestone` is derived from these by the repository
+ * — the first entry that is not yet "Completed".
+ */
+export const demoMilestones: Milestone[] = [
+  { id: "mi-1", projectId: "pj-1", name: "Project Kickoff", dueDate: "2026-07-05", status: "Completed" },
+  { id: "mi-2", projectId: "pj-1", name: "Design Review", dueDate: "2026-08-19", status: "Upcoming" },
+  { id: "mi-3", projectId: "pj-1", name: "Development Handoff", dueDate: "2026-09-02", status: "Scheduled" },
+  { id: "mi-4", projectId: "pj-1", name: "Final Review", dueDate: "2026-09-16", status: "Pending" },
+
+  { id: "mi-5", projectId: "pj-2", name: "Brand Audit", dueDate: "2026-07-14", status: "Completed" },
+  { id: "mi-6", projectId: "pj-2", name: "Content Plan Sign-off", dueDate: "2026-08-28", status: "Upcoming" },
+
+  { id: "mi-7", projectId: "pj-3", name: "Technical Discovery", dueDate: "2026-07-01", status: "Completed" },
+  { id: "mi-8", projectId: "pj-3", name: "API Integration", dueDate: "2026-09-15", status: "Scheduled" },
+
+  { id: "mi-9", projectId: "pj-4", name: "Content Migration", dueDate: "2026-07-22", status: "Completed" },
+  { id: "mi-10", projectId: "pj-4", name: "Pre-launch QA", dueDate: "2026-08-08", status: "Upcoming" },
+
+  { id: "mi-11", projectId: "pj-5", name: "Audit Delivery", dueDate: "2026-09-30", status: "Pending" },
+];
+
+/* -------------------------------------------------------------------------- */
+/* Revisions                                                                   */
+/* -------------------------------------------------------------------------- */
+
+export const demoRevisions: Revision[] = [
+  { id: "rv-1", projectId: "pj-1", title: "Update hero headline", priority: "High", status: "In Review", requestedAt: "2026-07-28T11:20:00Z", commentCount: 2 },
+  { id: "rv-2", projectId: "pj-1", title: "Adjust mobile navigation", priority: "Medium", status: "Completed", requestedAt: "2026-07-21T09:40:00Z", commentCount: 1 },
+  { id: "rv-3", projectId: "pj-2", title: "Soften the secondary palette", priority: "Low", status: "Requested", requestedAt: "2026-07-29T14:05:00Z", commentCount: 0 },
+];
+
+/* -------------------------------------------------------------------------- */
+/* Message threads                                                             */
+/* -------------------------------------------------------------------------- */
+
+export const demoMessageEntries: MessageEntry[] = [
+  { id: "me-1", threadId: "ms-1", from: "team", body: "Hi there! The updated homepage concept is ready for your review.", sentAt: "2026-07-30T08:00:00Z" },
+  { id: "me-2", threadId: "ms-1", from: "client", body: "Thanks for the latest round — a couple of notes on the hero section.", sentAt: "2026-07-30T08:15:00Z" },
+  { id: "me-3", threadId: "ms-2", from: "client", body: "Could we shift the blog cadence to fortnightly?", sentAt: "2026-07-29T17:40:00Z" },
+  { id: "me-4", threadId: "ms-3", from: "team", body: "Confirming we're still on for the 8th.", sentAt: "2026-07-29T11:05:00Z" },
 ];
