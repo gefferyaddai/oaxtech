@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { getAdminAuthAdapter } from "@/lib/admin/auth";
-import { ADMIN_ROLES, type AdminRole } from "@/lib/admin/types";
+import { ADMIN_ROLES, type AdminRole } from "@/lib/domain/types";
 
 function parseRole(value: FormDataEntryValue | null): AdminRole {
   const raw = typeof value === "string" ? value : "";
