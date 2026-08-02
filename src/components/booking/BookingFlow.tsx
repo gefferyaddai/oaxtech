@@ -492,6 +492,9 @@ export function BookingFlow() {
             <FormOutcome
               outcome={outcome}
               successTitle="Your consultation is booked"
+              /* Only `delivered` means a calendar actually reserved the slot.
+                 A received request must not claim to be booked. */
+              receivedTitle="Request received — we'll confirm your time"
               successBody={
                 <>
                   {service} — {selectedDate && formatDateLong(new Date(`${selectedDate}T12:00:00`))} at{" "}
