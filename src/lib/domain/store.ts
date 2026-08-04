@@ -148,32 +148,52 @@ const devFileStore: SubmissionStore = {
 /* Database store                                                              */
 /* -------------------------------------------------------------------------- */
 
-const NOT_IMPLEMENTED: WriteResult = {
-  ok: false,
-  reason: "not_configured",
-  detail:
-    "DATABASE_URL is set but the database store has not been implemented yet. See src/lib/domain/store.ts.",
-};
-
 /**
- * Fails loudly rather than falling back to the file store, so a half-configured
- * database can never look like it is working.
+ * Writes straight to Postgres.
+ *
+ * `read()` returns empty: once a database is configured the repository reads
+ * leads, consultations and subscribers from it directly, so there is nothing
+ * for the store to contribute. It exists only as the write path.
+ *
+ * Failures are reported rather than swallowed — a submission that could not be
+ * saved must not be reported to the visitor as received.
  */
 const databaseStore: SubmissionStore = {
   name: "Database",
   persists: true,
+
   async read() {
-    // return { leads: await db.select()…, … }
     return { ...EMPTY };
   },
-  async addLead() {
-    return NOT_IMPLEMENTED;
+
+  async addLead(lead) {
+    try {
+      const { insertLead } = await import("@/lib/db/queries");
+      await insertLead(lead);
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, reason: "failed", detail: (error as Error).message };
+    }
   },
-  async addConsultation() {
-    return NOT_IMPLEMENTED;
+
+  async addConsultation(consultation, lead) {
+    try {
+      const { insertBooking } = await import("@/lib/db/queries");
+      await insertBooking(consultation, lead);
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, reason: "failed", detail: (error as Error).message };
+    }
   },
-  async addSubscriber() {
-    return NOT_IMPLEMENTED;
+
+  async addSubscriber(subscriber) {
+    try {
+      const { insertSubscriber } = await import("@/lib/db/queries");
+      await insertSubscriber(subscriber);
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, reason: "failed", detail: (error as Error).message };
+    }
   },
 };
 

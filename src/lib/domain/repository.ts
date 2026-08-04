@@ -45,6 +45,7 @@ import {
   demoTasks,
   demoTeam,
 } from "@/data/demo-data";
+import * as q from "@/lib/db/queries";
 import { getStore, submissionsArePersisted } from "@/lib/domain/store";
 import { integrationStatus } from "@/lib/integrations";
 import type {
@@ -100,10 +101,7 @@ function copy<T>(rows: readonly T[]): T[] {
 /* -------------------------------------------------------------------------- */
 
 export async function getTeam(): Promise<TeamMemberRecord[]> {
-  if (isLive()) {
-    // return db.select().from(teamMembers);
-  }
-  return copy(demoTeam);
+  return isLive() ? q.selectTeam() : copy(demoTeam);
 }
 
 export async function getTeamMember(id: string): Promise<TeamMemberRecord | null> {
@@ -132,11 +130,10 @@ export async function getTeamLookup(): Promise<Map<string, TeamMemberRecord>> {
  * is configured the fixtures drop away entirely.
  */
 export async function getLeads(): Promise<Lead[]> {
+  if (isLive()) return q.selectLeads();
   const { leads } = await getStore().read();
-  const captured = leads
-    .slice()
-    .sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
-  return isLive() ? captured : [...captured, ...copy(demoLeads)];
+  const captured = leads.slice().sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
+  return [...captured, ...copy(demoLeads)];
 }
 
 export async function getLead(id: string): Promise<Lead | null> {
@@ -149,8 +146,9 @@ export async function getLead(id: string): Promise<Lead | null> {
 /* -------------------------------------------------------------------------- */
 
 export async function getConsultations(): Promise<Consultation[]> {
+  if (isLive()) return q.selectConsultations();
   const { consultations } = await getStore().read();
-  return isLive() ? consultations : [...consultations, ...copy(demoConsultations)];
+  return [...consultations, ...copy(demoConsultations)];
 }
 
 /** Sorted soonest-first, excluding anything already finished or cancelled. */
@@ -167,7 +165,7 @@ export async function getUpcomingConsultations(limit?: number): Promise<Consulta
 /* -------------------------------------------------------------------------- */
 
 export async function getClients(): Promise<Client[]> {
-  return copy(demoClients);
+  return isLive() ? q.selectClients() : copy(demoClients);
 }
 
 export async function getClient(id: string): Promise<Client | null> {
@@ -190,8 +188,11 @@ export async function getClientLookup(): Promise<Map<string, Client>> {
  * client sees in their portal.
  */
 export async function getProjects(): Promise<Project[]> {
-  const milestones = await getMilestones();
-  return copy(demoProjects).map((project) => ({
+  const [records, milestones] = await Promise.all([
+    isLive() ? q.selectProjects() : copy(demoProjects),
+    getMilestones(),
+  ]);
+  return records.map((project) => ({
     ...project,
     nextMilestone:
       milestones.find(
@@ -205,15 +206,15 @@ export async function getProjects(): Promise<Project[]> {
 /* -------------------------------------------------------------------------- */
 
 export async function getMilestones(): Promise<Milestone[]> {
-  return copy(demoMilestones);
+  return isLive() ? q.selectMilestones() : copy(demoMilestones);
 }
 
 export async function getRevisions(): Promise<Revision[]> {
-  return copy(demoRevisions);
+  return isLive() ? q.selectRevisions() : copy(demoRevisions);
 }
 
 export async function getMessageEntries(): Promise<MessageEntry[]> {
-  return copy(demoMessageEntries);
+  return isLive() ? q.selectMessageEntries() : copy(demoMessageEntries);
 }
 
 /**
@@ -250,7 +251,7 @@ export async function getProjectLookup(): Promise<Map<string, Project>> {
 /* -------------------------------------------------------------------------- */
 
 export async function getTasks(): Promise<Task[]> {
-  return copy(demoTasks);
+  return isLive() ? q.selectTasks() : copy(demoTasks);
 }
 
 /** Outstanding tasks, highest priority and soonest due first. */
@@ -269,7 +270,7 @@ export async function getTasksNeedingAttention(limit?: number): Promise<Task[]> 
 /* -------------------------------------------------------------------------- */
 
 export async function getApprovals(): Promise<Approval[]> {
-  return copy(demoApprovals);
+  return isLive() ? q.selectApprovals() : copy(demoApprovals);
 }
 
 export async function getPendingApprovals(): Promise<Approval[]> {
@@ -278,15 +279,15 @@ export async function getPendingApprovals(): Promise<Approval[]> {
 }
 
 export async function getMessages(): Promise<Message[]> {
-  return copy(demoMessages);
+  return isLive() ? q.selectMessages() : copy(demoMessages);
 }
 
 export async function getProposals(): Promise<Proposal[]> {
-  return copy(demoProposals);
+  return isLive() ? q.selectProposals() : copy(demoProposals);
 }
 
 export async function getInvoices(): Promise<Invoice[]> {
-  return copy(demoInvoices);
+  return isLive() ? q.selectInvoices() : copy(demoInvoices);
 }
 
 export async function getOutstandingInvoices(): Promise<Invoice[]> {
@@ -295,11 +296,11 @@ export async function getOutstandingInvoices(): Promise<Invoice[]> {
 }
 
 export async function getFiles(): Promise<ProjectFile[]> {
-  return copy(demoFiles);
+  return isLive() ? q.selectFiles() : copy(demoFiles);
 }
 
 export async function getSupportTickets(): Promise<SupportTicket[]> {
-  return copy(demoSupportTickets);
+  return isLive() ? q.selectSupportTickets() : copy(demoSupportTickets);
 }
 
 export async function getOpenSupportTickets(): Promise<SupportTicket[]> {
@@ -312,7 +313,9 @@ export async function getOpenSupportTickets(): Promise<SupportTicket[]> {
 /* -------------------------------------------------------------------------- */
 
 export async function getActivity(limit?: number): Promise<ActivityEvent[]> {
-  const events = copy(demoActivity).sort((a, b) => b.occurredAt.localeCompare(a.occurredAt));
+  const events = (isLive() ? await q.selectActivity() : copy(demoActivity)).sort((a, b) =>
+    b.occurredAt.localeCompare(a.occurredAt),
+  );
   return limit ? events.slice(0, limit) : events;
 }
 
@@ -329,12 +332,13 @@ export async function getLeadSources(): Promise<LeadSourcePoint[]> {
 /* -------------------------------------------------------------------------- */
 
 export async function getContent(): Promise<ContentItem[]> {
-  return copy(demoContent);
+  return isLive() ? q.selectContent() : copy(demoContent);
 }
 
 export async function getSubscribers(): Promise<Subscriber[]> {
+  if (isLive()) return q.selectSubscribers();
   const { subscribers } = await getStore().read();
-  return isLive() ? subscribers : [...subscribers, ...copy(demoSubscribers)];
+  return [...subscribers, ...copy(demoSubscribers)];
 }
 
 /* -------------------------------------------------------------------------- */

@@ -17,7 +17,9 @@
  * results into client components as props.
  */
 
+import * as q from "@/lib/db/queries";
 import * as domain from "@/lib/domain/repository";
+import { isLive } from "@/lib/domain/repository";
 import type {
   ActivityEvent,
   Approval,
@@ -49,6 +51,18 @@ export async function getClientProfile(clientId: string): Promise<Client | null>
 }
 
 export async function getClientProjects(clientId: string): Promise<Project[]> {
+  if (isLive()) {
+    const [records, milestones] = await Promise.all([
+      q.selectProjectsForClient(clientId),
+      getClientMilestones(clientId),
+    ]);
+    return records.map((project) => ({
+      ...project,
+      nextMilestone:
+        milestones.find((m) => m.projectId === project.id && m.status !== "Completed")?.name ??
+        null,
+    }));
+  }
   const projects = await domain.getProjects();
   return projects.filter((project) => project.clientId === clientId);
 }
@@ -80,24 +94,28 @@ export async function getPhaseSteps(clientId: string): Promise<PhaseStep[]> {
 /* -------------------------------------------------------------------------- */
 
 export async function getClientMilestones(clientId: string): Promise<Milestone[]> {
+  if (isLive()) return q.selectMilestonesForClient(clientId);
   const ids = await projectIds(clientId);
   const milestones = await domain.getMilestones();
   return milestones.filter((milestone) => ids.has(milestone.projectId));
 }
 
 export async function getClientTasks(clientId: string): Promise<Task[]> {
+  if (isLive()) return q.selectTasksForClient(clientId);
   const ids = await projectIds(clientId);
   const tasks = await domain.getTasks();
   return tasks.filter((task) => task.projectId && ids.has(task.projectId));
 }
 
 export async function getClientApprovals(clientId: string): Promise<Approval[]> {
+  if (isLive()) return q.selectApprovalsForClient(clientId);
   const ids = await projectIds(clientId);
   const approvals = await domain.getApprovals();
   return approvals.filter((approval) => ids.has(approval.projectId));
 }
 
 export async function getClientRevisions(clientId: string): Promise<Revision[]> {
+  if (isLive()) return q.selectRevisionsForClient(clientId);
   const ids = await projectIds(clientId);
   const revisions = await domain.getRevisions();
   return revisions.filter((revision) => ids.has(revision.projectId));
@@ -109,6 +127,7 @@ export async function getClientRevisions(clientId: string): Promise<Revision[]> 
  * never be returned here.
  */
 export async function getClientFiles(clientId: string): Promise<ProjectFile[]> {
+  if (isLive()) return q.selectFilesForClient(clientId);
   const ids = await projectIds(clientId);
   const files = await domain.getFiles();
   return files.filter((file) => ids.has(file.projectId) && file.visibleToClient);
@@ -133,6 +152,7 @@ export async function getClientFolders(clientId: string): Promise<FolderSummary[
 /* -------------------------------------------------------------------------- */
 
 export async function getClientThreads(clientId: string): Promise<Message[]> {
+  if (isLive()) return q.selectThreadsForClient(clientId);
   const messages = await domain.getMessages();
   return messages
     .filter((message) => message.clientId === clientId)
@@ -143,6 +163,7 @@ export async function getThreadEntries(
   clientId: string,
   threadId: string,
 ): Promise<MessageEntry[]> {
+  if (isLive()) return q.selectEntriesForClientThread(clientId, threadId);
   // Verify the thread belongs to this client before returning its contents.
   const threads = await getClientThreads(clientId);
   if (!threads.some((thread) => thread.id === threadId)) return [];
@@ -153,11 +174,13 @@ export async function getThreadEntries(
 }
 
 export async function getClientProposals(clientId: string): Promise<Proposal[]> {
+  if (isLive()) return q.selectProposalsForClient(clientId);
   const proposals = await domain.getProposals();
   return proposals.filter((proposal) => proposal.clientId === clientId);
 }
 
 export async function getClientInvoices(clientId: string): Promise<Invoice[]> {
+  if (isLive()) return q.selectInvoicesForClient(clientId);
   const invoices = await domain.getInvoices();
   return invoices.filter((invoice) => invoice.clientId === clientId);
 }
@@ -174,6 +197,7 @@ export function canShowInvoiceAmounts(): boolean {
 }
 
 export async function getClientSupportTickets(clientId: string): Promise<SupportTicket[]> {
+  if (isLive()) return q.selectSupportForClient(clientId);
   const tickets = await domain.getSupportTickets();
   return tickets.filter((ticket) => ticket.clientId === clientId);
 }
@@ -191,6 +215,11 @@ export async function getClientActivity(
   clientId: string,
   limit?: number,
 ): Promise<ActivityEvent[]> {
+  // With a database the events carry a client_id, so this is a real WHERE.
+  if (isLive()) {
+    const events = await q.selectActivityForClient(clientId);
+    return limit ? events.slice(0, limit) : events;
+  }
   const [client, events] = await Promise.all([getClientProfile(clientId), domain.getActivity()]);
   if (!client) return [];
   const mine = events.filter((event) => event.actor === client.name);
