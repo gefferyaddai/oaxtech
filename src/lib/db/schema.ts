@@ -168,6 +168,111 @@ export const activityKind = pgEnum("activity_kind", [
 ]);
 
 /* -------------------------------------------------------------------------- */
+/* Identity — Auth.js tables plus our own membership                           */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * People who can sign in. Shape follows the Auth.js Drizzle adapter so OAuth
+ * providers can be added later without a migration.
+ *
+ * `passwordHash` is argon2id and is NEVER selected into anything that reaches a
+ * component — see `selectUserForSignIn` in queries.ts, the only read of it.
+ *
+ * `adminRole` null means "not staff". Staff access is the presence of a role,
+ * not a boolean flag, so there is one source of truth for what someone may do.
+ */
+export const users = pgTable("users", {
+  id: text("id").primaryKey(),
+  name: text("name"),
+  email: text("email").notNull().unique(),
+  emailVerified: timestamp("email_verified", { withTimezone: true }),
+  image: text("image"),
+  /** argon2id. Null for accounts that only use OAuth. */
+  passwordHash: text("password_hash"),
+  /** Null = client-side user. Set = staff, with these capabilities. */
+  adminRole: adminRole("admin_role"),
+  /** Disabled accounts keep their history but cannot sign in. */
+  disabledAt: timestamp("disabled_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** OAuth provider links. Unused with credentials, required by the adapter. */
+export const accounts = pgTable(
+  "accounts",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").notNull(),
+    provider: text("provider").notNull(),
+    providerAccountId: text("provider_account_id").notNull(),
+    refresh_token: text("refresh_token"),
+    access_token: text("access_token"),
+    expires_at: integer("expires_at"),
+    token_type: text("token_type"),
+    scope: text("scope"),
+    id_token: text("id_token"),
+    session_state: text("session_state"),
+  },
+  (table) => ({
+    providerIdx: uniqueIndex("accounts_provider_idx").on(
+      table.provider,
+      table.providerAccountId,
+    ),
+  }),
+);
+
+export const verificationTokens = pgTable(
+  "verification_tokens",
+  {
+    identifier: text("identifier").notNull(),
+    token: text("token").notNull(),
+    expires: timestamp("expires", { withTimezone: true }).notNull(),
+  },
+  (table) => ({
+    tokenIdx: uniqueIndex("verification_tokens_idx").on(table.identifier, table.token),
+  }),
+);
+
+/**
+ * Which clients a user may see. Many-to-many on purpose: one contact can cover
+ * two brands, and two people at one company both need access. Modelling this as
+ * a column on `users` would be wrong on day one.
+ *
+ * This table IS the portal's authorisation boundary. A session may only read a
+ * client that appears here for that user.
+ */
+export const clientUsers = pgTable(
+  "client_users",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    clientId: text("client_id")
+      .notNull()
+      .references(() => clients.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    membershipIdx: uniqueIndex("client_users_membership_idx").on(table.userId, table.clientId),
+  }),
+);
+
+/**
+ * Failed sign-in attempts, for rate limiting.
+ *
+ * Credentials auth is an unauthenticated public endpoint that checks a secret,
+ * so it must be throttled or it is a brute-force target. Keyed by email AND by
+ * IP so neither a single account nor a single source can be hammered.
+ */
+export const signInAttempts = pgTable("sign_in_attempts", {
+  id: text("id").primaryKey(),
+  /** Lowercased email, or `ip:1.2.3.4`. */
+  key: text("key").notNull(),
+  attemptedAt: timestamp("attempted_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/* -------------------------------------------------------------------------- */
 /* Team                                                                        */
 /* -------------------------------------------------------------------------- */
 
@@ -178,6 +283,14 @@ export const teamMembers = pgTable("team_members", {
   initials: text("initials").notNull(),
   role: adminRole("role").notNull(),
   title: text("title").notNull(),
+  /**
+   * The sign-in account for this staff member, when they have one. Nullable
+   * because a person can be assignable work before they have a login, and
+   * unique because one account is one person.
+   */
+  userId: text("user_id")
+    .references(() => users.id, { onDelete: "set null" })
+    .unique(),
 });
 
 /* -------------------------------------------------------------------------- */
