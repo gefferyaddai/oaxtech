@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Avatar } from "@/components/admin/primitives";
 import { Icon } from "@/components/ui/Icon";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { EmptyState } from "@/components/ui/States";
+import { moveLeadAction } from "@/lib/admin/write-actions";
 import { formatDate } from "@/lib/admin/format";
 import { LEAD_STAGES, type Lead, type LeadStage, type TeamMemberRecord } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,8 @@ import { cn } from "@/lib/utils";
 interface LeadPipelineProps {
   leads: Lead[];
   team: TeamMemberRecord[];
+  /** True when a database is configured and changes can actually be saved. */
+  canPersist: boolean;
 }
 
 const FOLLOW_UP_TONE = {
@@ -30,20 +33,37 @@ const FOLLOW_UP_TONE = {
  * layered on later as an enhancement, but it must never be the sole means of
  * moving a lead.
  *
- * Stage changes are local state. With no database configured there is nothing
- * to persist to, and the UI says so rather than implying the change was saved.
+ * The card updates immediately and the server call follows. If the save fails
+ * the card moves back and the reason is shown — an optimistic update that
+ * quietly diverges from the database is worse than a slow one.
  */
-export function LeadPipeline({ leads, team }: LeadPipelineProps) {
+export function LeadPipeline({ leads, team, canPersist }: LeadPipelineProps) {
   const [stages, setStages] = useState<Record<string, LeadStage>>(() =>
     Object.fromEntries(leads.map((lead) => [lead.id, lead.stage])),
   );
   const [announcement, setAnnouncement] = useState("");
+  const [error, setError] = useState<string>();
+  const [, startTransition] = useTransition();
 
   const memberById = new Map(team.map((member) => [member.id, member]));
 
   function move(lead: Lead, stage: LeadStage) {
+    const previous = stages[lead.id] ?? lead.stage;
     setStages((current) => ({ ...current, [lead.id]: stage }));
     setAnnouncement(`${lead.name} moved to ${stage}.`);
+    setError(undefined);
+
+    if (!canPersist) return;
+
+    startTransition(async () => {
+      const result = await moveLeadAction(lead.id, stage);
+      if (!result.ok) {
+        // Roll back, so the board never shows a state the database rejected.
+        setStages((current) => ({ ...current, [lead.id]: previous }));
+        setAnnouncement(`${lead.name} could not be moved.`);
+        setError(result.error);
+      }
+    });
   }
 
   const byStage = LEAD_STAGES.map((stage) => ({
@@ -147,11 +167,20 @@ export function LeadPipeline({ leads, team }: LeadPipelineProps) {
         />
       )}
 
-      <p className="mt-3 flex items-start gap-1.5 text-2xs text-slate">
-        <Icon name="Info" className="mt-0.5 h-3 w-3 shrink-0" />
-        Stage changes are not saved — no database is configured. Set{" "}
-        <code className="rounded bg-mist px-1">DATABASE_URL</code> to enable persistence.
-      </p>
+      {error && (
+        <p role="alert" className="mt-3 flex items-start gap-1.5 text-2xs text-danger">
+          <Icon name="AlertCircle" className="mt-0.5 h-3 w-3 shrink-0" />
+          {error}
+        </p>
+      )}
+
+      {!canPersist && (
+        <p className="mt-3 flex items-start gap-1.5 text-2xs text-slate">
+          <Icon name="Info" className="mt-0.5 h-3 w-3 shrink-0" />
+          Stage changes are not saved — no database is configured. Set{" "}
+          <code className="rounded bg-mist px-1">DATABASE_URL</code> to enable persistence.
+        </p>
+      )}
     </div>
   );
 }
