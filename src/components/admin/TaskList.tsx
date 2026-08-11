@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Avatar } from "@/components/admin/primitives";
 import { Icon } from "@/components/ui/Icon";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { EmptyState } from "@/components/ui/States";
+import { setTaskCompletedAction } from "@/lib/admin/write-actions";
 import { formatDate } from "@/lib/admin/format";
 import type { Priority, Project, Task, TeamMemberRecord } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
@@ -20,20 +21,24 @@ interface TaskListProps {
   tasks: Task[];
   team: TeamMemberRecord[];
   projects: Project[];
+  /** True when a database is configured and changes can actually be saved. */
+  canPersist: boolean;
 }
 
 /**
  * Tasks requiring attention.
  *
- * Completion toggles local state and gives immediate visual feedback. With no
- * database configured nothing is persisted, and the footnote says so — the
- * checkbox does not silently pretend to have saved.
+ * The checkbox updates immediately and the server call follows. A failed save
+ * un-ticks the box and explains why, so the list never shows a completion the
+ * database does not have.
  */
-export function TaskList({ tasks, team, projects }: TaskListProps) {
+export function TaskList({ tasks, team, projects, canPersist }: TaskListProps) {
   const [completed, setCompleted] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(tasks.map((task) => [task.id, task.completed])),
   );
   const [announcement, setAnnouncement] = useState("");
+  const [error, setError] = useState<string>();
+  const [, startTransition] = useTransition();
 
   const memberById = new Map(team.map((member) => [member.id, member]));
   const projectById = new Map(projects.map((project) => [project.id, project]));
@@ -52,6 +57,18 @@ export function TaskList({ tasks, team, projects }: TaskListProps) {
     const next = !completed[task.id];
     setCompleted((current) => ({ ...current, [task.id]: next }));
     setAnnouncement(`${task.title} marked ${next ? "complete" : "incomplete"}.`);
+    setError(undefined);
+
+    if (!canPersist) return;
+
+    startTransition(async () => {
+      const result = await setTaskCompletedAction(task.id, next);
+      if (!result.ok) {
+        setCompleted((current) => ({ ...current, [task.id]: !next }));
+        setAnnouncement(`${task.title} could not be updated.`);
+        setError(result.error);
+      }
+    });
   }
 
   return (
@@ -114,10 +131,19 @@ export function TaskList({ tasks, team, projects }: TaskListProps) {
         })}
       </ul>
 
-      <p className="mt-3 flex items-start gap-1.5 text-2xs text-slate">
-        <Icon name="Info" className="mt-0.5 h-3 w-3 shrink-0" />
-        Completion is not saved — no database is configured.
-      </p>
+      {error && (
+        <p role="alert" className="mt-3 flex items-start gap-1.5 text-2xs text-danger">
+          <Icon name="AlertCircle" className="mt-0.5 h-3 w-3 shrink-0" />
+          {error}
+        </p>
+      )}
+
+      {!canPersist && (
+        <p className="mt-3 flex items-start gap-1.5 text-2xs text-slate">
+          <Icon name="Info" className="mt-0.5 h-3 w-3 shrink-0" />
+          Completion is not saved — no database is configured.
+        </p>
+      )}
     </div>
   );
 }
