@@ -1,4 +1,10 @@
+import { ApprovalActions } from "@/components/portal/ApprovalActions";
 import { PortalCard } from "@/components/portal/PortalPage";
+import {
+  CreateSupportButton,
+  MessageComposer,
+  RequestRevisionButton,
+} from "@/components/portal/RequestForms";
 import { Icon } from "@/components/ui/Icon";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { EmptyState } from "@/components/ui/States";
@@ -351,7 +357,13 @@ export function FilesWidget({
 
 /* -- Approvals ------------------------------------------------------------- */
 
-export function ApprovalsWidget({ approvals }: { approvals: Approval[] }) {
+export function ApprovalsWidget({
+  approvals,
+  canPersist,
+}: {
+  approvals: Approval[];
+  canPersist: boolean;
+}) {
   return (
     <PortalCard title="Design Approvals">
       {approvals.length === 0 ? (
@@ -380,53 +392,35 @@ export function ApprovalsWidget({ approvals }: { approvals: Approval[] }) {
                 {approval.commentCount} comments
               </p>
               {approval.status === "Awaiting Client" && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    disabled
-                    className="btn btn-sm btn-primary"
-                    title="Available once the portal is connected"
-                  >
-                    Approve Design
-                  </button>
-                  <button
-                    type="button"
-                    disabled
-                    className="btn btn-sm btn-neutral"
-                    title="Available once the portal is connected"
-                  >
-                    Request Changes
-                  </button>
-                </div>
+                <ApprovalActions
+                  approvalId={approval.id}
+                  title={approval.title}
+                  canPersist={canPersist}
+                />
               )}
             </li>
           ))}
         </ul>
       )}
-      <p className="mt-4 text-xs text-slate">
-        Approval actions are disabled — no database is configured, so approving a design here
-        would not be recorded anywhere.
-      </p>
     </PortalCard>
   );
 }
 
 /* -- Revisions ------------------------------------------------------------- */
 
-export function RevisionsWidget({ revisions }: { revisions: Revision[] }) {
+export function RevisionsWidget({
+  revisions,
+  projectId,
+  canPersist,
+}: {
+  revisions: Revision[];
+  projectId: string | null;
+  canPersist: boolean;
+}) {
   return (
     <PortalCard
       title="Revision Requests"
-      action={
-        <button
-          type="button"
-          disabled
-          className="btn btn-sm btn-primary"
-          title="Available once the portal is connected"
-        >
-          New Revision Request
-        </button>
-      }
+      action={<RequestRevisionButton projectId={projectId} canPersist={canPersist} />}
     >
       {revisions.length === 0 ? (
         <EmptyState
@@ -466,9 +460,11 @@ export function RevisionsWidget({ revisions }: { revisions: Revision[] }) {
 export function MessagesWidget({
   threads,
   entries,
+  canPersist,
 }: {
   threads: Message[];
   entries: MessageEntry[];
+  canPersist: boolean;
 }) {
   return (
     <PortalCard title="Messages">
@@ -533,21 +529,7 @@ export function MessagesWidget({
                 </li>
               ))}
             </ul>
-            <div className="flex items-center gap-2 border-t border-line-subtle p-3">
-              <label htmlFor="portal-message" className="sr-only">
-                Write a message
-              </label>
-              <input
-                id="portal-message"
-                className="field-control min-h-[2.25rem] flex-1 py-1.5 text-sm"
-                placeholder="Messaging is disabled until the portal is connected"
-                disabled
-              />
-              <button type="button" disabled className="btn btn-sm btn-primary">
-                <Icon name="Send" className="h-4 w-4" />
-                Send
-              </button>
-            </div>
+            <MessageComposer threadId={threads[0]?.id ?? null} canPersist={canPersist} />
           </div>
         </div>
       )}
@@ -703,20 +685,17 @@ export function CompletedFilesWidget({ project }: { project: Project | null }) {
 
 /* -- Support --------------------------------------------------------------- */
 
-export function SupportWidget({ tickets }: { tickets: SupportTicket[] }) {
+export function SupportWidget({
+  tickets,
+  canPersist,
+}: {
+  tickets: SupportTicket[];
+  canPersist: boolean;
+}) {
   return (
     <PortalCard
       title="Support Requests"
-      action={
-        <button
-          type="button"
-          disabled
-          className="btn btn-sm btn-primary"
-          title="Available once the portal is connected"
-        >
-          Create Support Request
-        </button>
-      }
+      action={<CreateSupportButton canPersist={canPersist} />}
     >
       {tickets.length === 0 ? (
         <EmptyState
