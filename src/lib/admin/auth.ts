@@ -3,10 +3,14 @@
  * ADMIN AUTHENTICATION ADAPTER
  * ============================================================================
  *
- * THERE IS NO REAL AUTHENTICATION IN THIS BUILD. This file does not pretend
- * otherwise, and the UI states it plainly on every screen.
+ * Two adapters. Which one is used depends on whether AUTH_SECRET is set.
  *
- * What that means concretely:
+ * REAL (AUTH_SECRET set): Auth.js credentials, argon2id, rate limited. Staff
+ * access is the presence of `users.admin_role` — signing in is not the same as
+ * being staff.
+ *
+ * DEMO (AUTH_SECRET unset): no credentials are checked, because none exist. The
+ * UI states this plainly on every screen. Concretely:
  *   - No credentials are checked, because none exist.
  *   - No password is stored in source, in a cookie, or in local storage.
  *   - The demo session cookie carries a role string and nothing else — no user
@@ -19,10 +23,9 @@
  * with no provider configured, `/admin` refuses to open at all — see
  * `demoAccessAllowed()` below.
  *
- * TO ADD REAL AUTHENTICATION
- *   1. Set AUTH_SECRET and AUTH_PROVIDER_URL (see .env.example).
- *   2. Implement `realAdapter` below against your provider, mapping the
- *      provider's groups onto `AdminRole`.
+ * TO TURN ON REAL AUTHENTICATION
+ *   1. Set AUTH_SECRET (see .env.example).
+ *   2. Create a user with an `admin_role` — see scripts/seed-users.ts.
  *   3. Nothing else changes — every admin screen reads `getAdminSession()`.
  */
 
@@ -48,6 +51,8 @@ export interface AdminSession {
   /** Display label only. In demo mode this is generic, never a real person. */
   label: string;
   role: AdminRole;
+  /** The signed-in account, when this is a real session. Absent in demo mode. */
+  userId?: string;
 }
 
 export interface AdminAuthAdapter {
@@ -60,6 +65,9 @@ export interface AdminAuthAdapter {
 export function isAdminDemoMode(): boolean {
   return !integrationStatus.auth();
 }
+
+/** Re-exported so screens can name the variable that turns demo mode off. */
+export const AUTH_ENV_VAR = "AUTH_SECRET";
 
 /**
  * Demo admin access is allowed only outside production. This is the guard that
@@ -85,7 +93,7 @@ const demoAdapter: AdminAuthAdapter = {
       return {
         ok: false,
         message:
-          "Demo admin access is disabled in production. Configure AUTH_SECRET and AUTH_PROVIDER_URL, then implement the real adapter in src/lib/admin/auth.ts.",
+          "Demo admin access is disabled in production. Set AUTH_SECRET and create a staff account to sign in.",
       };
     }
     const store = await cookies();
@@ -114,22 +122,51 @@ const demoAdapter: AdminAuthAdapter = {
 };
 
 /**
- * Real adapter placeholder. Fails loudly rather than falling back to the demo
- * adapter, so a half-configured provider can never look like a working login.
+ * Real adapter, backed by Auth.js.
+ *
+ * Staff access is the presence of `users.admin_role`. An authenticated account
+ * without one gets no admin session at all — being able to sign in is not the
+ * same as being staff.
+ *
+ * The role is re-read from the database on every call, so changing or removing
+ * it takes effect on the next request rather than when the token expires.
  */
 const realAdapter: AdminAuthAdapter = {
   async signIn() {
+    // Credentials sign-in goes through the Auth.js route, not here.
     return {
       ok: false,
-      message:
-        "An authentication provider is configured but the admin adapter has not been implemented yet. See src/lib/admin/auth.ts.",
+      message: "Use the sign-in form. This adapter does not accept credentials directly.",
     };
   },
+
   async signOut() {
-    /* no-op until implemented */
+    const { signOut } = await import("@/lib/auth/config");
+    await signOut({ redirect: false });
   },
+
   async getSession() {
-    return null;
+    const [{ auth }, { selectAccount }] = await Promise.all([
+      import("@/lib/auth/config"),
+      import("@/lib/db/queries"),
+    ]);
+
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) return null;
+
+    const account = await selectAccount(userId);
+    if (!account || account.disabled) return null;
+
+    // No role means not staff, regardless of a valid login.
+    if (!account.adminRole) return null;
+
+    return {
+      isDemo: false,
+      label: account.name ?? account.email,
+      role: account.adminRole,
+      userId: account.id,
+    };
   },
 };
 
