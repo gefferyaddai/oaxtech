@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import { FormField } from "@/components/forms/Fields";
 import { Button } from "@/components/ui/Button";
 import { ErrorState } from "@/components/ui/States";
 import { enterAdminAction } from "@/lib/admin/actions";
+import { signInWithPassword } from "@/lib/auth/actions";
 import { ADMIN_ROLES, type AdminRole } from "@/lib/domain/types";
 
 /**
@@ -24,6 +26,71 @@ export function AdminLoginForm({
   demoMode: boolean;
   demoAllowed: boolean;
 }) {
+  if (!demoMode) return <CredentialsSignIn />;
+  return <DemoSignIn demoAllowed={demoAllowed} />;
+}
+
+/**
+ * Real staff sign-in. Being able to authenticate is not the same as being
+ * staff: an account without `admin_role` signs in successfully and still gets
+ * no admin session, so the redirect below lands back on this page.
+ */
+function CredentialsSignIn() {
+  const router = useRouter();
+  const [state, formAction, pending] = useActionState(signInWithPassword, null);
+
+  useEffect(() => {
+    if (state && !state.error) router.push("/admin");
+  }, [state, router]);
+
+  return (
+    <form action={formAction} className="mt-6">
+      <div className="space-y-4">
+        <FormField
+          label="Email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@oaxtech.com"
+          required
+        />
+        <FormField
+          label="Password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          placeholder="••••••••"
+          required
+        />
+      </div>
+
+      {state?.error && (
+        <div className="mt-4">
+          <ErrorState title="Couldn't sign in" description={state.error} />
+        </div>
+      )}
+
+      <Button
+        type="submit"
+        variant="primary"
+        fullWidth
+        className="mt-6"
+        loading={pending}
+        loadingLabel="Signing in…"
+      >
+        Sign In
+      </Button>
+
+      <p className="mt-4 text-xs leading-relaxed text-slate">
+        Staff accounts only. For security we can&apos;t confirm whether an email address has an
+        account.
+      </p>
+    </form>
+  );
+}
+
+function DemoSignIn({ demoAllowed }: { demoAllowed: boolean }) {
+  const demoMode = true;
   const [error, setError] = useState<string>();
   const [role, setRole] = useState<AdminRole>("Super Admin");
   const [pending, startTransition] = useTransition();
