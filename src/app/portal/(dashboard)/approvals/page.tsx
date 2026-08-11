@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { PortalPage } from "@/components/portal/PortalPage";
 import { ApprovalsWidget } from "@/components/portal/widgets";
+import { canPersistChanges } from "@/lib/domain/mutations";
 import { getSession } from "@/lib/portal/auth";
 import { getClientApprovals } from "@/lib/portal/repository";
 
@@ -16,7 +17,7 @@ export default async function Page() {
 
   return (
     <PortalPage title="Design Approvals" description="Designs waiting on your sign-off.">
-      <ApprovalsWidget approvals={approvals} />
+      <ApprovalsWidget approvals={approvals} canPersist={canPersistChanges()} />
     </PortalPage>
   );
 }
