@@ -638,6 +638,112 @@ export async function insertSubscriber(subscriber: Subscriber): Promise<void> {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Identity                                                                    */
+/* -------------------------------------------------------------------------- */
+
+export interface SignInCandidate {
+  id: string;
+  name: string | null;
+  email: string;
+  passwordHash: string | null;
+  adminRole: (typeof t.adminRole.enumValues)[number] | null;
+  disabled: boolean;
+}
+
+/**
+ * The ONLY read of `password_hash` in the codebase.
+ *
+ * Returns null when no such account exists — the caller must still run the
+ * password comparison against a dummy hash so the response time does not reveal
+ * whether the address is registered.
+ */
+export async function selectUserForSignIn(email: string): Promise<SignInCandidate | null> {
+  const [row] = await db()
+    .select({
+      id: t.users.id,
+      name: t.users.name,
+      email: t.users.email,
+      passwordHash: t.users.passwordHash,
+      adminRole: t.users.adminRole,
+      disabledAt: t.users.disabledAt,
+    })
+    .from(t.users)
+    .where(eq(t.users.email, email.toLowerCase()))
+    .limit(1);
+
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    passwordHash: row.passwordHash,
+    adminRole: row.adminRole,
+    disabled: row.disabledAt !== null,
+  };
+}
+
+export interface AccountIdentity {
+  id: string;
+  name: string | null;
+  email: string;
+  adminRole: (typeof t.adminRole.enumValues)[number] | null;
+  disabled: boolean;
+}
+
+/**
+ * Re-reads an account by id. Called on EVERY request rather than trusting the
+ * token's copy, so disabling an account or changing a role takes effect
+ * immediately instead of whenever the JWT happens to expire.
+ *
+ * Never selects the password hash.
+ */
+export async function selectAccount(userId: string): Promise<AccountIdentity | null> {
+  const [row] = await db()
+    .select({
+      id: t.users.id,
+      name: t.users.name,
+      email: t.users.email,
+      adminRole: t.users.adminRole,
+      disabledAt: t.users.disabledAt,
+    })
+    .from(t.users)
+    .where(eq(t.users.id, userId))
+    .limit(1);
+
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    adminRole: row.adminRole,
+    disabled: row.disabledAt !== null,
+  };
+}
+
+/**
+ * Clients this user is a member of. This is the portal's authorisation
+ * boundary — a session may read a client only if it appears here.
+ */
+export async function selectMemberships(userId: string): Promise<string[]> {
+  const rows = await db()
+    .select({ clientId: t.clientUsers.clientId })
+    .from(t.clientUsers)
+    .where(eq(t.clientUsers.userId, userId))
+    .orderBy(asc(t.clientUsers.createdAt));
+  return rows.map((row) => row.clientId);
+}
+
+/** Whether this user may read this client. Checked server-side, every time. */
+export async function hasMembership(userId: string, clientId: string): Promise<boolean> {
+  const [row] = await db()
+    .select({ clientId: t.clientUsers.clientId })
+    .from(t.clientUsers)
+    .where(and(eq(t.clientUsers.userId, userId), eq(t.clientUsers.clientId, clientId)))
+    .limit(1);
+  return Boolean(row);
+}
+
+/* -------------------------------------------------------------------------- */
 /* Health                                                                      */
 /* -------------------------------------------------------------------------- */
 
