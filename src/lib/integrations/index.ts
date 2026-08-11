@@ -35,7 +35,7 @@ export const integrationStatus = {
   storage: () => Boolean(process.env.STORAGE_BUCKET && process.env.STORAGE_ACCESS_KEY),
   database: () => Boolean(process.env.DATABASE_URL),
   payments: () => Boolean(process.env.PAYMENTS_SECRET_KEY),
-  auth: () => Boolean(process.env.AUTH_SECRET && process.env.AUTH_PROVIDER_URL),
+  auth: () => Boolean(process.env.AUTH_SECRET),
   analytics: () => Boolean(process.env.NEXT_PUBLIC_ANALYTICS_ID),
   spamProtection: () => Boolean(process.env.SPAM_PROTECTION_SECRET),
 };
