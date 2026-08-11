@@ -6,9 +6,12 @@ import { integrationStatus } from "@/lib/integrations";
  * PORTAL AUTHENTICATION ADAPTER
  * ============================================================================
  *
- * There is NO real authentication in this build, and this file does not
- * pretend otherwise.
+ * Two adapters, chosen by whether AUTH_SECRET is set.
  *
+ * REAL: Auth.js credentials, argon2id, rate limited. Which client a session may
+ * read comes from the `client_users` membership table, re-read on every request.
+ *
+ * DEMO (AUTH_SECRET unset), which does not pretend otherwise:
  * - No credentials are checked, because none exist.
  * - No password is stored in source, in a cookie, or in local storage.
  * - The demo session cookie carries a single flag and nothing else — no user
@@ -16,9 +19,9 @@ import { integrationStatus } from "@/lib/integrations";
  * - `isDemoMode()` is true whenever a real auth provider isn't configured, and
  *   every portal screen renders a visible demo banner while it is.
  *
- * To add real authentication:
- *   1. Set AUTH_SECRET and AUTH_PROVIDER_URL (see .env.example).
- *   2. Implement `RealAuthAdapter` below against your provider.
+ * To turn on real authentication:
+ *   1. Set AUTH_SECRET (see .env.example).
+ *   2. Create a user and a `client_users` row — see scripts/seed-users.ts.
  *   3. Nothing else in the portal needs to change — every screen consumes
  *      `getSession()` through this interface.
  */
@@ -46,12 +49,19 @@ export interface PortalSession {
    * another's projects, files and invoices by editing a parameter.
    */
   clientId: string;
+  /** The signed-in account, when this is a real session. Null in demo mode. */
+  userId?: string;
+  /**
+   * Every client this account may read. `clientId` is the active one.
+   *
+   * Switching between them must go through `setActiveClient`, which re-checks
+   * membership server-side — a client id from a URL or form field is never
+   * trusted.
+   */
+  memberships?: string[];
 }
 
-/**
- * The client a demo session is signed in as. Once real authentication exists,
- * this is resolved from the authenticated user's account instead.
- */
+/** The client a demo session is signed in as. Development only. */
 const DEMO_CLIENT_ID = "cl-1";
 
 export interface AuthAdapter {
@@ -93,23 +103,60 @@ const demoAdapter: AuthAdapter = {
 };
 
 /**
- * Real adapter placeholder. Deliberately fails loudly rather than falling back
- * to the demo adapter, so a half-configured provider can never look like a
- * working login.
+ * Real adapter, backed by Auth.js.
+ *
+ * Sign-in itself is handled by the Auth.js credentials flow (see
+ * `src/lib/auth/config.ts` and `signInWithPassword` in `actions.ts`). This
+ * adapter's job is turning an authenticated account into a PORTAL session —
+ * which means answering "which client may this person read?".
+ *
+ * Both the account and its memberships are re-read on every call rather than
+ * trusted from the token. Disabling an account, or removing someone's access to
+ * a client, therefore takes effect on the next request instead of whenever the
+ * JWT expires.
  */
 const realAdapter: AuthAdapter = {
   async signIn() {
+    // Credentials sign-in goes through the Auth.js route, not here.
     return {
       ok: false,
-      message:
-        "An authentication provider is configured but the adapter has not been implemented yet. See src/lib/portal/auth.ts.",
+      message: "Use the sign-in form. This adapter does not accept credentials directly.",
     };
   },
+
   async signOut() {
-    /* no-op until implemented */
+    const { signOut } = await import("@/lib/auth/config");
+    await signOut({ redirect: false });
   },
+
   async getSession() {
-    return null;
+    const [{ auth }, { selectAccount, selectMemberships }] = await Promise.all([
+      import("@/lib/auth/config"),
+      import("@/lib/db/queries"),
+    ]);
+
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) return null;
+
+    const account = await selectAccount(userId);
+    if (!account || account.disabled) return null;
+
+    /*
+     * A portal session exists only if the account is a member of at least one
+     * client. Staff without a membership get nothing here — they use /admin.
+     */
+    const memberships = await selectMemberships(userId);
+    const clientId = memberships[0];
+    if (!clientId) return null;
+
+    return {
+      isDemo: false,
+      label: account.name ?? account.email,
+      clientId,
+      userId: account.id,
+      memberships,
+    };
   },
 };
 
