@@ -15,6 +15,7 @@ import {
 } from "@/components/admin/widgets";
 import { Icon } from "@/components/ui/Icon";
 import { formatMoney, greeting, percentChange } from "@/lib/admin/format";
+import { canPersistChanges } from "@/lib/domain/mutations";
 import {
   getActiveProjects,
   getActivity,
@@ -192,7 +193,7 @@ export default async function AdminOverviewPage() {
           }
         >
           <SectionBoundary>
-            <LeadPipeline leads={leads} team={team} />
+            <LeadPipeline leads={leads} team={team} canPersist={canPersistChanges()} />
           </SectionBoundary>
         </AdminCard>
       </div>
@@ -221,7 +222,12 @@ export default async function AdminOverviewPage() {
           }
         >
           <SectionBoundary>
-            <TaskList tasks={attentionTasks} team={team} projects={projects} />
+            <TaskList
+              tasks={attentionTasks}
+              team={team}
+              projects={projects}
+              canPersist={canPersistChanges()}
+            />
           </SectionBoundary>
         </AdminCard>
       </div>
