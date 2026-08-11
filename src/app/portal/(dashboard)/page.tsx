@@ -15,6 +15,7 @@ import {
   SupportWidget,
 } from "@/components/portal/widgets";
 import { Icon } from "@/components/ui/Icon";
+import { canPersistChanges } from "@/lib/domain/mutations";
 import { getSession } from "@/lib/portal/auth";
 import {
   canShowInvoiceAmounts,
@@ -127,16 +128,20 @@ export default async function PortalOverviewPage() {
             files={files}
             storageConfigured={integrationStatus.storage()}
           />
-          <ApprovalsWidget approvals={approvals} />
-          <RevisionsWidget revisions={revisions} />
+          <ApprovalsWidget approvals={approvals} canPersist={canPersistChanges()} />
+          <RevisionsWidget
+            revisions={revisions}
+            projectId={project?.id ?? null}
+            canPersist={canPersistChanges()}
+          />
         </div>
         <div className="grid gap-4 xl:grid-cols-3">
-          <MessagesWidget threads={threads} entries={entries} />
+          <MessagesWidget threads={threads} entries={entries} canPersist={canPersistChanges()} />
           <ContractsWidget proposals={proposals} />
           <InvoicesWidget invoices={invoices} showAmounts={canShowInvoiceAmounts()} />
         </div>
         <div className="grid gap-4 xl:grid-cols-2">
-          <SupportWidget tickets={tickets} />
+          <SupportWidget tickets={tickets} canPersist={canPersistChanges()} />
         </div>
       </div>
     </PortalPage>
