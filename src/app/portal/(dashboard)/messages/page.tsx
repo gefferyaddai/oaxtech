@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { PortalPage } from "@/components/portal/PortalPage";
 import { MessagesWidget } from "@/components/portal/widgets";
+import { canPersistChanges } from "@/lib/domain/mutations";
 import { getSession } from "@/lib/portal/auth";
 import { getClientThreads, getThreadEntries } from "@/lib/portal/repository";
 
@@ -17,7 +18,7 @@ export default async function Page() {
 
   return (
     <PortalPage title="Messages" description="Your conversation with the project team.">
-      <MessagesWidget threads={threads} entries={entries} />
+      <MessagesWidget threads={threads} entries={entries} canPersist={canPersistChanges()} />
     </PortalPage>
   );
 }
