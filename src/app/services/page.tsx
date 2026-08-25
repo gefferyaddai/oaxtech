@@ -8,15 +8,16 @@ import { ServicesHeroVisual } from "@/components/sections/HeroVisuals";
 import { ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { clientTypes, fullProcess, services } from "@/data/services";
+import { clientTypes, fullProcess, softwareServices } from "@/data/services";
 import { buildMetadata } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
+import { layerFor } from "@/lib/layers";
 import { cn } from "@/lib/utils";
 
 export const metadata = buildMetadata({
-  title: "Services",
+  title: "Websites & Software",
   description:
-    "Website design and development, custom software, marketing consulting and SEO for businesses in Calgary, Alberta and across Canada.",
+    "Website design and development, web and mobile applications, AI and automation for businesses in Calgary, Alberta and across Canada.",
   path: "/services",
 });
 
@@ -24,7 +25,7 @@ function serviceSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    itemListElement: services.map((service, index) => ({
+    itemListElement: softwareServices.map((service, index) => ({
       "@type": "ListItem",
       position: index + 1,
       item: {
@@ -45,9 +46,10 @@ export default function ServicesPage() {
   return (
     <>
       <PageHero
+        sheetNo="SHT 02"
         eyebrow="What we do"
-        title="Technology and Marketing Solutions Built Around Your Goals"
-        description="OAX Tech combines strategy, design, development and optimization to help organizations launch with confidence and grow with clarity."
+        title="Websites and software built around how your business actually works"
+        description="Websites, web and mobile applications, AI and automation. Marketing and SEO live on their own page, so this one covers what we build."
         actions={
           <>
             <ButtonLink href="/book" variant="dark" size="lg" iconLeft="Calendar">
@@ -61,8 +63,11 @@ export default function ServicesPage() {
         visual={<ServicesHeroVisual />}
       />
 
-      {services.map((service, index) => {
+      {softwareServices.map((service, index) => {
         const alternate = index % 2 === 1;
+        /* Each service section is drawn on its own layer, so the discipline
+           reads the same colour here as on the homepage legend and its card. */
+        const layer = layerFor(service.slug);
         return (
           <section
             key={service.slug}
@@ -88,7 +93,7 @@ export default function ServicesPage() {
                   <ul className="mt-8 grid gap-x-6 gap-y-5 sm:grid-cols-3">
                     {service.features.map((feature) => (
                       <li key={feature.label}>
-                        <Icon name={feature.icon} className="mb-2 h-5 w-5 text-cobalt" />
+                        <Icon name={feature.icon} className={cn("mb-2 h-5 w-5", layer.text)} />
                         <p className="text-xs font-medium leading-snug text-ink">{feature.label}</p>
                       </li>
                     ))}
@@ -106,7 +111,7 @@ export default function ServicesPage() {
                   </Link>
                 </div>
 
-                <div className="card overflow-hidden p-5 shadow-card sm:p-6">
+                <div className="plate plate-clipped p-5 sm:p-6">
                   <p className="eyebrow">{service.shortTitle}</p>
                   <p className="mt-3 font-display text-display-xs text-ink">{service.summary}</p>
                   <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
@@ -115,7 +120,7 @@ export default function ServicesPage() {
                         key={feature.label}
                         className="flex items-center gap-2.5 rounded-lg border border-line bg-mist px-3 py-2.5"
                       >
-                        <Icon name={feature.icon} className="h-4 w-4 shrink-0 text-cobalt" />
+                        <Icon name={feature.icon} className={cn("h-4 w-4 shrink-0", layer.text)} />
                         <span className="text-xs text-charcoal">{feature.label}</span>
                       </li>
                     ))}
@@ -129,14 +134,18 @@ export default function ServicesPage() {
 
       <section className="section">
         <Container>
-          <SectionHeading title="Built for Businesses at Every Stage" />
+          <SectionHeading
+            no="S01"
+            align="left" title="Built for Businesses at Every Stage" />
           <FeatureGrid items={clientTypes} columns={5} className="mt-10" />
         </Container>
       </section>
 
       <section className="section border-y border-line bg-mist">
         <Container>
-          <SectionHeading title="Our Process, Built Around Your Success" />
+          <SectionHeading
+            no="S02"
+            align="left" title="Our Process, Built Around Your Success" />
           <ProcessStepsRow steps={fullProcess} className="mt-12" />
         </Container>
       </section>

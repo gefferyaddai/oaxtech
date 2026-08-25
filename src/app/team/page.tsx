@@ -35,6 +35,7 @@ export default function TeamPage() {
   return (
     <>
       <PageHero
+        sheetNo="SHT 07"
         eyebrow="Our team"
         title="The People Behind OAX Tech"
         description="A multidisciplinary team combining software development, AI, business strategy and client outreach to build practical solutions that create real value."
@@ -59,7 +60,9 @@ export default function TeamPage() {
 
       <section className="section">
         <Container>
-          <SectionHeading eyebrow="Meet the team" title="The People Behind OAX Tech" />
+          <SectionHeading
+            no="T01"
+            align="left" eyebrow="Meet the team" title="The People Behind OAX Tech" />
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {team.map((member) => (
               <li key={member.slug}>
@@ -75,7 +78,9 @@ export default function TeamPage() {
 
       <section className="section border-y border-line bg-mist">
         <Container>
-          <SectionHeading eyebrow="How we work together" title="A Shared, Transparent Process" />
+          <SectionHeading
+            no="T02"
+            align="left" eyebrow="How we work together" title="A Shared, Transparent Process" />
           <ProcessStepsRow steps={collaborationProcess} className="mt-12" />
           <p className="mx-auto mt-10 max-w-2xl text-center text-sm leading-relaxed text-slate">
             Engineers, analysts and outreach specialists share context at every stage — ensuring
@@ -87,6 +92,8 @@ export default function TeamPage() {
       <section className="section">
         <Container>
           <SectionHeading
+            no="T03"
+            align="left"
             eyebrow="Our strength"
             title="Technical Skill Meets Business Understanding"
           />
@@ -133,7 +140,9 @@ export default function TeamPage() {
 
       <section className="section border-t border-line bg-mist">
         <Container>
-          <SectionHeading eyebrow="Our collaboration principles" title="How We Hold Ourselves to It" />
+          <SectionHeading
+            no="T04"
+            align="left" eyebrow="Our collaboration principles" title="How We Hold Ourselves to It" />
           <FeatureGrid items={collaborationPrinciples} columns={4} className="mt-10" />
         </Container>
       </section>
@@ -152,7 +161,7 @@ export default function TeamPage() {
             <ul className="grid gap-4 sm:grid-cols-2">
               {growWithUs.map((item) => (
                 <li key={item.label} className="card flex h-full flex-col p-5">
-                  <span className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-cobalt-soft text-cobalt">
+                  <span className="mb-3 inline-flex h-10 w-10 items-center justify-center border-rule border-graphite bg-revision text-white">
                     <Icon name={item.icon} className="h-5 w-5" />
                   </span>
                   <p className="font-display text-sm font-semibold text-ink">{item.label}</p>
