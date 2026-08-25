@@ -256,10 +256,12 @@ export function CheckboxGroup({
             <label
               key={option}
               className={cn(
-                "flex min-h-[2.75rem] cursor-pointer items-center gap-2.5 rounded-md border px-3 py-2 text-sm transition-colors",
+                /* Selected state inks the whole option solid rather than tinting it —
+                   a mark, not a wash, like every other state in the system. */
+                "flex min-h-[2.75rem] cursor-pointer items-center gap-2.5 border-rule px-3 py-2 text-sm transition-colors",
                 checked
-                  ? "border-cobalt bg-cobalt-soft text-ink"
-                  : "border-line bg-paper text-charcoal hover:border-line-strong",
+                  ? "border-graphite bg-graphite text-sheet"
+                  : "border-graphite bg-chalk text-graphite hover:bg-sheet-deep",
               )}
             >
               <input
@@ -338,10 +340,10 @@ export function RadioCardGroup({
             <label
               key={option.value}
               className={cn(
-                "flex cursor-pointer items-start gap-3 rounded-lg border p-3.5 transition-colors",
+                "flex cursor-pointer items-start gap-3 border-rule p-3.5 transition-colors",
                 checked
-                  ? "border-cobalt bg-cobalt-soft"
-                  : "border-line bg-paper hover:border-line-strong",
+                  ? "border-revision bg-revision-soft"
+                  : "border-graphite bg-chalk hover:bg-sheet-deep",
               )}
             >
               <input
