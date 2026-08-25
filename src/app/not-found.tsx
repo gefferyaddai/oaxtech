@@ -7,7 +7,7 @@ export default function NotFound() {
     <section className="section">
       <Container narrow>
         <div className="mx-auto max-w-lg text-center">
-          <span className="mx-auto mb-5 inline-flex h-12 w-12 items-center justify-center rounded-full bg-cobalt-soft text-cobalt">
+          <span className="mx-auto mb-5 inline-flex h-12 w-12 items-center justify-center border-rule border-graphite bg-revision text-white">
             <Icon name="Search" className="h-6 w-6" />
           </span>
           <h1 className="text-display-md">This page doesn&apos;t exist</h1>
