@@ -87,7 +87,10 @@ export function MobileNavigation() {
         onClick={() => setOpen(true)}
         aria-expanded={open}
         aria-haspopup="dialog"
-        className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-line text-ink lg:hidden"
+        /* The header sits on the ink ground, so this trigger is light-on-dark.
+           It was `text-ink`, which rendered an invisible icon inside a visible
+           box once the header stopped being a light surface. */
+        className="inline-flex h-11 w-11 items-center justify-center border border-ink-line text-white transition-colors hover:border-revision hover:bg-revision lg:hidden"
       >
         <Icon name="Menu" className="h-5 w-5" label="Open menu" />
       </button>
