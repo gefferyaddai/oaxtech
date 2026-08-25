@@ -17,16 +17,24 @@ export const primaryNav: NavGroup[] = [
   {
     label: "Services",
     href: "/services",
+    /* Three destinations, split by what a visitor is actually shopping for.
+       Each one leads somewhere that covers only that thing — "Websites &
+       Software" showing marketing sections would make the split cosmetic. */
     children: [
       {
-        label: "All Services",
+        label: "Websites & Software",
         href: "/services",
-        description: "Websites, software, marketing and SEO",
+        description: "Websites, web and mobile apps, AI and automation",
       },
       {
         label: "Marketing & SEO",
         href: "/services/marketing-seo",
-        description: "Strategy, local SEO and reporting",
+        description: "Strategy, paid ads, local SEO and reporting",
+      },
+      {
+        label: "Business Kickstarter Packages",
+        href: "/services/business-kickstarter",
+        description: "Website plus campaigns, bundled over a fixed term",
       },
     ],
   },
@@ -47,10 +55,10 @@ export const footerNav: { heading: string; links: NavLink[] }[] = [
   {
     heading: "Services",
     links: [
-      { label: "Website Design", href: "/services#website-design" },
-      { label: "Custom Software", href: "/services#custom-software" },
-      { label: "Marketing Consulting", href: "/services/marketing-seo#marketing-consulting" },
-      { label: "SEO Services", href: "/services/marketing-seo#seo-services" },
+      { label: "Websites & Software", href: "/services" },
+      { label: "Marketing & SEO", href: "/services/marketing-seo" },
+      { label: "Business Kickstarter", href: "/services/business-kickstarter" },
+      { label: "Pricing", href: "/pricing" },
     ],
   },
   {
