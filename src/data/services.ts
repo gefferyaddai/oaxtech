@@ -49,12 +49,20 @@ export const services: Service[] = [
     title: "Custom Software Solutions",
     shortTitle: "Custom Software",
     summary:
-      "Powerful custom applications and integrations that solve real business problems.",
+      "Custom applications, mobile apps and automation that solve real business problems.",
     detail:
-      "Powerful web applications and tools tailored to your processes, integrations, and growth objectives.",
+      "Web and mobile applications, AI and automation, and integrations tailored to your processes, systems and growth objectives.",
     icon: "Code2",
+    /* Mobile applications and AI & automation are listed here as well as in
+       `capabilities`: both are real offerings, scoped and priced after a
+       consultation (see `softwarePackages` in data/pricing.ts). They sit under
+       this service rather than becoming top-level services of their own —
+       both are software work, and the site's structure and its four
+       drawing-layer colours are built around four disciplines. */
     features: [
       { label: "Web Applications", icon: "AppWindow" },
+      { label: "Mobile Applications", icon: "Smartphone" },
+      { label: "AI & Automation", icon: "BrainCircuit" },
       { label: "Internal Management Systems", icon: "Building" },
       { label: "Business Dashboards", icon: "LayoutDashboard" },
       { label: "API Integrations", icon: "Workflow" },
@@ -109,6 +117,21 @@ export const services: Service[] = [
     ctaLabel: "Explore SEO",
   },
 ];
+
+/**
+ * The services grouped the way the navigation splits them.
+ *
+ * The Services menu offers "Websites & Software" and "Marketing & SEO" as
+ * separate destinations, so each page must show only its own half — a visitor
+ * who picks one and finds the other there learns the menu is decorative.
+ */
+export const softwareServices = services.filter(
+  (service) => service.slug === "website-design" || service.slug === "custom-software",
+);
+
+export const marketingServices = services.filter(
+  (service) => service.slug === "marketing-consulting" || service.slug === "seo",
+);
 
 /** Capability cards used on the work page filter overview. */
 export const capabilities = [
