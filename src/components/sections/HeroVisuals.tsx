@@ -1,98 +1,218 @@
+import { CornerTicks, TitleBlock } from "@/components/ui/Drawing";
 import { Icon } from "@/components/ui/Icon";
-import { OrbitalSystem } from "@/components/ui/OrbitalSystem";
+import { SlideIn } from "@/components/ui/Motion";
+import { layerFor } from "@/lib/layers";
 import { cn } from "@/lib/utils";
 
 /**
- * Hero visuals are built from real markup rather than dropped-in screenshots.
+ * ============================================================================
+ * HERO VISUALS
+ * ============================================================================
  *
- * That keeps page weight low, avoids layout shift, and means no meaningful text
- * is trapped inside an image. Most heroes below are variations of one signature
- * device — the orbital system, echoing the OAX mark — orbited by the page's own
- * real content (services, packages, people) instead of an invented dashboard
- * screenshot. Any text that is purely illustrative (device-mockup captions) is
- * marked aria-hidden so screen readers aren't read a fake product.
+ * Built from real markup rather than dropped-in screenshots: page weight stays
+ * low, there is no layout shift, and no meaningful text is trapped inside an
+ * image.
+ *
+ * Every visual here is a DRAWING PLATE — a bordered field with registration
+ * ticks, a ruled header, numbered rows and a title block at the foot. It is the
+ * same device as the homepage's legend, which is the point: each interior page
+ * opens with a detail plate belonging to the same set as the cover sheet.
+ *
+ * These replaced the previous orbital-motif visuals. Two things changed beyond
+ * the styling:
+ *
+ *   - Illustrative device mockups no longer carry invented marketing copy
+ *     ("Grow with confidence", "Built for what's next"). They are labelled as
+ *     elevations, which is what they actually are — a drawing of a layout at a
+ *     given width. It is more honest and it belongs to this world.
+ *   - Anything purely illustrative stays `aria-hidden`, so a screen reader is
+ *     never read a fake product.
  */
 
 /* -------------------------------------------------------------------------- */
-/* Home hero — the four disciplines, orbiting                                  */
+/* The plate                                                                  */
 /* -------------------------------------------------------------------------- */
 
+interface PlateNode {
+  key: string;
+  icon?: string;
+  label: string;
+  /** Secondary value shown right-aligned — a price, a status, a count. */
+  meta?: string;
+  /** Rendered instead of an icon. Used for the team plate's initials. */
+  initials?: string;
+  /** Service slug, when this row maps to one of the four drawing layers. */
+  slug?: string;
+}
+
+/**
+ * The shared device. A legend of the page's own real content, drawn as a plate.
+ */
+function LegendPlate({
+  title,
+  nodes,
+  sheet,
+  countLabel = "items",
+  className,
+}: {
+  title: string;
+  nodes: PlateNode[];
+  sheet: string;
+  countLabel?: string;
+  className?: string;
+}) {
+  return (
+    <div className={cn("relative border border-line bg-chalk p-5 sm:p-6", className)}>
+      <CornerTicks />
+
+      <div className="flex items-baseline justify-between border-b-rule border-graphite pb-2">
+        <span className="tally font-mono text-graphite">{title}</span>
+        <span className="tally font-mono text-faint nums">
+          {String(nodes.length).padStart(2, "0")} {countLabel}
+        </span>
+      </div>
+
+      <ul>
+        {nodes.map((node, index) => (
+          <SlideIn
+            as="li"
+            key={node.key}
+            from="right"
+            delay={120 + index * 90}
+            className="group flex items-center gap-4 border-b border-line py-3.5 last:border-b-0"
+          >
+            {/* Rows that map to a discipline carry that layer's pen colour;
+                the rest stay neutral rather than borrowing one. */}
+            <span
+              aria-hidden="true"
+              className={cn(
+                "tally shrink-0 font-mono nums",
+                node.slug ? layerFor(node.slug).text : "text-faint",
+              )}
+            >
+              {node.slug ? layerFor(node.slug).no : String(index + 1).padStart(2, "0")}
+            </span>
+
+            <span
+              className={cn(
+                "flex h-9 w-9 shrink-0 items-center justify-center border border-graphite transition-colors duration-200 group-hover:bg-graphite group-hover:text-white",
+                node.slug ? `${layerFor(node.slug).fill} text-white` : "bg-sheet text-graphite",
+                node.initials && "font-display text-sm font-bold",
+              )}
+            >
+              {node.initials ? (
+                node.initials
+              ) : (
+                <Icon name={node.icon ?? "Square"} className="h-4 w-4" />
+              )}
+            </span>
+
+            <span className="min-w-0 flex-1 font-display text-base font-bold uppercase leading-tight text-graphite">
+              {node.label}
+            </span>
+
+            {node.meta && (
+              <span className="tally shrink-0 whitespace-nowrap font-mono text-faint">
+                {node.meta}
+              </span>
+            )}
+          </SlideIn>
+        ))}
+      </ul>
+
+      <TitleBlock
+        className="mt-5"
+        fields={[
+          { label: "Sheet", value: sheet },
+          { label: "Drawn by", value: "OAX Tech" },
+        ]}
+      />
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Home                                                                       */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Retained for compatibility. The homepage composes its own legend inside
+ * `HomeHero`, so nothing renders this today.
+ */
 export function HeroDashboard() {
   return (
-    <OrbitalSystem
-      hub={{ icon: "Rocket", label: "OAX Tech" }}
+    <LegendPlate
+      title="Disciplines"
+      sheet="01"
+      countLabel="services"
       nodes={[
-        { key: "web", icon: "Monitor", label: "Websites" },
-        { key: "software", icon: "Code2", label: "Custom Software" },
-        { key: "marketing", icon: "BarChart3", label: "Marketing" },
-        { key: "seo", icon: "Search", label: "SEO" },
+        { key: "web", icon: "Monitor", label: "Websites", slug: "website-design" },
+        { key: "software", icon: "Code2", label: "Custom software", slug: "custom-software" },
+        { key: "marketing", icon: "BarChart3", label: "Marketing", slug: "marketing-consulting" },
+        { key: "seo", icon: "Search", label: "SEO", slug: "seo" },
       ]}
     />
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/* Services hero — orbit of capability tiles                                   */
+/* Services / pricing / marketing / about / contact                           */
 /* -------------------------------------------------------------------------- */
 
 export function ServicesHeroVisual() {
   return (
-    <OrbitalSystem
-      hub={{ icon: "Layers", label: "Capabilities" }}
+    <LegendPlate
+      title="Capabilities"
+      sheet="02"
+      countLabel="areas"
       nodes={[
-        { key: "dev", icon: "Code2", label: "Custom Development" },
-        { key: "design", icon: "PenSquare", label: "Design & Experience" },
-        { key: "marketing", icon: "BarChart3", label: "Digital Marketing" },
-        { key: "growth", icon: "Search", label: "Optimization & Growth" },
+        { key: "dev", icon: "Code2", label: "Custom development", slug: "custom-software" },
+        { key: "design", icon: "PenSquare", label: "Design & experience", slug: "website-design" },
+        { key: "marketing", icon: "BarChart3", label: "Digital marketing", slug: "marketing-consulting" },
+        { key: "growth", icon: "Search", label: "Optimization & growth", slug: "seo" },
       ]}
     />
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/* Pricing hero                                                                */
-/* -------------------------------------------------------------------------- */
 
 export function PricingHeroVisual() {
   return (
-    <OrbitalSystem
-      hub={{ icon: "Wallet", label: "Pricing" }}
+    <LegendPlate
+      title="Rate schedule"
+      sheet="03"
+      countLabel="lines"
       nodes={[
-        { key: "web", icon: "Monitor", label: "Websites", meta: "From $600 CAD" },
-        { key: "software", icon: "Code2", label: "Custom Software", meta: "Custom quote" },
-        { key: "marketing", icon: "BarChart3", label: "Marketing", meta: "Request pricing" },
-        { key: "seo", icon: "Search", label: "SEO", meta: "Request pricing" },
+        { key: "web", icon: "Monitor", label: "Websites", meta: "From $600 CAD", slug: "website-design" },
+        { key: "software", icon: "Code2", label: "Custom software", meta: "Custom quote", slug: "custom-software" },
+        { key: "marketing", icon: "BarChart3", label: "Marketing", meta: "Request pricing", slug: "marketing-consulting" },
+        { key: "seo", icon: "Search", label: "SEO", meta: "Request pricing", slug: "seo" },
       ]}
     />
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/* Marketing hero                                                              */
-/* -------------------------------------------------------------------------- */
 
 export function MarketingHeroVisual() {
   return (
-    <OrbitalSystem
-      hub={{ icon: "TrendingUp", label: "Growth" }}
+    <LegendPlate
+      title="Growth scope"
+      sheet="04"
+      countLabel="areas"
       nodes={[
-        { key: "brand", icon: "Megaphone", label: "Brand Awareness" },
-        { key: "leads", icon: "Target", label: "Lead Generation" },
+        { key: "brand", icon: "Megaphone", label: "Brand awareness" },
+        { key: "leads", icon: "Target", label: "Lead generation" },
         { key: "content", icon: "PenSquare", label: "Content" },
-        { key: "seo", icon: "Search", label: "SEO" },
+        { key: "seo", icon: "Search", label: "SEO", slug: "seo" },
       ]}
     />
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/* About hero                                                                  */
-/* -------------------------------------------------------------------------- */
-
 export function AboutHeroVisual() {
   return (
-    <OrbitalSystem
-      hub={{ icon: "Compass", label: "Our approach" }}
+    <LegendPlate
+      title="Our approach"
+      sheet="05"
+      countLabel="stages"
       nodes={[
         { key: "research", icon: "Search", label: "Research" },
         { key: "plan", icon: "ClipboardCheck", label: "Plan" },
@@ -103,115 +223,155 @@ export function AboutHeroVisual() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/* Contact hero                                                                */
-/* -------------------------------------------------------------------------- */
-
 export function ContactHeroVisual() {
   return (
-    <OrbitalSystem
-      hub={{ icon: "MessageSquare", label: "Let's talk" }}
+    <LegendPlate
+      title="Ways to reach us"
+      sheet="06"
+      countLabel="routes"
       nodes={[
-        { key: "message", icon: "MessageSquare", label: "Send a Message" },
-        { key: "email", icon: "Mail", label: "Email Us" },
-        { key: "book", icon: "Calendar", label: "Book a Consultation" },
+        { key: "message", icon: "MessageSquare", label: "Send a message" },
+        { key: "email", icon: "Mail", label: "Email us" },
+        { key: "book", icon: "Calendar", label: "Book a consultation" },
       ]}
     />
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/* Team hero — the people, orbiting                                            */
-/* -------------------------------------------------------------------------- */
-
 export function TeamHeroVisual({ initials }: { initials: string[] }) {
   return (
-    <OrbitalSystem
-      nodeStyle="avatar"
-      hub={{ icon: "Users", label: "The team" }}
-      nodes={initials.map((value, index) => ({ key: `${value}-${index}`, label: value }))}
+    <LegendPlate
+      title="Team register"
+      sheet="07"
+      countLabel="on record"
+      nodes={initials.map((value, index) => ({
+        key: `${value}-${index}`,
+        initials: value,
+        label: "Team member",
+      }))}
     />
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/* Shared device-frame primitives — used where the subject really is a screen  */
+/* Elevations                                                                 */
 /* -------------------------------------------------------------------------- */
 
-function BrowserChrome({ label, dark }: { label?: string; dark?: boolean }) {
+/**
+ * A drawn elevation: the outline of a layout at a given width, with its
+ * dimension label. This replaces the previous gradient-filled device mockups —
+ * a drawing of a screen shows the same thing (this site works at these widths)
+ * without pretending to be a screenshot of a site that does not exist.
+ */
+function Elevation({
+  label,
+  width,
+  ratio,
+  rows = 3,
+  tone = "paper",
+  className,
+}: {
+  label: string;
+  width: string;
+  /** Tailwind aspect ratio class, e.g. "aspect-[9/16]". */
+  ratio: string;
+  rows?: number;
+  tone?: "paper" | "ink";
+  className?: string;
+}) {
+  const onInk = tone === "ink";
+
   return (
-    <div
-      className={cn(
-        "flex items-center gap-1.5 border-b px-3.5 py-2.5",
-        dark ? "border-space-line" : "border-line-subtle",
-      )}
-    >
-      <span className="h-2.5 w-2.5 rounded-full bg-danger/50" />
-      <span className="h-2.5 w-2.5 rounded-full bg-warning/50" />
-      <span className="h-2.5 w-2.5 rounded-full bg-success/50" />
-      {label && (
-        <span className={cn("ml-2 truncate text-2xs", dark ? "text-space-text" : "text-muted")}>
-          {label}
-        </span>
-      )}
-    </div>
+    <figure className={cn("flex min-w-0 flex-col gap-2", className)}>
+      <div
+        className={cn(
+          "relative border-rule",
+          ratio,
+          onInk ? "border-ink-line bg-ink" : "border-graphite bg-sheet",
+        )}
+      >
+        {/* Title bar of the drawn screen */}
+        <div
+          className={cn(
+            "flex h-5 items-center gap-1 border-b px-1.5",
+            onInk ? "border-ink-line" : "border-line",
+          )}
+          aria-hidden="true"
+        >
+          <span className={cn("h-1.5 w-1.5", onInk ? "bg-ink-line" : "bg-line")} />
+          <span className={cn("h-1.5 w-1.5", onInk ? "bg-ink-line" : "bg-line")} />
+        </div>
+
+        {/* Content blocks, drawn not filled */}
+        <div className="space-y-1.5 p-2" aria-hidden="true">
+          <span className={cn("block h-3 w-3/4", onInk ? "bg-ink-text/40" : "bg-graphite")} />
+          <span className="block h-8 w-full bg-revision/85" />
+          {Array.from({ length: rows }).map((_, index) => (
+            <span
+              key={index}
+              className={cn(
+                "block h-1.5",
+                index % 2 === 0 ? "w-full" : "w-2/3",
+                onInk ? "bg-ink-line" : "bg-line",
+              )}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* The dimension: end ticks, rule, and the width it is drawn at */}
+      <div className="flex items-center gap-1.5" aria-hidden="true">
+        <span className="h-2 w-px shrink-0 bg-line" />
+        <span className="h-px flex-1 bg-line" />
+        <span className="tally shrink-0 whitespace-nowrap font-mono text-faint">{width}</span>
+        <span className="h-px flex-1 bg-line" />
+        <span className="h-2 w-px shrink-0 bg-line" />
+      </div>
+
+      <figcaption className="tally text-center font-mono text-faint">{label}</figcaption>
+    </figure>
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/* Work hero — a real mini site, rendered across three real form factors       */
-/* -------------------------------------------------------------------------- */
-
+/**
+ * The work page: one layout drawn at three widths, which is what "responsive"
+ * actually means and what the previous three-device mockup was gesturing at.
+ */
 export function WorkHeroVisual() {
   return (
-    <div className="relative mx-auto flex w-full max-w-lg items-end justify-center gap-3">
-      <div className="pointer-events-none absolute inset-x-0 top-1/2 h-32 -translate-y-1/2 rounded-full bg-cobalt/10 blur-3xl" />
+    <div className="relative border border-line bg-chalk p-5 sm:p-6">
+      <CornerTicks />
 
-      {/* Phone */}
-      <div className="w-24 shrink-0 -rotate-3 rounded-[1.4rem] border border-line bg-paper p-1.5 shadow-float transition-transform duration-500 hover:rotate-0 sm:w-28">
-        <div className="overflow-hidden rounded-[1rem] bg-mist">
-          <div className="mx-auto mb-2 mt-1.5 h-1 w-6 rounded-full bg-line-strong" aria-hidden="true" />
-          <div className="space-y-2 px-2 pb-2.5">
-            <p className="font-display text-[0.55rem] font-semibold text-ink">Grow with confidence.</p>
-            <div className="h-9 rounded-md bg-gradient-to-br from-cobalt/25 to-violet/15" aria-hidden="true" />
-            <span className="btn btn-primary block !min-h-0 !py-1 !text-[0.5rem]">Get Started</span>
-          </div>
-        </div>
+      <div className="flex items-baseline justify-between border-b-rule border-graphite pb-2">
+        <span className="tally font-mono text-graphite">Elevations</span>
+        <span className="tally font-mono text-faint nums">03 widths</span>
       </div>
 
-      {/* Laptop */}
-      <div className="card relative z-10 min-w-0 flex-1 overflow-hidden shadow-float">
-        <BrowserChrome label="yoursite.com" />
-        <div className="space-y-2.5 p-3.5">
-          <p className="font-display text-xs font-semibold leading-snug text-ink">Built for what&apos;s next.</p>
-          <div className="h-14 rounded-md bg-gradient-to-br from-cobalt/20 via-violet/10 to-transparent" aria-hidden="true" />
-          <div className="grid grid-cols-3 gap-2 pt-0.5" aria-hidden="true">
-            {["Home", "Work", "Contact"].map((label) => (
-              <div key={label} className="rounded-md border border-line bg-mist px-2 py-1.5 text-center text-[0.55rem] font-medium text-slate">
-                {label}
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className="mt-5 grid grid-cols-[1fr_1.5fr_1fr] items-end gap-3 sm:gap-4">
+        <SlideIn delay={80}>
+          <Elevation label="Phone" width="390" ratio="aspect-[9/16]" rows={2} />
+        </SlideIn>
+        <SlideIn delay={160}>
+          <Elevation label="Desktop" width="1440" ratio="aspect-[4/3]" rows={3} />
+        </SlideIn>
+        <SlideIn delay={240}>
+          <Elevation label="Tablet" width="820" ratio="aspect-[3/4]" rows={2} tone="ink" />
+        </SlideIn>
       </div>
 
-      {/* Tablet, dark */}
-      <div className="hidden w-28 shrink-0 rotate-3 overflow-hidden rounded-xl border border-space-line bg-space p-1.5 shadow-float transition-transform duration-500 hover:rotate-0 sm:block">
-        <div className="rounded-lg bg-space-card p-2.5">
-          <p className="text-[0.55rem] font-medium text-space-text">Performance</p>
-          <div className="mt-2 flex items-end gap-1" aria-hidden="true">
-            {[40, 65, 52, 80, 70].map((h, i) => (
-              <span key={i} className="flex-1 rounded-sm bg-cobalt/70" style={{ height: `${h * 0.4}px` }} />
-            ))}
-          </div>
-        </div>
-      </div>
+      <TitleBlock
+        className="mt-6"
+        fields={[
+          { label: "Sheet", value: "08" },
+          { label: "Scale", value: "NTS" },
+        ]}
+      />
     </div>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/* Case-study hero — phone trio                                                */
+/* Case study                                                                 */
 /* -------------------------------------------------------------------------- */
 
 interface PhoneProps {
@@ -221,92 +381,115 @@ interface PhoneProps {
   className?: string;
 }
 
+/**
+ * A single phone elevation with its own caption. The `title` is real copy
+ * describing what that screen does, so it stays visible rather than being
+ * hidden as decoration.
+ */
 export function PhoneFrame({ title, eyebrow = "Compare", featured, className }: PhoneProps) {
   return (
-    <div
+    <figure
       className={cn(
-        "rounded-[1.75rem] border-4 border-ink bg-ink p-1 shadow-float transition-transform duration-500 hover:-translate-y-1.5",
+        "flex min-w-0 flex-col border-rule border-graphite bg-chalk",
         featured ? "w-40 sm:w-48" : "w-32 sm:w-36",
         className,
       )}
     >
-      <div className="overflow-hidden rounded-[1.35rem] bg-paper">
-        <div className="flex items-center justify-center border-b border-line-subtle py-1.5">
-          <span className="h-1 w-8 rounded-full bg-line-strong" aria-hidden="true" />
-        </div>
-        <div className="space-y-2.5 p-3">
-          <p className="text-[0.6rem] font-semibold uppercase tracking-[0.1em] text-cobalt">{eyebrow}</p>
-          <p className="font-display text-[0.75rem] font-semibold leading-snug text-ink">{title}</p>
-          <div className="h-10 rounded-md bg-gradient-to-br from-cobalt/20 via-violet/10 to-transparent" aria-hidden="true" />
-          {featured && (
-            <span className="btn btn-primary block !min-h-0 !py-1.5 !text-[0.55rem]">
-              See savings
-            </span>
-          )}
+      <div className={cn("border-b border-line px-2 py-1.5", featured && "bg-revision")}>
+        <span
+          className={cn("tally block font-mono", featured ? "text-white" : "text-revision-text")}
+        >
+          {eyebrow}
+        </span>
+      </div>
+
+      <div className="aspect-[9/16] bg-sheet p-2">
+        <span className="block h-6 w-full bg-revision/80" aria-hidden="true" />
+        <div className="mt-2 space-y-1.5" aria-hidden="true">
+          <span className="block h-1.5 w-full bg-line" />
+          <span className="block h-1.5 w-2/3 bg-line" />
         </div>
       </div>
-    </div>
+
+      <figcaption className="border-t border-line px-2 py-2 font-display text-xs font-bold uppercase leading-tight text-graphite">
+        {title}
+      </figcaption>
+    </figure>
   );
 }
 
 export function SpargoHeroVisual() {
   return (
-    <div className="flex items-center justify-center gap-2 sm:gap-3">
-      <PhoneFrame title="Compare prices instantly" eyebrow="Search" className="hidden translate-y-4 xs:block" />
-      <PhoneFrame title="Find better prices. Save more today." eyebrow="Spargo" featured />
-      <PhoneFrame title="Track your savings" eyebrow="Savings" className="hidden translate-y-4 xs:block" />
+    <div className="flex items-start justify-center gap-2 sm:gap-3">
+      <PhoneFrame title="Compare prices instantly" eyebrow="Search" className="hidden xs:flex" />
+      <PhoneFrame title="Find better prices" eyebrow="Spargo" featured />
+      <PhoneFrame title="Track your savings" eyebrow="Savings" className="hidden xs:flex" />
     </div>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/* Booking hero — a real calendar grid with a selected slot                    */
+/* Booking                                                                    */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * A month drawn as a schedule grid.
+ *
+ * The marked day and time are ILLUSTRATIVE, not an available slot — the whole
+ * grid is `aria-hidden` and the booking page's own availability UI is the only
+ * thing that states real times. The previous version had the same constraint.
+ */
 export function BookingHeroVisual() {
   const days = Array.from({ length: 28 }, (_, i) => i + 1);
   const selected = 17;
 
   return (
-    <div className="relative mx-auto w-full max-w-sm">
-      <div className="card overflow-hidden p-5 shadow-float">
-        <div className="mb-3 flex items-center justify-between">
-          <p className="font-display text-xs font-semibold text-ink">Pick a time</p>
-          <Icon name="Calendar" className="h-4 w-4 text-cobalt" />
-        </div>
-        <div className="grid grid-cols-7 gap-1.5" aria-hidden="true">
-          {days.map((day) => (
-            <span
-              key={day}
-              className={cn(
-                "flex aspect-square items-center justify-center rounded text-[0.6rem] font-medium",
-                day === selected
-                  ? "bg-cobalt text-white"
-                  : day % 5 === 0
-                    ? "bg-cobalt-soft text-cobalt"
-                    : "bg-mist text-slate",
-              )}
-            >
-              {day}
-            </span>
-          ))}
-        </div>
+    <div className="relative border border-line bg-chalk p-5 sm:p-6">
+      <CornerTicks />
+
+      <div className="flex items-baseline justify-between border-b-rule border-graphite pb-2">
+        <span className="tally font-mono text-graphite">Schedule</span>
+        <span className="tally font-mono text-faint nums">30 min · Free</span>
       </div>
-      <div className="card absolute -bottom-5 -right-3 flex items-center gap-2 p-3 shadow-float">
-        <Icon name="CheckCircle2" className="h-5 w-5 shrink-0 text-cobalt" />
-        <div className="pr-1">
-          <p className="text-[0.65rem] font-semibold text-ink">Tue, 2:00 PM</p>
-          <p className="text-[0.6rem] text-muted">30 min call</p>
-        </div>
+
+      <div className="mt-5 grid grid-cols-7 gap-1" aria-hidden="true">
+        {days.map((day) => (
+          <span
+            key={day}
+            className={cn(
+              "flex aspect-square items-center justify-center border font-mono text-[0.6rem] tabular-nums",
+              day === selected
+                ? "border-graphite bg-revision text-white"
+                : day % 5 === 0
+                  ? "border-graphite bg-sheet text-graphite"
+                  : "border-line text-faint",
+            )}
+          >
+            {day}
+          </span>
+        ))}
       </div>
+
+      <p className="tally mt-4 border-t border-line pt-3 font-mono text-faint">
+        Marked cells are illustrative — real availability is shown below.
+      </p>
+
+      <TitleBlock
+        className="mt-4"
+        fields={[
+          { label: "Sheet", value: "09" },
+          { label: "Duration", value: "30 min" },
+        ]}
+      />
     </div>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/* Quote hero — a proposal outline                                            */
+/* Quote                                                                      */
 /* -------------------------------------------------------------------------- */
 
+/** A proposal drawn as a schedule of what a quote covers. */
 export function QuoteHeroVisual() {
   const rows = [
     { icon: "Layers", label: "Scope" },
@@ -315,35 +498,11 @@ export function QuoteHeroVisual() {
   ];
 
   return (
-    <div className="relative mx-auto w-full max-w-sm">
-      <div className="card overflow-hidden shadow-float">
-        <div className="flex items-center justify-between border-b border-line-subtle px-5 py-3.5">
-          <p className="font-display text-sm font-semibold text-ink">Project proposal</p>
-          <span className="rounded-full bg-cobalt-soft px-2.5 py-1 text-2xs font-semibold text-cobalt">Draft</span>
-        </div>
-        <ul className="space-y-3.5 p-5">
-          {rows.map((row) => (
-            <li key={row.label} className="flex items-center gap-3">
-              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cobalt-soft text-cobalt">
-                <Icon name={row.icon} className="h-4 w-4" />
-              </span>
-              <span className="text-sm font-medium text-charcoal">{row.label}</span>
-              <span className="ml-auto h-1.5 w-16 rounded-full bg-line" aria-hidden="true" />
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="card absolute -bottom-6 -left-3 w-40 p-3 shadow-float">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-cobalt-soft text-cobalt">
-            <Icon name="Monitor" className="h-3.5 w-3.5" />
-          </span>
-          <div>
-            <p className="text-2xs text-muted">Website project</p>
-            <p className="text-xs font-semibold text-ink">From $1,000 CAD</p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <LegendPlate
+      title="Proposal outline"
+      sheet="10"
+      countLabel="sections"
+      nodes={rows.map((row) => ({ key: row.label, icon: row.icon, label: row.label }))}
+    />
   );
 }
