@@ -107,7 +107,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           ) : (
             // Clear "coming soon" handling — never a broken link.
             <div className="card mt-10 p-6 sm:p-8">
-              <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-cobalt-soft text-cobalt">
+              <span className="mb-4 inline-flex h-11 w-11 items-center justify-center border-rule border-graphite bg-revision text-white">
                 <Icon name="PenSquare" className="h-5 w-5" />
               </span>
               <h2 className="font-display text-display-xs">This guide is still being written</h2>
