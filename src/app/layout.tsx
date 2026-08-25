@@ -86,10 +86,49 @@ function organizationSchema() {
   return schema;
 }
 
+/**
+ * The direction contract for this build, emitted as a real HTML comment.
+ *
+ * React strips JSX comments before they ever reach the markup, so a `{/* … *\/}`
+ * block here would document the decision for whoever opens this file and for
+ * nobody auditing the built page. Setting it through `dangerouslySetInnerHTML`
+ * on a hidden, aria-hidden container is what actually survives `next build`,
+ * which is the point: the contract has to be greppable in the output.
+ */
+const DIRECTION_CONTRACT = `<!--
+  THESIS: This site is an engineering drawing set — every section a sheet carrying
+  its own title block, drawing number and revision. It refuses the dark-navy agency
+  page with its gradient mesh, glass cards and floating dashboard mockup.
+
+  OWN-WORLD: Cool grey stock (#E4E5E8) and near-black ink (#0B0B10) as two full-bleed
+  grounds, a deep exposure violet (#6D28D9) carrying the action at ~30% coverage, one
+  Prussian blue (#1E40AF) reserved for the metadata layer, hairline linework and
+  45-degree hatch. The cyanotype/diazo end of technical printing rather than the
+  warm-paper end. Big Shoulders Display set oversized, uppercase and tight; Martian
+  Mono for drawing numbers and specs. Square corners everywhere; containers are
+  clipped, never rounded.
+
+  STORY: A Calgary business owner sees a team that documents what it builds, reads
+  real projects and transparent pricing, and books a free consultation.
+
+  FIRST VIEWPORT: A sheet border with corner ticks frames the viewport. The headline
+  runs four tight lines across the left two-thirds over a heavy rule; a dimension
+  line measures from the last word to the booking block, a solid revision-orange
+  rectangle at lower left. The title block sits bottom-right carrying SHEET 01 /
+  REV 2026.08 / CALGARY AB.
+
+  FORM: The Title Block — candidate 1 of 7, user-picked over the roll's assignment;
+  seed key 61bdf409.
+
+  FINISH: unreviewed and undocumented is unfinished; this build ends with the finish
+  review, the verdict, DESIGN.md, and every shipping raster carrying its provenance.
+-->`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-CA">
       <body>
+        <div hidden aria-hidden dangerouslySetInnerHTML={{ __html: DIRECTION_CONTRACT }} />
         <a href="#main" className="skip-link">
           Skip to main content
         </a>
