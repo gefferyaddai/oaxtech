@@ -33,17 +33,24 @@ export function FilterTabs<T extends string>({
             type="button"
             aria-pressed={isActive}
             onClick={() => onChange(option)}
+            /* Square tabs that ink solid when selected. State is a fill, not a
+               tint — the same rule the rest of the system runs on. */
             className={cn(
-              "inline-flex min-h-[2.5rem] items-center gap-1.5 rounded-full border px-4 text-sm transition-colors",
+              "inline-flex min-h-[2.75rem] items-center gap-2 border-rule px-4 font-display text-base font-bold uppercase tracking-wide transition-colors duration-150",
               isActive
-                ? "border-cobalt bg-cobalt font-medium text-white"
-                : "border-line bg-paper text-slate hover:border-line-strong hover:text-ink",
+                ? "border-graphite bg-revision text-white"
+                : "border-graphite bg-chalk text-graphite hover:bg-graphite hover:text-sheet",
             )}
           >
             {option}
             {typeof count === "number" && (
-              <span className={cn("text-xs", isActive ? "text-white/70" : "text-muted")}>
-                {count}
+              <span
+                className={cn(
+                  "tally font-mono tabular-nums",
+                  isActive ? "text-white/80" : "text-faint",
+                )}
+              >
+                {String(count).padStart(2, "0")}
               </span>
             )}
           </button>
