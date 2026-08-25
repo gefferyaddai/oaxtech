@@ -1,6 +1,5 @@
 import { Container } from "@/components/layout/Container";
-import { OrbitalBackdrop } from "@/components/ui/OrbitalBackdrop";
-import { StarField } from "@/components/ui/StarField";
+import { CornerTicks, TitleBlock } from "@/components/ui/Drawing";
 import { cn } from "@/lib/utils";
 
 interface CTASectionProps {
@@ -8,43 +7,62 @@ interface CTASectionProps {
   description?: React.ReactNode;
   actions: React.ReactNode;
   className?: string;
-  /** Inset card style used on the pricing and contact pages. */
+  /** Inset plate style used on the pricing and contact pages. */
   inset?: boolean;
+  /** Sheet number shown in the closing title block. */
+  sheetNo?: string;
 }
 
-/** Dark, space-inspired call to action used at the foot of every page. */
-export function CTASection({ title, description, actions, className, inset }: CTASectionProps) {
+/**
+ * The closing sheet, on the ink ground.
+ *
+ * This is the last thing on every page and the primary action's home, so it
+ * gets the heaviest treatment in the system: full-bleed ink, an oversized
+ * title, a hatched margin, and the actions as solid blocks rather than a row
+ * of links. The hatching runs down the left edge the way a drawing marks the
+ * bound edge of a sheet.
+ */
+export function CTASection({ title, description, actions, className, inset, sheetNo = "SHT 99" }: CTASectionProps) {
   const body = (
-    <div className="relative overflow-hidden">
-      <StarField />
-      <OrbitalBackdrop variant="dark" className="opacity-80" showNodes={false} animated />
-      <div className="relative grid grid-cols-1 items-center gap-8 px-6 py-12 sm:px-10 lg:grid-cols-[1.3fr_auto] lg:gap-12 lg:px-14 lg:py-16">
-        <div>
-          <h2 className="text-display-md text-white">{title}</h2>
+    <div className="relative">
+      <CornerTicks tone="revision" />
+
+      <div className="grid grid-cols-1 items-start gap-10 px-5 py-12 sm:px-10 sm:py-14 lg:grid-cols-[1.25fr_auto] lg:gap-16 lg:px-14 lg:py-20">
+        <div className="min-w-0">
+          <p className="eyebrow mb-6 text-ink-text">Next step</p>
+          <h2 className="text-display-xl text-white">{title}</h2>
           {description && (
-            <p className="mt-3 max-w-md text-sm leading-relaxed text-space-text sm:text-base">
-              {description}
-            </p>
+            <p className="mt-6 max-w-prose text-lg leading-relaxed text-ink-text">{description}</p>
           )}
+          <TitleBlock
+            tone="paper"
+            className="mt-10 hidden lg:flex"
+            fields={[
+              { label: "Consultation", value: "30 min · Free" },
+              { label: "Sheet", value: sheetNo },
+              { label: "Location", value: "Calgary AB" },
+            ]}
+          />
         </div>
-        <div className="flex w-full flex-col gap-3 sm:max-w-xs">{actions}</div>
+
+        <div className="flex w-full flex-col gap-4 lg:max-w-xs">{actions}</div>
       </div>
     </div>
   );
 
   if (inset) {
     return (
-      <section className={cn("bg-cream py-10 lg:py-14", className)}>
+      <section className={cn("bg-sheet py-12 lg:py-16", className)}>
         <Container>
-          <div className="overflow-hidden rounded-3xl bg-space">{body}</div>
+          <div className="surface-ink">{body}</div>
         </Container>
       </section>
     );
   }
 
   return (
-    <section className={cn("surface-space", className)}>
-      <Container>{body}</Container>
+    <section className={cn("surface-ink", className)}>
+      <Container className="py-0">{body}</Container>
     </section>
   );
 }
