@@ -8,6 +8,8 @@ import { ProcessStepsRow } from "@/components/sections/ProcessSteps";
 import { FeatureGrid } from "@/components/sections/ServiceCard";
 import { ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
+import { CornerTicks, TitleBlock } from "@/components/ui/Drawing";
+import { SlideIn } from "@/components/ui/Motion";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { marketingFaqs } from "@/data/faqs";
 import {
@@ -20,9 +22,18 @@ import {
   sampleReportSections,
   seoServiceList,
 } from "@/data/marketing";
+import {
+  auditBundle,
+  auditDelivery,
+  auditPackages,
+  auditsTotal,
+  bundleSaving,
+  formatCad,
+} from "@/data/audits";
 import { marketingPackages, seoPackages } from "@/data/pricing";
 import { marketingProcess } from "@/data/services";
 import { buildMetadata } from "@/lib/metadata";
+import { paymentsEnabled } from "@/lib/integrations";
 import { siteConfig } from "@/lib/site";
 
 export const metadata = buildMetadata({
@@ -32,10 +43,60 @@ export const metadata = buildMetadata({
   path: "/services/marketing-seo",
 });
 
+/**
+ * The buy action for an audit.
+ *
+ * Audits are meant to be purchased on the spot, but no payment provider is
+ * connected yet (`PAYMENTS_SECRET_KEY` is unset). Rendering a "Buy now" button
+ * that cannot take money would be the one thing this site has consistently
+ * refused to do — simulate a working integration. So until Stripe is wired up,
+ * the action routes to the quote form with the audit preselected, and says so
+ * plainly rather than failing at a checkout step.
+ *
+ * When the key is set, this switches to the real purchase route with no other
+ * change to the page.
+ */
+function AuditAction({ name, onInk }: { name: string; onInk?: boolean }) {
+  const canPurchase = paymentsEnabled();
+
+  if (canPurchase) {
+    return (
+      <ButtonLink
+        href={`/checkout?item=${encodeURIComponent(name)}`}
+        variant={onInk ? "primary" : "outline"}
+        className="mt-6 w-full"
+        iconLeft="CreditCard"
+      >
+        Buy this audit
+        <span className="sr-only"> — {name}</span>
+      </ButtonLink>
+    );
+  }
+
+  return (
+    <div className="mt-6">
+      <ButtonLink
+        href={`/quote?package=${encodeURIComponent(name)}`}
+        variant={onInk ? "primary" : "outline"}
+        className="w-full"
+      >
+        Request this audit
+        <span className="sr-only"> — {name}</span>
+      </ButtonLink>
+      <p
+        className={`tally mt-2 font-mono ${onInk ? "text-ink-muted" : "text-faint"}`}
+      >
+        Online payment coming soon — we will invoice you directly.
+      </p>
+    </div>
+  );
+}
+
 export default function MarketingSeoPage() {
   return (
     <>
       <PageHero
+        sheetNo="SHT 04"
         eyebrow="Marketing & SEO"
         title={
           <>
@@ -69,11 +130,13 @@ export default function MarketingSeoPage() {
 
       <section className="section">
         <Container>
-          <SectionHeading eyebrow="Problems we help solve" title="Where Growth Usually Gets Stuck" />
+          <SectionHeading
+            no="M01"
+            align="left" eyebrow="Problems we help solve" title="Where Growth Usually Gets Stuck" />
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             {problemsSolved.map((problem) => (
               <li key={problem.label} className="card p-5">
-                <span className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-cobalt-soft text-cobalt">
+                <span className="mb-3 inline-flex h-10 w-10 items-center justify-center border-rule border-graphite bg-revision text-white">
                   <Icon name={problem.icon} className="h-5 w-5" />
                 </span>
                 <p className="font-display text-sm font-semibold leading-snug text-ink">
@@ -222,15 +285,129 @@ export default function MarketingSeoPage() {
 
       <section className="section border-y border-line bg-mist">
         <Container>
-          <SectionHeading eyebrow="Our process" title="A Practical Path From Visibility to Growth" />
+          <SectionHeading
+            no="M02"
+            align="left" eyebrow="Our process" title="A Practical Path From Visibility to Growth" />
           <ProcessStepsRow steps={marketingProcess} className="mt-12" />
         </Container>
       </section>
 
       {/* Packages ------------------------------------------------------------ */}
+      {/* Audits — fixed price, bought directly --------------------------- */}
+      <section className="section border-t border-line bg-sheet" id="audits">
+        <Container>
+          <SectionHeading
+            no="M03"
+            align="left"
+            eyebrow="Audits"
+            title="Buy an audit outright"
+            description="Fixed price, no proposal round. You get a written report by email with findings ordered by what to fix first, and the option to book a call to walk through it."
+          />
+
+          <div className="mt-12 grid gap-5 md:grid-cols-3">
+            {auditPackages.map((audit, index) => (
+              <SlideIn key={audit.slug} delay={index * 110}>
+                <article className="plate plate-clipped plate-interactive group flex h-full flex-col p-6">
+                  <div className="flex items-center gap-3 border-b border-line pb-4">
+                    <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center border-rule border-graphite bg-revision text-white transition-colors duration-200 group-hover:bg-graphite">
+                      <Icon name={audit.icon} className="h-5 w-5" />
+                    </span>
+                    <h3 className="font-display text-lg font-bold uppercase leading-none text-graphite">
+                      {audit.name}
+                    </h3>
+                  </div>
+
+                  <p className="mt-4 flex items-baseline gap-2">
+                    <span className="font-display text-display-sm font-extrabold leading-none text-revision nums">
+                      {formatCad(audit.price)}
+                    </span>
+                    <span className="tally font-mono text-faint">CAD</span>
+                  </p>
+
+                  <p className="mt-3 text-sm leading-relaxed text-pencil">{audit.description}</p>
+
+                  <ul className="mt-5 flex-1">
+                    {audit.deliverables.map((item) => (
+                      <li
+                        key={item}
+                        className="flex items-start gap-3 border-b border-line py-2.5 text-sm text-pencil last:border-b-0"
+                      >
+                        <Icon name="Check" className="mt-0.5 h-4 w-4 shrink-0 text-revision-text" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <AuditAction name={audit.name} />
+                </article>
+              </SlideIn>
+            ))}
+          </div>
+
+          {/* Bundle */}
+          <SlideIn delay={140}>
+            <div className="plate plate-ink relative mt-5 p-6 sm:p-8">
+              <CornerTicks tone="revision" />
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.3fr_auto] lg:items-center">
+                <div>
+                  <p className="tally font-mono text-revision-onInk">Bundle</p>
+                  <h3 className="mt-3 font-display text-display-sm text-white">
+                    {auditBundle.name}
+                  </h3>
+                  <p className="mt-3 max-w-prose text-sm leading-relaxed text-ink-text">
+                    {auditBundle.description}
+                  </p>
+                  <TitleBlock
+                    tone="paper"
+                    className="mt-6"
+                    fields={[
+                      { label: "Bought separately", value: formatCad(auditsTotal()) },
+                      { label: "You save", value: formatCad(bundleSaving().amount) },
+                      { label: "Discount", value: `${bundleSaving().percent}%` },
+                    ]}
+                  />
+                </div>
+
+                <div className="flex w-full flex-col gap-4 lg:max-w-xs">
+                  <p className="flex items-baseline gap-2">
+                    <span className="font-display text-display-md font-extrabold leading-none text-revision-onInk nums">
+                      {formatCad(auditBundle.price)}
+                    </span>
+                    <span className="tally font-mono text-ink-muted">CAD</span>
+                  </p>
+                  <AuditAction name={auditBundle.name} onInk />
+                </div>
+              </div>
+            </div>
+          </SlideIn>
+
+          {/* How it is delivered */}
+          <div className="mt-12 grid gap-5 md:grid-cols-3">
+            {auditDelivery.map((step, index) => (
+              <SlideIn key={step.label} delay={index * 110}>
+                <div className="border-t-[3px] border-graphite pt-4">
+                  <div className="flex items-center gap-3">
+                    <Icon name={step.icon} className="h-5 w-5 text-revision-text" />
+                    <span aria-hidden="true" className="tally font-mono text-faint nums">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <p className="mt-3 font-display text-lg font-bold uppercase leading-none text-graphite">
+                    {step.label}
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-pencil">{step.description}</p>
+                </div>
+              </SlideIn>
+            ))}
+          </div>
+        </Container>
+      </section>
+
       <section className="section" id="packages">
         <Container>
-          <SectionHeading eyebrow="Available packages" title="Marketing and SEO Packages" />
+          <SectionHeading
+            no="M04"
+            align="left" eyebrow="Available packages" title="Ongoing marketing and SEO packages" />
           <div className="mt-10 grid gap-4 md:grid-cols-3">
             {seoPackages.map((pkg) => (
               <QuotedPackageCard key={pkg.name} pkg={pkg} />
@@ -249,11 +426,10 @@ export default function MarketingSeoPage() {
         <Container>
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-14">
             <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cobalt-border bg-cobalt-soft px-3 py-1.5">
-                <Icon name="Info" className="h-3.5 w-3.5 text-cobalt" />
-                <span className="text-2xs font-semibold uppercase tracking-wide text-cobalt">
-                  Illustrative sample
-                </span>
+              {/* Marked plainly: the panel below is a worked example, not a client result. */}
+              <div className="mb-4 inline-flex items-center gap-2 border-rule border-graphite bg-sheet-deep px-3 py-1.5">
+                <Icon name="Info" className="h-3.5 w-3.5 text-revision-text" />
+                <span className="tally font-mono text-graphite">Illustrative sample</span>
               </div>
               <div className="card p-5">
                 <p className="font-display text-sm font-semibold text-ink">
@@ -312,7 +488,9 @@ export default function MarketingSeoPage() {
 
       <section className="section" id="faq">
         <Container>
-          <SectionHeading eyebrow="FAQ" title="Marketing & SEO Questions" />
+          <SectionHeading
+            no="M04"
+            align="left" eyebrow="FAQ" title="Marketing & SEO Questions" />
           <FAQAccordion items={marketingFaqs} className="mt-10" />
         </Container>
       </section>

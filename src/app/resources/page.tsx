@@ -18,6 +18,7 @@ export default function ResourcesPage() {
   return (
     <>
       <PageHero
+        sheetNo="SHT 11"
         eyebrow="Resources"
         centered
         title="Practical Guides for Growing Businesses"
