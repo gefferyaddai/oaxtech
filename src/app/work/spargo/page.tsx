@@ -33,6 +33,7 @@ export default function SpargoCaseStudyPage() {
   return (
     <>
       <PageHero
+        sheetNo="SHT 08"
         eyebrow={study.eyebrow}
         breadcrumb={
           <nav aria-label="Breadcrumb" className="mb-8">
@@ -75,7 +76,7 @@ export default function SpargoCaseStudyPage() {
           <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {study.facts.map((fact) => (
               <div key={fact.label} className="flex items-start gap-3">
-                <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-cobalt-soft text-cobalt">
+                <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center border-rule border-graphite bg-revision text-white">
                   <Icon name={fact.icon} className="h-4 w-4" />
                 </span>
                 <div>
@@ -143,7 +144,9 @@ export default function SpargoCaseStudyPage() {
       {/* Solution ----------------------------------------------------------- */}
       <section className="section border-y border-line bg-mist">
         <Container>
-          <SectionHeading title="OAX Tech's Solution" />
+          <SectionHeading
+            no="W01"
+            align="left" title="OAX Tech's Solution" />
           <div className="mt-10 grid grid-cols-1 items-center gap-8 lg:grid-cols-[1fr_auto_1fr] lg:gap-10">
             <ul className="space-y-6">
               {study.solution.slice(0, 2).map((item) => (
@@ -177,11 +180,13 @@ export default function SpargoCaseStudyPage() {
       {/* Services + technologies -------------------------------------------- */}
       <section className="section">
         <Container>
-          <SectionHeading title="Services Provided" />
+          <SectionHeading
+            no="W02"
+            align="left" title="Services Provided" />
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {study.servicesProvided.map((item) => (
               <li key={item.label} className="card p-5">
-                <span className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-cobalt-soft text-cobalt">
+                <span className="mb-3 inline-flex h-10 w-10 items-center justify-center border-rule border-graphite bg-revision text-white">
                   <Icon name={item.icon} className="h-5 w-5" />
                 </span>
                 <p className="font-display text-sm font-semibold text-ink">{item.label}</p>
@@ -190,7 +195,9 @@ export default function SpargoCaseStudyPage() {
             ))}
           </ul>
 
-          <SectionHeading title="Technologies Used" className="mt-16" />
+          <SectionHeading
+            no="W03"
+            align="left" title="Technologies Used" className="mt-16" />
           <ul className="mt-8 grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {study.technologies.map((tech) => (
               <li key={tech.label} className="card flex items-center gap-3 p-4">
@@ -206,6 +213,8 @@ export default function SpargoCaseStudyPage() {
       <section className="section border-y border-line bg-mist">
         <Container>
           <SectionHeading
+            no="W04"
+            align="left"
             title="Screens & Mockups"
             description="Key screens from the app, described rather than embedded as large images so the page stays fast."
           />
@@ -228,7 +237,9 @@ export default function SpargoCaseStudyPage() {
       {/* Challenges --------------------------------------------------------- */}
       <section className="section">
         <Container>
-          <SectionHeading title="Challenges & Solutions" />
+          <SectionHeading
+            no="W05"
+            align="left" title="Challenges & Solutions" />
           <ul className="mt-10 space-y-4">
             {study.challenges.map((item) => (
               <li key={item.challenge} className="card overflow-hidden">
@@ -262,13 +273,15 @@ export default function SpargoCaseStudyPage() {
       <section className="section border-t border-line bg-mist">
         <Container>
           <SectionHeading
+            no="W06"
+            align="left"
             title="Final Results"
             description="Described qualitatively. No user counts, revenue, savings or launch statistics are published for this project."
           />
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {study.results.map((result) => (
               <li key={result.label} className="card p-5">
-                <span className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-cobalt-soft text-cobalt">
+                <span className="mb-3 inline-flex h-10 w-10 items-center justify-center border-rule border-graphite bg-revision text-white">
                   <Icon name={result.icon} className="h-5 w-5" />
                 </span>
                 <p className="font-display text-sm font-semibold text-ink">{result.label}</p>

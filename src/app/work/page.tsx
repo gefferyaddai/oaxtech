@@ -22,6 +22,7 @@ export default function WorkPage() {
   return (
     <>
       <PageHero
+        sheetNo="SHT 08"
         eyebrow="Our work"
         title="Ideas We've Turned Into Digital Experiences"
         description="We turn business and community problems into useful digital products that make a real difference."
@@ -47,14 +48,18 @@ export default function WorkPage() {
 
       <section className="section border-y border-line bg-mist">
         <Container>
-          <SectionHeading title="Explore by Capability" />
+          <SectionHeading
+            no="W01"
+            align="left" title="Explore by Capability" />
           <FeatureGrid items={capabilities} columns={5} className="mt-10" />
         </Container>
       </section>
 
       <section className="section bg-tint">
         <Container>
-          <SectionHeading title="Real Solutions. Meaningful Results." />
+          <SectionHeading
+            no="W02"
+            align="left" title="Real Solutions. Meaningful Results." />
           <FeatureGrid items={outcomeAreas} columns={4} className="mt-10" />
           <p className="mt-8 text-center text-sm text-slate">
             We describe outcomes in terms of what a solution does. Measured figures appear here only
@@ -66,9 +71,11 @@ export default function WorkPage() {
       {/* No client testimonials are published until they're approved in writing. */}
       <section className="section">
         <Container narrow>
-          <SectionHeading title="What Our Clients Say" />
+          <SectionHeading
+            no="W03"
+            align="left" title="What Our Clients Say" />
           <div className="card mx-auto mt-8 max-w-md p-8 text-center">
-            <span className="mx-auto mb-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-cobalt-soft text-cobalt">
+            <span className="mx-auto mb-4 inline-flex h-11 w-11 items-center justify-center border-rule border-graphite bg-revision text-white">
               <Icon name="MessageSquare" className="h-5 w-5" />
             </span>
             <p className="font-display text-base font-semibold text-ink">
