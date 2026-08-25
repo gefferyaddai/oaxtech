@@ -14,6 +14,18 @@ function isActive(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+/**
+ * The sheet's title bar.
+ *
+ * Set on the ink ground with a revision-orange rule beneath it, so the top of
+ * every page reads as the header strip of a drawing rather than a floating
+ * translucent bar. Active navigation is marked by a solid orange block under
+ * the label — a mark, not a tint — and the booking action is the only filled
+ * block in the strip, which is what makes it findable in one glance.
+ *
+ * Scroll only deepens the bottom rule. There is no blur and no shadow: the
+ * header is opaque stock, and stock does not blur what is behind it.
+ */
 export function Header() {
   const pathname = usePathname();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
@@ -52,33 +64,61 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 border-b bg-cream/90 backdrop-blur-md transition-shadow duration-300",
-        scrolled ? "border-line shadow-[0_1px_0_0_rgb(9_11_18_/_0.04),0_12px_24px_-16px_rgb(9_11_18_/_0.18)]" : "border-transparent",
+        "sticky top-0 z-50 bg-ink transition-[border-color] duration-300",
+        scrolled ? "border-b-[3px] border-revision" : "border-b border-ink-line",
       )}
     >
       <div className="container-page flex h-[var(--header-height)] items-center justify-between gap-4">
-        <Logo />
+        <div className="flex items-center gap-5">
+          {/*
+            The logo sits on a paper nameplate rather than directly on the ink.
+            Both files in /public/brand are still placeholders and the "white"
+            one is not actually white, so a light-on-dark lockup disappears
+            entirely against this header. A nameplate is legible whichever
+            artwork lands there, and it reads as a stamped plate on the title
+            bar, which is the world this header is already in.
+          */}
+          <Link
+            href="/"
+            aria-label="OAX Tech — home"
+            className="inline-flex shrink-0 items-center bg-sheet px-3 py-2"
+          >
+            <Logo asStatic width={96} />
+          </Link>
+          {/* The tally strip. Establishes the document register immediately,
+              and disappears below lg where the space belongs to navigation. */}
+          <span
+            aria-hidden="true"
+            className="tally hidden font-mono text-ink-muted xl:inline"
+          >
+            EST. 2024 · CALGARY AB
+          </span>
+        </div>
 
-        <div ref={navRef} className="hidden items-center gap-1 lg:flex">
+        <div ref={navRef} className="hidden items-center gap-2 lg:flex">
           <nav aria-label="Primary">
-            <ul className="flex items-center gap-1">
+            <ul className="flex items-center">
               {primaryNav.map((item) => {
                 const active = isActive(pathname, item.href);
+                const linkClass = cn(
+                  "relative inline-flex h-[var(--header-height)] items-center gap-1.5 px-3.5",
+                  "font-display text-base font-bold uppercase tracking-wide transition-colors",
+                  active ? "text-white" : "text-ink-text hover:text-white",
+                );
+                const marker = active && (
+                  <span className="absolute inset-x-3 bottom-0 h-1 bg-revision" />
+                );
+
                 if (!item.children) {
                   return (
                     <li key={item.href}>
                       <Link
                         href={item.href}
                         aria-current={active ? "page" : undefined}
-                        className={cn(
-                          "relative inline-flex h-10 items-center rounded-md px-3 text-sm transition-colors",
-                          active ? "text-ink font-medium" : "text-slate hover:text-ink",
-                        )}
+                        className={linkClass}
                       >
                         {item.label}
-                        {active && (
-                          <span className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-cobalt" />
-                        )}
+                        {marker}
                       </Link>
                     </li>
                   );
@@ -92,36 +132,39 @@ export function Header() {
                       aria-expanded={expanded}
                       aria-controls={`${menuId}-${item.label}`}
                       onClick={() => setOpenMenu(expanded ? null : item.label)}
-                      className={cn(
-                        "relative inline-flex h-10 items-center gap-1 rounded-md px-3 text-sm transition-colors",
-                        active ? "text-ink font-medium" : "text-slate hover:text-ink",
-                      )}
+                      className={linkClass}
                     >
                       {item.label}
                       <Icon
                         name="ChevronDown"
-                        className={cn("h-4 w-4 transition-transform", expanded && "rotate-180")}
+                        className={cn("h-4 w-4 transition-transform duration-200", expanded && "rotate-180")}
                       />
-                      {active && (
-                        <span className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-cobalt" />
-                      )}
+                      {marker}
                     </button>
 
                     {expanded && (
                       <div
                         id={`${menuId}-${item.label}`}
-                        className="absolute left-0 top-full z-50 mt-2 w-72 animate-fade-up rounded-xl border border-line bg-paper p-2 shadow-float"
+                        className="absolute left-0 top-full z-50 w-80 animate-sheet-in border-rule border-revision bg-ink-raised p-1.5 shadow-overlay"
                       >
                         <ul>
                           {item.children.map((child) => (
-                            <li key={child.href}>
+                            <li key={child.href} className="border-b border-ink-line last:border-b-0">
                               <Link
                                 href={child.href}
-                                className="block rounded-lg px-3 py-2.5 transition-colors hover:bg-mist"
+                                className="group/item block px-3 py-3 transition-colors hover:bg-ink-card"
                               >
-                                <span className="block text-sm font-medium text-ink">{child.label}</span>
+                                <span className="flex items-center gap-2 font-display text-base font-bold uppercase tracking-wide text-white">
+                                  {child.label}
+                                  <Icon
+                                    name="ArrowRight"
+                                    className="h-3.5 w-3.5 shrink-0 text-revision-onInk transition-transform duration-200 group-hover/item:translate-x-1"
+                                  />
+                                </span>
                                 {child.description && (
-                                  <span className="mt-0.5 block text-xs text-muted">{child.description}</span>
+                                  <span className="mt-1 block text-xs leading-relaxed text-ink-muted">
+                                    {child.description}
+                                  </span>
                                 )}
                               </Link>
                             </li>
@@ -135,12 +178,18 @@ export function Header() {
             </ul>
           </nav>
 
-          <div className="ml-4 flex items-center gap-2">
-            <Link href="/quote" className="btn btn-sm btn-neutral">
-              Request a Quote
+          <div className="ml-3 flex items-center gap-3">
+            <Link
+              href="/quote"
+              className="font-display text-base font-bold uppercase tracking-wide text-ink-text underline decoration-ink-line decoration-2 underline-offset-[6px] transition-colors hover:text-white hover:decoration-revision"
+            >
+              Get a quote
             </Link>
-            <Link href="/book" className="btn btn-sm btn-dark">
-              Book a Consultation
+            <Link
+              href="/book"
+              className="inline-flex h-11 items-center bg-revision px-5 font-display text-base font-bold uppercase tracking-wide text-white transition-colors duration-150 hover:bg-revision-hover"
+            >
+              Book a consult
             </Link>
           </div>
         </div>
