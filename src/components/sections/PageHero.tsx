@@ -1,6 +1,6 @@
 import { Container } from "@/components/layout/Container";
+import { CornerTicks, TitleBlock } from "@/components/ui/Drawing";
 import { Icon } from "@/components/ui/Icon";
-import { OrbitalBackdrop } from "@/components/ui/OrbitalBackdrop";
 import { cn } from "@/lib/utils";
 
 interface HeroBullet {
@@ -20,55 +20,96 @@ interface PageHeroProps {
   className?: string;
   /** Centred, no visual — used by simpler pages. */
   centered?: boolean;
+  /** Sheet number for the title block. Defaults to the cover sheet. */
+  sheetNo?: string;
 }
 
 /**
- * Shared hero used by every public page so the top of the site is consistent.
+ * Shared hero for every public page except the homepage, which composes its
+ * own first viewport (the hero carries the run's thesis and a shared component
+ * would flatten it).
+ *
+ * Rendered as the top of a drawing sheet: a bordered field with registration
+ * ticks, the title set oversized against the sheet's left edge, and a title
+ * block at the foot recording where you are in the set.
+ *
  * On mobile the copy always comes first; the visual stacks below and never
  * covers the headline.
  */
 export function PageHero({
   eyebrow, title, description, actions, bullets, visual, breadcrumb, className, centered,
+  sheetNo = "SHT 00",
 }: PageHeroProps) {
   return (
-    <section className={cn("relative overflow-hidden border-b border-line bg-cream", className)}>
-      <OrbitalBackdrop className="opacity-70" animated />
-      <Container className="relative py-12 md:py-16 lg:py-20">
+    <section className={cn("relative border-b-[3px] border-graphite bg-sheet", className)}>
+      <Container className="relative py-10 md:py-14 lg:py-16">
         {breadcrumb}
-        <div
-          className={cn(
-            "grid grid-cols-1 items-center gap-10",
-            visual && !centered ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14" : "",
-            centered && "justify-items-center text-center",
-          )}
-        >
-          <div className={cn("min-w-0", centered && "max-w-2xl")}>
-            {eyebrow && <p className="eyebrow mb-4 animate-fade-up">{eyebrow}</p>}
-            <h1 className="animate-fade-up text-display-xl [animation-delay:60ms]">{title}</h1>
-            {description && (
-              <p className={cn("mt-5 max-w-xl animate-fade-up text-lg text-slate [animation-delay:120ms]", centered && "mx-auto")}>
-                {description}
-              </p>
+
+        <div className="relative border border-line px-5 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-14">
+          <CornerTicks />
+
+          <div
+            className={cn(
+              "grid grid-cols-1 items-start gap-10",
+              visual && !centered ? "lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-14" : "",
+              centered && "justify-items-center text-center",
             )}
-            {actions && (
-              <div className={cn("mt-8 flex flex-wrap animate-fade-up gap-3 [animation-delay:180ms]", centered && "justify-center")}>
-                {actions}
-              </div>
-            )}
-            {bullets && bullets.length > 0 && (
-              <ul className={cn("mt-8 flex flex-wrap gap-x-6 gap-y-3", centered && "justify-center")}>
-                {bullets.map((bullet) => (
-                  <li key={bullet.label} className="flex items-center gap-2 text-sm text-slate">
-                    <Icon name={bullet.icon} className="h-4 w-4 shrink-0 text-cobalt" />
-                    {bullet.label}
-                  </li>
-                ))}
-              </ul>
-            )}
+          >
+            <div className={cn("min-w-0", centered && "max-w-3xl")}>
+              {eyebrow && (
+                <p className={cn("eyebrow mb-5 animate-sheet-in", centered && "justify-center")}>
+                  {eyebrow}
+                </p>
+              )}
+              <h1 className="animate-sheet-in text-display-xl [animation-delay:60ms]">{title}</h1>
+              {description && (
+                <p
+                  className={cn(
+                    "mt-6 max-w-prose animate-sheet-in text-lg leading-relaxed text-pencil [animation-delay:120ms]",
+                    centered && "mx-auto",
+                  )}
+                >
+                  {description}
+                </p>
+              )}
+              {actions && (
+                <div
+                  className={cn(
+                    "mt-9 flex flex-wrap animate-sheet-in gap-4 [animation-delay:180ms]",
+                    centered && "justify-center",
+                  )}
+                >
+                  {actions}
+                </div>
+              )}
+              {bullets && bullets.length > 0 && (
+                <ul
+                  className={cn(
+                    "mt-9 flex flex-wrap gap-x-8 gap-y-3 border-t border-line pt-5",
+                    centered && "justify-center",
+                  )}
+                >
+                  {bullets.map((bullet) => (
+                    <li key={bullet.label} className="tally flex items-center gap-2 font-mono text-graphite">
+                      <Icon name={bullet.icon} className="h-3.5 w-3.5 shrink-0 text-revision" />
+                      {bullet.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {visual && !centered && <div className="min-w-0">{visual}</div>}
           </div>
-          {visual && !centered && (
-            <div className="min-w-0 animate-fade-in [animation-delay:120ms]">{visual}</div>
-          )}
+
+          <TitleBlock
+            className="mt-10"
+            fields={[
+              { label: "Drawn by", value: "OAX Tech" },
+              { label: "Sheet", value: sheetNo },
+              { label: "Location", value: "Calgary AB" },
+            ]}
+          />
         </div>
       </Container>
     </section>
