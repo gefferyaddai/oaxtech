@@ -31,7 +31,12 @@ export default async function PortalLayout({ children }: { children: React.React
   const projects = await getClientProjects(session.clientId);
 
   return (
-    <div className="flex min-h-[calc(100vh-var(--header-height))] bg-mist">
+    /* See the admin layout: `data-surface="app"` keeps the drawing set's
+       colour and linework but restores the UI face for dense dashboard text. */
+    <div
+      data-surface="app"
+      className="flex min-h-[calc(100vh-var(--header-height))] bg-mist"
+    >
       <PortalSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <PortalTopbar sessionLabel={session.label} projects={projects} />

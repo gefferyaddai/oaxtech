@@ -70,7 +70,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const unreadCount = messages.filter((message) => message.unread).length;
 
   return (
-    <div className="flex min-h-screen bg-mist">
+    /* `data-surface="app"` swaps the condensed signage display face back to
+       the UI face and drops the uppercase heading treatment. The admin is an
+       Operate surface read at 13-15px all day; it keeps the drawing set's
+       colour, linework and square corners but not its headline face. */
+    <div data-surface="app" className="flex min-h-screen bg-mist">
       <AdminSidebar label={session.label} role={session.role} />
 
       {/*
