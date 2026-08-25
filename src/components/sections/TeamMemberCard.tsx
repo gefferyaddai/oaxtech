@@ -36,16 +36,18 @@ function Avatar({ member, className }: { member: TeamMember; className?: string 
       />
     );
   }
+  /* No photograph exists for anyone yet, so the placeholder is drawn as a
+     hatched plate with a monogram — the site's standing convention for a field
+     deliberately left unfilled. No AI-generated portrait is used, and nothing
+     here claims to be a photograph of a real person. */
   return (
     <div
-      className={cn(
-        "flex aspect-square w-full items-center justify-center bg-gradient-to-b from-haze to-mist",
-        className,
-      )}
+      className={cn("relative flex aspect-square w-full items-center justify-center bg-sheet-sunk", className)}
       role="img"
       aria-label={`Placeholder avatar for ${member.name}`}
     >
-      <span className="font-display text-2xl font-medium tracking-wide text-muted">
+      <span aria-hidden="true" className="hatch absolute inset-0" />
+      <span className="relative bg-sheet-sunk px-3 font-display text-3xl font-extrabold uppercase tracking-wide text-graphite">
         {initials(member.name)}
       </span>
     </div>
@@ -75,10 +77,7 @@ export function TeamMemberCard({ member, compact }: TeamMemberCardProps) {
 
         <ul className="mt-4 flex flex-wrap gap-1.5">
           {member.tags.map((tag) => (
-            <li
-              key={tag}
-              className="rounded-md border border-cobalt-border bg-cobalt-soft px-2 py-1 text-2xs font-medium text-cobalt"
-            >
+            <li key={tag} className="tally border border-graphite px-2 py-1 font-mono text-graphite">
               {tag}
             </li>
           ))}
