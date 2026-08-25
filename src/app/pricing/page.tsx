@@ -15,6 +15,7 @@ import {
   paymentFootnote,
   paymentInfo,
   seoPackages,
+  softwarePackages,
   websitePackages,
 } from "@/data/pricing";
 import { buildMetadata } from "@/lib/metadata";
@@ -30,6 +31,7 @@ export default function PricingPage() {
   return (
     <>
       <PageHero
+        sheetNo="SHT 03"
         eyebrow="Pricing & packages"
         title={
           <>
@@ -50,7 +52,7 @@ export default function PricingPage() {
 
       <section className="section">
         <Container>
-          <h2 className="text-center text-2xs font-semibold uppercase tracking-[0.16em] text-muted">
+          <h2 className="tally border-t-rule border-graphite pt-3 font-mono text-graphite">
             Primary website packages
           </h2>
           <div className="mt-8 grid gap-4 md:grid-cols-3 lg:gap-5">
@@ -65,7 +67,7 @@ export default function PricingPage() {
           shrinking text below a readable size. */}
       <section className="pb-12 lg:pb-16">
         <Container>
-          <h2 className="text-center text-2xs font-semibold uppercase tracking-[0.16em] text-muted">
+          <h2 className="tally border-t-rule border-graphite pt-3 font-mono text-graphite">
             Package comparison
           </h2>
           <div className="mt-8 card overflow-hidden">
@@ -115,7 +117,16 @@ export default function PricingPage() {
 
       <section className="section border-t border-line bg-mist">
         <Container>
-          <h2 className="text-center text-2xs font-semibold uppercase tracking-[0.16em] text-muted">
+          <h2 className="tally border-t-rule border-graphite pt-3 font-mono text-graphite">
+            Software packages
+          </h2>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {softwarePackages.map((pkg) => (
+              <QuotedPackageCard key={pkg.name} pkg={pkg} />
+            ))}
+          </div>
+
+          <h2 className="mt-16 tally border-t-rule border-graphite pt-3 font-mono text-graphite">
             SEO packages
           </h2>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -124,7 +135,7 @@ export default function PricingPage() {
             ))}
           </div>
 
-          <h2 className="mt-16 text-center text-2xs font-semibold uppercase tracking-[0.16em] text-muted">
+          <h2 className="mt-16 tally border-t-rule border-graphite pt-3 font-mono text-graphite">
             Marketing packages
           </h2>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -134,9 +145,9 @@ export default function PricingPage() {
           </div>
 
           <p className="mt-8 text-center text-sm text-slate">
-            SEO and marketing packages are priced against your goals and scope, so we quote them
-            after a short conversation rather than listing a figure that wouldn&apos;t fit your
-            situation.
+            Software, SEO and marketing packages are priced against your goals and scope, so we
+            quote them after a short conversation rather than listing a figure that
+            wouldn&apos;t fit your situation.
           </p>
         </Container>
       </section>
@@ -197,13 +208,13 @@ export default function PricingPage() {
       {/* Payment information ------------------------------------------------ */}
       <section className="section border-y border-line bg-mist">
         <Container>
-          <h2 className="text-center text-2xs font-semibold uppercase tracking-[0.16em] text-muted">
+          <h2 className="tally border-t-rule border-graphite pt-3 font-mono text-graphite">
             Clear terms. No surprises.
           </h2>
           <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {paymentInfo.map((item) => (
               <li key={item.label} className="card p-5">
-                <span className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-cobalt-soft text-cobalt">
+                <span className="mb-3 inline-flex h-10 w-10 items-center justify-center border-rule border-graphite bg-revision text-white">
                   <Icon name={item.icon} className="h-5 w-5" />
                 </span>
                 <p className="font-display text-sm font-semibold text-ink">{item.label}</p>
@@ -217,7 +228,7 @@ export default function PricingPage() {
 
       <section className="section" id="faq">
         <Container>
-          <h2 className="text-center text-2xs font-semibold uppercase tracking-[0.16em] text-muted">
+          <h2 className="tally border-t-rule border-graphite pt-3 font-mono text-graphite">
             Pricing FAQ
           </h2>
           <FAQAccordion items={pricingFaqs} className="mt-8" />
