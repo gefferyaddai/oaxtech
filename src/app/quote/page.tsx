@@ -34,6 +34,7 @@ export default async function QuotePage({
   return (
     <>
       <PageHero
+        sheetNo="SHT 10"
         eyebrow="Request a quote"
         title={
           <>
@@ -60,6 +61,8 @@ export default async function QuotePage({
       <section className="section border-y border-line bg-mist">
         <Container>
           <SectionHeading
+            no="Q01"
+            align="left"
             title="What Happens Next"
             description="No quote reference numbers are issued at this stage — we reply to you directly by email."
           />
@@ -69,7 +72,9 @@ export default async function QuotePage({
 
       <section className="section" id="faq">
         <Container>
-          <SectionHeading title="Frequently Asked Questions" />
+          <SectionHeading
+            no="Q02"
+            align="left" title="Frequently Asked Questions" />
           <FAQAccordion items={quoteFaqs} className="mt-10" />
         </Container>
       </section>
