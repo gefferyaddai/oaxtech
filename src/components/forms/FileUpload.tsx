@@ -77,12 +77,12 @@ export function FileUpload({ label = "Upload Supporting Files", files, onChange,
           if (!disabled) accept(e.dataTransfer.files);
         }}
         className={cn(
-          "rounded-xl border border-dashed p-6 text-center transition-colors",
-          isDragging ? "border-cobalt bg-cobalt-soft" : "border-line-strong bg-mist",
+          "border-rule border-dashed p-6 text-center transition-colors",
+          isDragging ? "border-revision bg-revision-soft" : "border-graphite bg-sheet-sunk",
           disabled && "opacity-60",
         )}
       >
-        <span className="mx-auto mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-cobalt-soft text-cobalt">
+        <span className="mx-auto mb-3 inline-flex h-10 w-10 items-center justify-center border-rule border-graphite bg-revision text-white">
           <Icon name="Upload" className="h-5 w-5" />
         </span>
         <p className="font-display text-sm font-medium text-ink">
