@@ -99,14 +99,15 @@ export interface QuotedPackage {
   features: string[];
 }
 
-/** No prices — these are quoted after a conversation. */
+/**
+ * No prices — these are quoted after a conversation.
+ *
+ * "SEO Audit" used to live here as a quoted package. It now has a fixed price
+ * and is bought directly through the site, so it lives in `data/audits.ts`
+ * instead. Listing it in both places would have put the same product on the
+ * site twice with two different pricing models.
+ */
 export const seoPackages: QuotedPackage[] = [
-  {
-    name: "SEO Audit",
-    icon: "Search",
-    description: "A comprehensive audit to uncover growth opportunities.",
-    features: ["Technical SEO review", "On-page analysis", "Basic SEO recommendations"],
-  },
   {
     name: "Local SEO Package",
     icon: "MapPin",
@@ -118,6 +119,40 @@ export const seoPackages: QuotedPackage[] = [
     icon: "TrendingUp",
     description: "Ongoing SEO to grow your rankings and organic traffic.",
     features: ["On-page optimization", "Content & keyword strategy", "Monthly performance reporting"],
+  },
+];
+
+/**
+ * Software work that is scoped and priced after a consultation.
+ *
+ * Mobile applications and AI/automation were previously named only in the
+ * `capabilities` list on the services page — real offerings with no service
+ * entry and no pricing, so a visitor shopping for either could not tell
+ * whether OAX does them. They sit under Custom Software rather than becoming
+ * top-level services: both are software work, and the site's structure (and
+ * its four drawing-layer colours) is built around four disciplines.
+ *
+ * No price is listed because scope genuinely determines cost here. Features
+ * describe what the engagement covers, never an outcome or a timeline.
+ */
+export const softwarePackages: QuotedPackage[] = [
+  {
+    name: "Mobile Applications",
+    icon: "Smartphone",
+    description: "Native and cross-platform apps, scoped around what your users actually need to do.",
+    features: ["Platform & approach recommendation", "Design and build", "Store submission support"],
+  },
+  {
+    name: "AI & Automation",
+    icon: "BrainCircuit",
+    description: "Automation and AI systems that take repetitive work off your team.",
+    features: ["Workflow and process review", "Integration with your existing tools", "Build, test and handover"],
+  },
+  {
+    name: "Custom Web Applications",
+    icon: "AppWindow",
+    description: "Internal tools, dashboards and client portals built around your processes.",
+    features: ["Requirements and scoping", "Build and integration", "Maintenance and support"],
   },
 ];
 
