@@ -41,11 +41,14 @@ export function FAQAccordion({ items, columns = 2, className }: FAQAccordionProp
         const panelId = `${baseId}-panel-${index}`;
         const buttonId = `${baseId}-button-${index}`;
         return (
+          /* A ruled register of questions rather than a stack of cards. The
+             open row inks its number block solid, so the open state is a mark
+             on the sheet instead of a border-colour change nobody notices. */
           <div
             key={item.question}
             className={cn(
-              "card h-fit transition-colors",
-              isOpen && "border-line-strong",
+              "h-fit border-t-rule transition-colors duration-200",
+              isOpen ? "border-revision" : "border-graphite",
             )}
           >
             <h3>
@@ -55,15 +58,28 @@ export function FAQAccordion({ items, columns = 2, className }: FAQAccordionProp
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => toggle(index)}
-                className="flex w-full items-center justify-between gap-4 px-4 py-4 text-left sm:px-5"
+                className="group flex w-full items-start gap-4 py-4 text-left"
               >
-                <span className="font-display text-sm font-medium text-ink sm:text-base">
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "tally mt-0.5 flex h-6 w-7 shrink-0 items-center justify-center font-mono tabular-nums transition-colors duration-200",
+                    isOpen
+                      ? "bg-revision text-white"
+                      : "bg-sheet-deep text-graphite group-hover:bg-graphite group-hover:text-sheet",
+                  )}
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+
+                <span className="min-w-0 flex-1 font-display text-base font-bold uppercase leading-tight text-graphite sm:text-lg">
                   {item.question}
                 </span>
+
                 <span
                   className={cn(
-                    "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-line text-muted transition-transform",
-                    isOpen && "rotate-45 border-cobalt text-cobalt",
+                    "mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center border border-graphite text-graphite transition-transform duration-200",
+                    isOpen && "rotate-45 bg-graphite text-sheet",
                   )}
                 >
                   <Icon name="Plus" className="h-3.5 w-3.5" strokeWidth={2} />
@@ -71,7 +87,7 @@ export function FAQAccordion({ items, columns = 2, className }: FAQAccordionProp
               </button>
             </h3>
             <div id={panelId} role="region" aria-labelledby={buttonId} hidden={!isOpen}>
-              <p className="border-t border-line-subtle px-4 py-4 text-sm leading-relaxed text-slate sm:px-5">
+              <p className="max-w-prose pb-5 pl-11 text-sm leading-relaxed text-pencil">
                 {item.answer}
               </p>
             </div>
