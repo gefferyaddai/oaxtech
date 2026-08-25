@@ -22,6 +22,7 @@ export default function BookPage() {
   return (
     <>
       <PageHero
+        sheetNo="SHT 09"
         eyebrow="Book a consultation"
         title={
           <>
@@ -47,14 +48,18 @@ export default function BookPage() {
 
       <section className="section border-y border-line bg-mist">
         <Container>
-          <SectionHeading title="What to Expect" />
+          <SectionHeading
+            no="B01"
+            align="left" title="What to Expect" />
           <FeatureGrid items={whatToExpect} columns={4} className="mt-10" />
         </Container>
       </section>
 
       <section className="section" id="faq">
         <Container>
-          <SectionHeading title="Frequently Asked Questions" />
+          <SectionHeading
+            no="B02"
+            align="left" title="Frequently Asked Questions" />
           <FAQAccordion items={bookingFaqs} className="mt-10" />
         </Container>
       </section>
