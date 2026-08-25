@@ -24,6 +24,7 @@ export default function AboutPage() {
   return (
     <>
       <PageHero
+        sheetNo="SHT 02"
         eyebrow="About OAX Tech"
         title="Building Technology That Creates Real Opportunities"
         description={`${siteConfig.name} is a Calgary-based technology and digital-growth agency helping businesses and organizations turn ideas into practical digital solutions.`}
@@ -121,7 +122,9 @@ export default function AboutPage() {
       {/* Values ------------------------------------------------------------- */}
       <section className="section border-y border-line bg-mist">
         <Container>
-          <SectionHeading eyebrow="Our values" title="The Principles Behind Our Work" />
+          <SectionHeading
+            no="A01"
+            align="left" eyebrow="Our values" title="The Principles Behind Our Work" />
           <FeatureGrid items={companyValues} columns={5} className="mt-10" />
         </Container>
       </section>
@@ -162,8 +165,8 @@ export default function AboutPage() {
                   key={layer.label}
                   className={
                     index === 3
-                      ? "flex items-center gap-4 rounded-xl bg-cobalt p-5 text-white shadow-card"
-                      : "card flex items-center gap-4 p-5"
+                      ? "flex items-center gap-4 border-rule border-graphite bg-revision p-5 text-white"
+                      : "plate flex items-center gap-4 p-5"
                   }
                   style={{ marginLeft: `${index * 8}px` }}
                 >
@@ -224,7 +227,9 @@ export default function AboutPage() {
       {/* Team preview ------------------------------------------------------- */}
       <section className="section">
         <Container>
-          <SectionHeading eyebrow="Meet the team" title="The People Behind OAX Tech" />
+          <SectionHeading
+            no="A02"
+            align="left" eyebrow="Meet the team" title="The People Behind OAX Tech" />
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {team.map((member) => (
               <li key={member.slug}>
@@ -242,7 +247,9 @@ export default function AboutPage() {
 
       <section className="section border-t border-line bg-mist" id="our-process">
         <Container>
-          <SectionHeading eyebrow="Our process" title="A Collaborative, Straightforward Approach" />
+          <SectionHeading
+            no="A03"
+            align="left" eyebrow="Our process" title="A Collaborative, Straightforward Approach" />
           <ProcessStepsRow steps={collaborationProcess} className="mt-12" />
         </Container>
       </section>
