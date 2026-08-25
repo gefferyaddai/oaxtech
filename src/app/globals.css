@@ -4,15 +4,25 @@
 
 /* ---------------------------------------------------------------------------
    Self-hosted variable fonts. No third-party font requests, no layout shift.
-   Bricolage Grotesque = display face — an ink-trap grotesque with enough
-   character to read as OAX Tech's own, not a stock template face.
+
+   Big Shoulders Display = the drawing face. Condensed industrial, drawn for
+   civic signage, and the reason the oversized headlines fit at all: a normal-
+   width grotesque set this large would wrap into unreadable two-word lines.
+   Martian Mono = the tally face. Drawing numbers, revisions, spec figures.
    Public Sans = body / UI face — built for dense, legible interface text.
-   Both are subset to latin (67KB total).
+   All subset to latin.
 --------------------------------------------------------------------------- */
 @font-face {
-  font-family: "Bricolage Grotesque Variable";
-  src: url("/fonts/BricolageGrotesque-Variable.woff2") format("woff2-variations");
-  font-weight: 200 800;
+  font-family: "Big Shoulders Display Variable";
+  src: url("/fonts/BigShouldersDisplay-Variable.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Martian Mono Variable";
+  src: url("/fonts/MartianMono-Variable.woff2") format("woff2-variations");
+  font-weight: 300 700;
   font-display: swap;
   font-style: normal;
 }
@@ -26,21 +36,39 @@
 
 @layer base {
   :root {
-    --font-display: "Bricolage Grotesque Variable";
+    --font-display: "Big Shoulders Display Variable";
     --font-body: "Public Sans Variable";
+    --font-mono: "Martian Mono Variable";
 
     /* Token mirrors, so non-Tailwind CSS (SVG strokes, gradients) stays in sync */
-    --color-ink: #090b12;
-    --color-cobalt: #2867ff;
-    --color-violet: #8b5cf6;
-    --color-cream: #f2f0ea;
-    --color-line: #e3dfd5;
-    --color-space: #090b12;
-    --color-space-raised: #10131d;
-    --color-space-card: #12151f;
+    --color-sheet: #e4e5e8;
+    --color-sheet-sunk: #d8dae0;
+    --color-ink: #0b0b10;
+    --color-ink-line: #2b2b39;
+    --color-revision: #6d28d9;
+    --color-line: #a9acb8;
+    --color-graphite: #0b0b10;
 
-    --container: 1200px;
+    --container: 1360px;
     --header-height: 4.5rem;
+    /* The sheet border inset — one value drives frame, ticks and title block */
+    --sheet-inset: 0.75rem;
+  }
+
+  @media (min-width: 768px) {
+    :root { --sheet-inset: 1.25rem; }
+  }
+
+  /*
+   * The admin and client portal are Operate surfaces: dense, long-lived,
+   * read at 13-15px. A condensed display face drawn for signage is wrong at
+   * that size, so those two route groups swap the display face back to the UI
+   * face. The rest of the world — colour, linework, square corners — carries
+   * through, so they stay part of the same system without inheriting a
+   * headline face that would hurt them.
+   */
+  [data-surface="app"] {
+    --font-display: var(--font-body);
   }
 
   * {
@@ -55,13 +83,16 @@
   }
 
   body {
-    background-color: theme("colors.cream");
+    background-color: theme("colors.sheet");
+    /* The drafting grid. Faint enough to read as paper tooth rather than a
+       visible table, and fixed so it behaves like stock the page is drawn on
+       instead of a pattern scrolling past. */
     background-image:
-      radial-gradient(circle at 15% 0%, rgb(40 103 255 / 0.08), transparent 30%),
-      radial-gradient(circle at 85% 8%, rgb(139 92 246 / 0.06), transparent 28%),
-      linear-gradient(180deg, #f7f4ee 0%, #f2f0ea 42%, #f7f4ee 100%);
+      linear-gradient(to right, rgb(11 11 16 / 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(11 11 16 / 0.045) 1px, transparent 1px);
+    background-size: 2rem 2rem;
     background-attachment: fixed;
-    color: theme("colors.slate");
+    color: theme("colors.pencil");
     font-family: var(--font-body), system-ui, sans-serif;
     font-size: theme("fontSize.base[0]");
     line-height: 1.65;
@@ -73,26 +104,36 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display), system-ui, sans-serif;
-    color: theme("colors.ink");
-    font-weight: 600;
+    color: theme("colors.graphite");
+    font-weight: 700;
+    text-transform: uppercase;
     text-wrap: balance;
+  }
+
+  /* The app surfaces keep sentence-case headings at UI weight — uppercase
+     condensed titles would make a dashboard harder to scan, not bolder. */
+  [data-surface="app"] :is(h1, h2, h3, h4, h5, h6) {
+    text-transform: none;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
 
   p { text-wrap: pretty; }
 
-  /* Single, consistent, always-visible focus treatment */
+  /* Single, consistent, always-visible focus treatment. Square, like
+     everything else, and offset so it reads as a drawn selection box. */
   :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-    outline: 2px solid theme("colors.cobalt.DEFAULT");
+    outline: 2px solid theme("colors.revision.DEFAULT");
     outline-offset: 2px;
-    border-radius: 4px;
+    border-radius: 0;
   }
 
   /* Native form controls inherit the type system */
   input, select, textarea, button { font: inherit; }
 
   ::selection {
-    background: theme("colors.cobalt.soft");
-    color: theme("colors.ink");
+    background: theme("colors.revision.DEFAULT");
+    color: #fff;
   }
 }
 
@@ -105,160 +146,405 @@
     padding-inline: 1.25rem;
   }
   @media (min-width: 768px) {
-    .container-page { padding-inline: 2rem; }
-  }
-  @media (min-width: 1280px) {
     .container-page { padding-inline: 2.5rem; }
   }
+  @media (min-width: 1280px) {
+    .container-page { padding-inline: 3.5rem; }
+  }
 
-  /* Buttons -------------------------------------------------------------- */
+  /* ---------------------------------------------------------------------
+     THE SHEET
+     A drawing sheet is a bordered field with registration ticks at the
+     corners. This is the single most recognisable move in the system, so it
+     is a primitive rather than a one-off: any section can become a sheet.
+  --------------------------------------------------------------------- */
+  .sheet-frame {
+    position: relative;
+    border: 1px solid theme("colors.line.DEFAULT");
+  }
+  .sheet-frame::before,
+  .sheet-frame::after {
+    content: "";
+    position: absolute;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-color: theme("colors.graphite");
+    pointer-events: none;
+  }
+  /* Top-left and bottom-right corner ticks — two elements, four corners is
+     handled by the -all variant below where the extra markup is worth it. */
+  .sheet-frame::before {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid;
+    border-left: 2px solid;
+  }
+  .sheet-frame::after {
+    right: -1px;
+    bottom: -1px;
+    border-bottom: 2px solid;
+    border-right: 2px solid;
+  }
+  .sheet-frame-ink {
+    border-color: theme("colors.ink.line");
+  }
+  .sheet-frame-ink::before,
+  .sheet-frame-ink::after {
+    border-color: theme("colors.revision.onInk");
+  }
+
+  /* ---------------------------------------------------------------------
+     RULES
+     Weight carries rank, not colour. A section opens on a bar rule, a
+     subsection on a heavy rule, a row on a hairline.
+  --------------------------------------------------------------------- */
+  .rule-bar { border-top: 6px solid theme("colors.graphite"); }
+  .rule-heavy { border-top: 3px solid theme("colors.graphite"); }
+  .rule-hair { border-top: 1px solid theme("colors.line.DEFAULT"); }
+  .rule-revision { border-top: 6px solid theme("colors.revision.DEFAULT"); }
+
+  /* ---------------------------------------------------------------------
+     PLATES
+     What used to be a card. No radius, no blur: a plate is a sheet of stock
+     sitting on the drawing, and its elevation is a hard offset copy of
+     itself. Hover slides the plate onto its shadow, which is the whole
+     interaction — position, not glow.
+  --------------------------------------------------------------------- */
+  .plate {
+    background-color: theme("colors.chalk");
+    border: 1px solid theme("colors.graphite");
+    position: relative;
+  }
+  .plate-ink {
+    background-color: theme("colors.ink.card");
+    border-color: theme("colors.ink.line");
+    color: theme("colors.ink.text");
+  }
+  .plate-interactive {
+    box-shadow: theme("boxShadow.plate-sm");
+    transition:
+      transform 220ms theme("transitionTimingFunction.draft"),
+      box-shadow 220ms theme("transitionTimingFunction.draft"),
+      border-color 180ms ease;
+  }
+  .plate-interactive:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: theme("boxShadow.plate-lift");
+  }
+  .plate-interactive:active {
+    transform: translate(1px, 1px);
+    box-shadow: theme("boxShadow.plate-sm");
+  }
+
+  /* A plate with its top-right corner cut — the clipped geometric container.
+     The notch is a real clip, so the ground shows through it.
+
+     The cut deepens on hover. `clip-path` is not interpolable between polygons
+     with differing point counts, but these two share their five points, so the
+     browser tweens it cleanly and the corner reads as being cut further open
+     rather than jumping to a second shape. */
+  .plate-clipped {
+    clip-path: polygon(0 0, calc(100% - 1.5rem) 0, 100% 1.5rem, 100% 100%, 0 100%);
+    transition: clip-path 260ms theme("transitionTimingFunction.draft");
+  }
+  .plate-clipped:hover,
+  .group:hover .plate-clipped {
+    clip-path: polygon(0 0, calc(100% - 2.75rem) 0, 100% 2.75rem, 100% 100%, 0 100%);
+  }
+
+  /* A block that wipes in from the left behind its content. Used where a
+     surface should read as being inked rather than tinted. */
+  .wipe-fill {
+    position: relative;
+    isolation: isolate;
+  }
+  .wipe-fill::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: theme("colors.revision.DEFAULT");
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 320ms theme("transitionTimingFunction.draft");
+  }
+  .wipe-fill:hover::before,
+  .group:hover .wipe-fill::before {
+    transform: scaleX(1);
+  }
+
+  /* ---------------------------------------------------------------------
+     HATCH
+     45-degree section hatching, the drafting convention for a cut surface.
+     Used for empty states and inactive regions — a hatched area reads as
+     "nothing is here yet" far better than grey ever did.
+  --------------------------------------------------------------------- */
+  .hatch {
+    background-image: repeating-linear-gradient(
+      45deg,
+      theme("colors.line.DEFAULT") 0,
+      theme("colors.line.DEFAULT") 1px,
+      transparent 1px,
+      transparent 8px
+    );
+  }
+  .hatch-revision {
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgb(109 40 217 / 0.55) 0,
+      rgb(109 40 217 / 0.55) 1px,
+      transparent 1px,
+      transparent 8px
+    );
+  }
+  .hatch-ink {
+    background-image: repeating-linear-gradient(
+      45deg,
+      theme("colors.ink.line") 0,
+      theme("colors.ink.line") 1px,
+      transparent 1px,
+      transparent 8px
+    );
+  }
+
+  /* ---------------------------------------------------------------------
+     BUTTONS
+     Rectangular, square-cornered, and drawn: the primary sits on a hard
+     offset plate and presses into it. Nothing here fades — pressing moves
+     the block onto its own shadow, the way a stamp meets paper.
+  --------------------------------------------------------------------- */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    border-radius: theme("borderRadius.md");
-    font-weight: 500;
+    gap: 0.625rem;
+    border-radius: 0;
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     line-height: 1;
     white-space: nowrap;
-    transition-property: background-color, color, border-color, box-shadow, opacity, transform;
-    transition-duration: 160ms;
-    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    transition:
+      transform 180ms theme("transitionTimingFunction.draft"),
+      box-shadow 180ms theme("transitionTimingFunction.draft"),
+      background-color 140ms ease,
+      color 140ms ease,
+      border-color 140ms ease;
     /* 44px min target keeps every button comfortably tappable */
-    min-height: 2.75rem;
-    padding: 0.75rem 1.25rem;
+    min-height: 2.875rem;
+    padding: 0.8125rem 1.5rem;
+    font-size: 1.0625rem;
+  }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+  /* The app surfaces use sentence-case UI buttons — an uppercase condensed
+     label is wrong on a dense dashboard control. */
+  [data-surface="app"] .btn {
+    font-family: var(--font-body), system-ui, sans-serif;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 600;
     font-size: theme("fontSize.sm[0]");
   }
-  .btn:disabled { opacity: 0.55; cursor: not-allowed; }
-  .btn:active:not(:disabled) { transform: scale(0.97); }
 
-  .btn-sm { min-height: 2.25rem; padding: 0.5rem 0.875rem; font-size: theme("fontSize.xs[0]"); }
-  .btn-lg { min-height: 3.125rem; padding: 0.9375rem 1.625rem; font-size: theme("fontSize.base[0]"); }
+  .btn-sm { min-height: 2.375rem; padding: 0.5rem 1rem; font-size: 0.9375rem; }
+  .btn-lg { min-height: 3.5rem; padding: 1rem 2rem; font-size: 1.25rem; }
 
-  .btn-primary { background-color: theme("colors.cobalt.DEFAULT"); color: #fff; }
+  /* Primary — the booking action. Solid revision orange, white label at
+     4.6:1, seated on an ink plate. */
+  .btn-primary {
+    background-color: theme("colors.revision.DEFAULT");
+    color: #fff;
+    border: 1px solid theme("colors.graphite");
+    box-shadow: theme("boxShadow.plate-sm");
+  }
   .btn-primary:hover:not(:disabled) {
-    background-color: theme("colors.cobalt.hover");
-    box-shadow: 0 10px 24px -8px rgb(40 103 255 / 0.45);
+    background-color: theme("colors.revision.hover");
+    transform: translate(-2px, -2px);
+    box-shadow: theme("boxShadow.plate");
   }
-  .btn-primary:active:not(:disabled) { background-color: theme("colors.cobalt.press"); }
+  .btn-primary:active:not(:disabled) {
+    background-color: theme("colors.revision.press");
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 0 theme("colors.graphite");
+  }
 
-  .btn-dark { background-color: theme("colors.ink"); color: #fff; }
+  .btn-dark {
+    background-color: theme("colors.graphite");
+    color: theme("colors.sheet");
+    border: 1px solid theme("colors.graphite");
+    box-shadow: theme("boxShadow.plate-revision");
+  }
   .btn-dark:hover:not(:disabled) {
-    background-color: #1b2029;
-    box-shadow: 0 10px 24px -8px rgb(9 11 18 / 0.45);
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 0 theme("colors.revision.DEFAULT");
+  }
+  .btn-dark:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 0 theme("colors.revision.DEFAULT");
   }
 
+  /* Outline — the secondary action on paper. State is an ink flip, never a
+     tint: the block fills solid on hover the way a stamp inks over. */
   .btn-outline {
-    background-color: theme("colors.paper");
-    color: theme("colors.cobalt.DEFAULT");
-    border: 1px solid theme("colors.cobalt.border");
+    background-color: transparent;
+    color: theme("colors.graphite");
+    border: 2px solid theme("colors.graphite");
   }
-  .btn-outline:hover:not(:disabled) { background-color: theme("colors.cobalt.soft"); border-color: theme("colors.cobalt.DEFAULT"); }
+  .btn-outline:hover:not(:disabled) {
+    background-color: theme("colors.graphite");
+    color: theme("colors.sheet");
+  }
 
   .btn-neutral {
-    background-color: theme("colors.paper");
-    color: theme("colors.ink");
-    border: 1px solid theme("colors.line.strong");
+    background-color: theme("colors.chalk");
+    color: theme("colors.graphite");
+    border: 1px solid theme("colors.graphite");
   }
-  .btn-neutral:hover:not(:disabled) { background-color: theme("colors.mist"); }
+  .btn-neutral:hover:not(:disabled) { background-color: theme("colors.sheet-deep"); }
 
-  .btn-ghost { background-color: transparent; color: theme("colors.ink"); }
-  .btn-ghost:hover:not(:disabled) { background-color: theme("colors.haze"); }
+  .btn-ghost {
+    background-color: transparent;
+    color: theme("colors.graphite");
+    border: 1px solid transparent;
+  }
+  .btn-ghost:hover:not(:disabled) { border-color: theme("colors.graphite"); }
 
-  /* On dark space-themed sections */
+  /* On the ink ground */
   .btn-on-dark {
     background-color: transparent;
     color: #fff;
-    border: 1px solid rgb(255 255 255 / 0.28);
+    border: 2px solid theme("colors.ink.text");
   }
-  .btn-on-dark:hover:not(:disabled) { background-color: rgb(255 255 255 / 0.08); border-color: rgb(255 255 255 / 0.5); }
-
-  /* Cards ---------------------------------------------------------------- */
-  .card {
-    background-color: theme("colors.paper");
-    border: 1px solid theme("colors.line.DEFAULT");
-    border-radius: theme("borderRadius.xl");
-    box-shadow: 0 18px 45px rgb(9 11 18 / 0.06);
-  }
-  /* Card Navy — pricing cards and dashboard panels on dark sections */
-  .card-dark {
-    background-color: theme("colors.space.card");
-    border: 1px solid theme("colors.space.line");
-    border-radius: theme("borderRadius.xl");
-    color: theme("colors.space.text");
-    box-shadow: 0 18px 45px rgb(9 11 18 / 0.2);
-  }
-  .card-interactive {
-    transition: box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1), border-color 220ms ease, transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .card-interactive:hover {
-    border-color: theme("colors.cobalt.border");
-    box-shadow: theme("boxShadow.card-hover"), 0 0 0 1px rgb(40 103 255 / 0.06);
-    transform: translateY(-3px);
+  .btn-on-dark:hover:not(:disabled) {
+    background-color: #fff;
+    color: theme("colors.ink.DEFAULT");
+    border-color: #fff;
   }
 
-  /* Forms ---------------------------------------------------------------- */
+  /* ---------------------------------------------------------------------
+     FORMS
+     Square fields on the sheet. The focus state doubles the rule weight and
+     switches it to revision orange rather than adding a soft ring.
+  --------------------------------------------------------------------- */
   .field-label {
     display: block;
-    font-size: theme("fontSize.xs[0]");
-    font-weight: 500;
-    color: theme("colors.charcoal");
-    margin-bottom: 0.375rem;
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: theme("fontSize.tally[0]");
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: theme("colors.graphite");
+    margin-bottom: 0.5rem;
   }
   .field-control {
     display: block;
     width: 100%;
-    background-color: theme("colors.paper");
-    border: 1px solid theme("colors.line.strong");
-    border-radius: theme("borderRadius.md");
-    padding: 0.6875rem 0.875rem;
+    background-color: theme("colors.chalk");
+    border: 1px solid theme("colors.graphite");
+    border-radius: 0;
+    padding: 0.75rem 0.875rem;
     font-size: theme("fontSize.sm[0]");
-    color: theme("colors.ink");
-    /* 16px on iOS prevents the zoom-on-focus jump */
-    min-height: 2.75rem;
+    color: theme("colors.graphite");
+    /* 16px-equivalent on iOS prevents the zoom-on-focus jump */
+    min-height: 2.875rem;
     transition: border-color 140ms ease, box-shadow 140ms ease;
   }
-  .field-control::placeholder { color: theme("colors.muted"); }
-  .field-control:hover:not(:disabled) { border-color: theme("colors.muted"); }
+  .field-control::placeholder { color: theme("colors.faint"); }
+  .field-control:hover:not(:disabled) { border-color: theme("colors.revision.DEFAULT"); }
   .field-control:focus {
-    border-color: theme("colors.cobalt.DEFAULT");
-    box-shadow: 0 0 0 3px theme("colors.cobalt.soft");
+    border-color: theme("colors.revision.DEFAULT");
+    box-shadow: inset 0 0 0 2px theme("colors.revision.DEFAULT");
     outline: none;
   }
-  .field-control[aria-invalid="true"] {
-    border-color: theme("colors.danger.DEFAULT");
-  }
+  .field-control[aria-invalid="true"] { border-color: theme("colors.danger.DEFAULT"); }
   .field-control[aria-invalid="true"]:focus {
-    box-shadow: 0 0 0 3px theme("colors.danger.soft");
+    box-shadow: inset 0 0 0 2px theme("colors.danger.DEFAULT");
   }
-  .field-control:disabled { background-color: theme("colors.haze"); cursor: not-allowed; }
+  .field-control:disabled { background-color: theme("colors.sheet-deep"); cursor: not-allowed; }
   textarea.field-control { min-height: 7rem; resize: vertical; line-height: 1.6; }
   select.field-control {
     appearance: none;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%235E6675' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%230D1520' stroke-width='2' stroke-linecap='square'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
     padding-right: 2.25rem;
   }
 
-  /* Kicker label above section headings — a tick mark + word, not a generic
-     tracked-uppercase eyebrow. The mark echoes the orbital node motif. */
+  /* ---------------------------------------------------------------------
+     THE TALLY LAYER
+     Mono metadata that runs alongside the display type: drawing numbers,
+     revisions, dates, counts. It is what makes the sheet read as a document
+     rather than a poster, and it is always small, tracked and uppercase.
+  --------------------------------------------------------------------- */
+  .tally {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: theme("fontSize.tally[0]");
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Section kicker: a drawing number in the tally face, preceded by a solid
+     revision block. Replaces the old tracked-uppercase eyebrow. */
   .eyebrow {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: theme("fontSize.2xs[0]");
+    gap: 0.625rem;
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: theme("fontSize.tally[0]");
     font-weight: 600;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: theme("colors.cobalt.DEFAULT");
+    color: theme("colors.graphite");
   }
   .eyebrow::before {
     content: "";
-    width: 1.125rem;
-    height: 1px;
-    background: currentColor;
-    opacity: 0.55;
+    width: 1.25rem;
+    height: 0.5rem;
+    background: theme("colors.revision.DEFAULT");
+    flex: none;
+  }
+
+  /* ---------------------------------------------------------------------
+     COMPATIBILITY CLASSES
+     `.card` and `.card-interactive` are used by roughly every section
+     component, the pricing tables, the portal and the admin. Tailwind emits
+     nothing for a component class that no longer exists, so dropping these
+     in favour of `.plate` would silently strip the border, ground and
+     elevation from every surface this redesign did not rewrite by hand.
+
+     They are redefined onto the plate treatment instead, so untouched pages
+     adopt the drawing set automatically. New work uses `.plate`; these exist
+     to be deleted as the remaining pages are rebuilt.
+  --------------------------------------------------------------------- */
+  .card {
+    background-color: theme("colors.chalk");
+    border: 1px solid theme("colors.graphite");
+    border-radius: 0;
+    position: relative;
+  }
+  .card-dark {
+    background-color: theme("colors.ink.card");
+    border: 1px solid theme("colors.ink.line");
+    border-radius: 0;
+    color: theme("colors.ink.text");
+  }
+  .card-interactive {
+    box-shadow: theme("boxShadow.plate-sm");
+    transition:
+      transform 220ms theme("transitionTimingFunction.draft"),
+      box-shadow 220ms theme("transitionTimingFunction.draft");
+  }
+  .card-interactive:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: theme("boxShadow.plate-lift");
+  }
+  .card-interactive:active {
+    transform: translate(1px, 1px);
+    box-shadow: theme("boxShadow.plate-sm");
   }
 
   /* Section rhythm */
@@ -272,10 +558,10 @@
     left: 1rem;
     top: -100%;
     z-index: 100;
-    background: theme("colors.ink");
+    background: theme("colors.revision.DEFAULT");
     color: #fff;
     padding: 0.75rem 1rem;
-    border-radius: theme("borderRadius.md");
+    border-radius: 0;
     font-size: theme("fontSize.sm[0]");
   }
   .skip-link:focus { top: 1rem; }
@@ -289,48 +575,58 @@
 }
 
 @layer utilities {
-  /* The blue period that ends most headlines in the mockups */
-  .accent-dot { color: theme("colors.cobalt.DEFAULT"); }
+  /* The revision-orange period that ends the headline */
+  .accent-dot { color: theme("colors.revision.DEFAULT"); }
 
   .text-balance { text-wrap: balance; }
 
-  /* Dark space sections */
+  /* The ink ground, for full-bleed dark bands */
+  .surface-ink {
+    background-color: theme("colors.ink.DEFAULT");
+    color: theme("colors.ink.text");
+  }
+  .surface-ink :is(h1, h2, h3, h4, h5, h6) { color: #fff; }
+  .surface-ink .eyebrow { color: theme("colors.ink.text"); }
+  .surface-ink .rule-bar,
+  .surface-ink .rule-heavy { border-color: theme("colors.ink.text"); }
+  .surface-ink .rule-hair { border-color: theme("colors.ink.line"); }
+
+  /* Angular section divider — the diagonal cut between two grounds. Applied
+     to the incoming section so the shape belongs to the band it reveals. */
+  .edge-cut-top {
+    clip-path: polygon(0 2.5rem, 100% 0, 100% 100%, 0 100%);
+  }
+  .edge-cut-bottom {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 2.5rem), 0 100%);
+  }
+  @media (min-width: 768px) {
+    .edge-cut-top { clip-path: polygon(0 4.5rem, 100% 0, 100% 100%, 0 100%); }
+    .edge-cut-bottom { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 4.5rem), 0 100%); }
+  }
+
+  /* Registration offset — the donated discipline from the ben-day challenger.
+     An idle plate sits a hair off-register; interaction snaps the plates into
+     true. The offset means "not yet engaged", so it is never decorative. */
+  .off-register {
+    transition: transform 200ms theme("transitionTimingFunction.draft");
+    transform: translate(2px, -2px);
+  }
+  .group:hover .off-register,
+  .off-register:hover {
+    transform: translate(0, 0);
+  }
+
+  /* Tabular figures for every drawing number, price and count */
+  .nums { font-variant-numeric: tabular-nums; }
+
+  /* Compatibility: the old dark-surface utility, used by pages this redesign
+     has not rewritten. Same treatment as .surface-ink. */
   .surface-space {
-    background-color: theme("colors.space.DEFAULT");
-    color: theme("colors.space.text");
+    background-color: theme("colors.ink.DEFAULT");
+    color: theme("colors.ink.text");
   }
+  .surface-space :is(h1, h2, h3, h4, h5, h6) { color: #fff; }
 
-  /* Orbital hub — pulsing ring behind the signature hero/CTA node */
-  .orbit-hub::before {
-    content: "";
-    position: absolute;
-    inset: -0.5rem;
-    border-radius: inherit;
-    border: 1px solid theme("colors.cobalt.DEFAULT");
-    opacity: 0.35;
-    animation: orbit-pulse 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-  }
-
-  /* Magnetic pointer-follow wrapper — see useMagnetic. The transition is what
-     gives the pull its spring; JS only ever sets the raw transform. */
-  .magnetic {
-    transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: transform;
-  }
-}
-
-@keyframes orbit-pulse {
-  0% { transform: scale(0.94); opacity: 0.4; }
-  70% { opacity: 0; }
-  100% { transform: scale(1.22); opacity: 0; }
-}
-
-@keyframes orbit-spin {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes orbit-travel {
-  to { offset-distance: 100%; }
 }
 
 /* Honour the OS-level reduced-motion setting everywhere */
@@ -342,4 +638,7 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  /* Transforms that exist only as motion are neutralised outright, so a
+     reduced-motion visitor gets the settled state rather than a snapped one. */
+  .off-register { transform: none !important; }
 }
