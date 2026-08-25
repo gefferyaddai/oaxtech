@@ -36,6 +36,7 @@ export default async function ContactPage({
   return (
     <>
       <PageHero
+        sheetNo="SHT 06"
         eyebrow="Contact OAX Tech"
         title={
           <>
@@ -162,7 +163,7 @@ export default async function ContactPage({
           {/* Secondary paths ------------------------------------------------ */}
           <div className="mt-8 grid gap-4 lg:grid-cols-2">
             <div className="card flex flex-col gap-4 p-6 sm:flex-row sm:items-center">
-              <span className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-cobalt-soft text-cobalt">
+              <span className="inline-flex h-14 w-14 shrink-0 items-center justify-center border-rule border-graphite bg-revision text-white">
                 <Icon name="FileText" className="h-6 w-6" />
               </span>
               <div className="min-w-0 flex-1">
@@ -180,7 +181,7 @@ export default async function ContactPage({
             </div>
 
             <div className="card flex flex-col gap-4 p-6 sm:flex-row sm:items-center">
-              <span className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-cobalt-soft text-cobalt">
+              <span className="inline-flex h-14 w-14 shrink-0 items-center justify-center border-rule border-graphite bg-revision text-white">
                 <Icon name="Calendar" className="h-6 w-6" />
               </span>
               <div className="min-w-0 flex-1">
@@ -199,7 +200,9 @@ export default async function ContactPage({
 
       <section className="section border-t border-line bg-mist" id="faq">
         <Container narrow>
-          <SectionHeading title="Frequently Asked Questions" />
+          <SectionHeading
+            no="C01"
+            align="left" title="Frequently Asked Questions" />
           <FAQAccordion items={contactFaqs} columns={1} className="mt-10" />
         </Container>
       </section>
