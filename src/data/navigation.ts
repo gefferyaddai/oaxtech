@@ -46,7 +46,7 @@ export const primaryNav: NavGroup[] = [
 
 /** Secondary destinations kept out of the primary nav to avoid crowding. */
 export const utilityNav: NavLink[] = [
-  { label: "Our Team", href: "/team" },
+  { label: "Learn More About Us", href: "/learn-more" },
   { label: "Resources", href: "/resources" },
   { label: "Client Portal", href: "/portal/login" },
 ];
@@ -65,7 +65,7 @@ export const footerNav: { heading: string; links: NavLink[] }[] = [
     heading: "Company",
     links: [
       { label: "About Us", href: "/about" },
-      { label: "Our Team", href: "/team" },
+      { label: "Learn More About Us", href: "/learn-more" },
       { label: "Our Process", href: "/about#our-process" },
       { label: "Work", href: "/work" },
       { label: "Pricing", href: "/pricing" },
