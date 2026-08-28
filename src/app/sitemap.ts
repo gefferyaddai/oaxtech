@@ -17,7 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/work", priority: 0.8, changeFrequency: "monthly" as const },
     { path: "/work/spargo", priority: 0.7, changeFrequency: "yearly" as const },
     { path: "/about", priority: 0.7, changeFrequency: "yearly" as const },
-    { path: "/team", priority: 0.6, changeFrequency: "yearly" as const },
+    { path: "/learn-more", priority: 0.6, changeFrequency: "yearly" as const },
     { path: "/book", priority: 0.8, changeFrequency: "monthly" as const },
     { path: "/quote", priority: 0.8, changeFrequency: "monthly" as const },
     { path: "/contact", priority: 0.7, changeFrequency: "monthly" as const },
