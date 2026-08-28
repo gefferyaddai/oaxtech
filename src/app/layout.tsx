@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { SiteChrome } from "@/components/layout/SiteChrome";
+import { SplashScreen } from "@/components/layout/SplashScreen";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -129,6 +130,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en-CA">
       <body>
         <div hidden aria-hidden dangerouslySetInnerHTML={{ __html: DIRECTION_CONTRACT }} />
+        {/* Runs on document load only, not on client-side navigation. Outside
+            SiteChrome: the splash covers the client portal too, and is
+            suppressed on /admin by its own exclusion list rather than by the
+            marketing-chrome rule, which is about the header and footer. */}
+        <SplashScreen />
         <a href="#main" className="skip-link">
           Skip to main content
         </a>
