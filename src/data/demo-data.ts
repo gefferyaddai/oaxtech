@@ -56,7 +56,8 @@ export const DEMO_NOTICE =
   "Demo data. Every client, project, invoice and amount on this screen is invented for development — none of it is real business information.";
 
 /* -------------------------------------------------------------------------- */
-/* Team — the only real names here, taken from the public team page            */
+/* Team — the only real names here. Internal admin roster; the public site no  */
+/* longer publishes a team page, so these live here and nowhere else.          */
 /* -------------------------------------------------------------------------- */
 
 export const demoTeam: TeamMemberRecord[] = [
