@@ -4,12 +4,11 @@ import { PageHero } from "@/components/sections/PageHero";
 import { AboutHeroVisual } from "@/components/sections/HeroVisuals";
 import { ProcessStepsRow } from "@/components/sections/ProcessSteps";
 import { FeatureGrid } from "@/components/sections/ServiceCard";
-import { TeamMemberCard } from "@/components/sections/TeamMemberCard";
 import { ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { aboutHighlights, collaborationProcess, companyValues, differentiators } from "@/data/services";
-import { communityWork, missionVision, team } from "@/data/team";
+import { communityWork, missionVision, storyVideo } from "@/data/company";
 import { buildMetadata } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
 
@@ -30,8 +29,8 @@ export default function AboutPage() {
         description={`${siteConfig.name} is a Calgary-based technology and digital-growth agency helping businesses and organizations turn ideas into practical digital solutions.`}
         actions={
           <>
-            <ButtonLink href="/team" variant="dark" size="lg">
-              Meet Our Team
+            <ButtonLink href="/learn-more" variant="dark" size="lg">
+              Learn More About Us
             </ButtonLink>
             <ButtonLink href="/contact" variant="outline" size="lg">
               Work With Us
@@ -224,23 +223,30 @@ export default function AboutPage() {
         </Container>
       </section>
 
-      {/* Team preview ------------------------------------------------------- */}
+      {/* Story video pointer -------------------------------------------------
+          This slot used to hold a strip of team profile cards. It now points at
+          the recorded story instead — the same "who are these people" question,
+          answered by us rather than by five placeholder avatars. */}
       <section className="section">
         <Container>
           <SectionHeading
             no="A02"
-            align="left" eyebrow="Meet the team" title="The People Behind OAX Tech" />
-          <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-            {team.map((member) => (
-              <li key={member.slug}>
-                <TeamMemberCard member={member} compact />
-              </li>
-            ))}
-          </ul>
-          <div className="mt-8 flex justify-center">
-            <ButtonLink href="/team" variant="outline" iconRight="ArrowRight">
-              Meet the Full Team
-            </ButtonLink>
+            align="left" eyebrow="In our own words" title="Learn More About Us" />
+          <div className="mt-10 grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-14">
+            <div>
+              <p className="text-base leading-relaxed text-slate">{storyVideo.description}</p>
+              <ButtonLink href="/learn-more" variant="primary" className="mt-7" iconLeft="Play">
+                Watch Our Story
+              </ButtonLink>
+            </div>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {storyVideo.covers.map((cover) => (
+                <li key={cover.label} className="card flex h-full flex-col p-5">
+                  <p className="font-display text-sm font-semibold text-ink">{cover.label}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-slate">{cover.description}</p>
+                </li>
+              ))}
+            </ul>
           </div>
         </Container>
       </section>
