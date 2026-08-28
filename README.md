@@ -39,7 +39,7 @@ npm run dev                  # http://localhost:3000
 | `/work` | Our work (client-side filtering) |
 | `/work/spargo` | Spargo case study |
 | `/about` | About us |
-| `/team` | Our team |
+| `/learn-more` | Learn more about us (story video) |
 | `/book` | Book a consultation (4-step flow) |
 | `/quote` | Request a quote |
 | `/contact` | Contact |
@@ -120,13 +120,30 @@ state. Replace:
 The mockups showed `hello@oaxtech.com` and `(587) 123-4567`. Both look like
 sample data, so **neither was used anywhere in the build.**
 
-### 3. Team photos — `src/data/team.ts`
+### 3. Story video — `src/data/company.ts`
 
-`photo` is `null` for all five members, so `TeamMemberCard` renders a neutral
-monogram. Add approved artwork to `/public/team/` and set the path. No
-AI-generated portraits were used and nothing claims to be a photograph.
+`/learn-more` is built around a recorded video of the OAX Tech story. Until the
+recording exists, `storyVideo.src` is `null` and `StoryVideoPlate` renders a
+hatched field stamped "footage pending" — never a broken player or a fake
+thumbnail.
 
-Team LinkedIn URLs are also `null` and render as inert text, not dead links.
+To publish it, drop the files in `/public/video/` and set three fields in
+`storyVideo`:
+
+```ts
+src:      "/video/oax-story.mp4",     // H.264 MP4, web-optimised
+poster:   "/video/oax-story.jpg",     // 16:9 poster frame
+captions: "/video/oax-story.en.vtt",  // WebVTT — required before going live
+duration: "6:20",                     // shown in the plate header
+```
+
+Captions are not optional: a spoken-word company story is unusable without them
+for deaf and hard-of-hearing visitors.
+
+This replaced the old `/team` page, which led with five profile cards whose
+photographs were never supplied. `/team` permanently redirects to `/learn-more`
+(see `next.config.ts`). The internal admin roster is unaffected — it lives in
+`src/data/demo-data.ts`.
 
 ### 4. Resources content — `src/data/articles.ts`
 
