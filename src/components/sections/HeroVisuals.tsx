@@ -39,8 +39,6 @@ interface PlateNode {
   label: string;
   /** Secondary value shown right-aligned — a price, a status, a count. */
   meta?: string;
-  /** Rendered instead of an icon. Used for the team plate's initials. */
-  initials?: string;
   /** Service slug, when this row maps to one of the four drawing layers. */
   slug?: string;
 }
@@ -97,14 +95,9 @@ function LegendPlate({
               className={cn(
                 "flex h-9 w-9 shrink-0 items-center justify-center border border-graphite transition-colors duration-200 group-hover:bg-graphite group-hover:text-white",
                 node.slug ? `${layerFor(node.slug).fill} text-white` : "bg-sheet text-graphite",
-                node.initials && "font-display text-sm font-bold",
               )}
             >
-              {node.initials ? (
-                node.initials
-              ) : (
-                <Icon name={node.icon ?? "Square"} className="h-4 w-4" />
-              )}
+              <Icon name={node.icon ?? "Square"} className="h-4 w-4" />
             </span>
 
             <span className="min-w-0 flex-1 font-display text-base font-bold uppercase leading-tight text-graphite">
@@ -238,16 +231,21 @@ export function ContactHeroVisual() {
   );
 }
 
-export function TeamHeroVisual({ initials }: { initials: string[] }) {
+/**
+ * Learn More plate. Lists what the story video actually walks through, taken
+ * from `storyVideo.covers` — a legend of the page's own content, same as every
+ * other plate in the set.
+ */
+export function LearnMoreHeroVisual({ covers }: { covers: { label: string }[] }) {
   return (
     <LegendPlate
-      title="Team register"
+      title="In the video"
       sheet="07"
-      countLabel="on record"
-      nodes={initials.map((value, index) => ({
-        key: `${value}-${index}`,
-        initials: value,
-        label: "Team member",
+      countLabel="chapters"
+      nodes={covers.map((cover, index) => ({
+        key: `${cover.label}-${index}`,
+        icon: "Play",
+        label: cover.label,
       }))}
     />
   );
