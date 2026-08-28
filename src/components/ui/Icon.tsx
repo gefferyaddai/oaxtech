@@ -8,10 +8,10 @@ import {
   Info, Instagram, Layers, LayoutDashboard, LayoutTemplate, Lightbulb, LifeBuoy,
   Linkedin, LineChart, ListChecks, Loader2, Lock, LogOut, Mail, MapPin, Megaphone,
   Menu, MessageSquare, Minus, Monitor, MoreHorizontal, Paperclip, PenSquare, Phone,
-  PieChart, Plus, Puzzle, Receipt, RefreshCw, Rocket, ScanEye, Scale, Search,
+  PieChart, Play, Plus, Puzzle, Receipt, RefreshCw, Rocket, ScanEye, Scale, Search,
   SearchCheck, Send, Settings, Share2, ShieldCheck, ShoppingCart, Smartphone,
   Sparkles, Star, Store, Tag, Target, TrendingDown, TrendingUp, Triangle, Trash2,
-  Twitter, Upload, UserPlus, UserRound, UserSquare, Users,
+  Twitter, Upload, UserPlus, UserRound, UserSquare, Users, Video,
   Wallet, Workflow, X, Youtube, Zap,
   type LucideIcon,
 } from "lucide-react";
