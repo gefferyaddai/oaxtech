@@ -27,6 +27,18 @@ const nextConfig: NextConfig = {
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
+  async redirects() {
+    return [
+      {
+        // /team was retired in favour of /learn-more, which carries the story
+        // video instead of the profile-card roster. Permanent so search
+        // engines transfer the old URL's standing rather than reindexing.
+        source: "/team",
+        destination: "/learn-more",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
