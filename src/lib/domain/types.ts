@@ -73,13 +73,13 @@ export const ADMIN_ROLES: AdminRole[] = [
 
 export interface TeamMemberRecord {
   id: string;
-  /** Matches `slug` in src/data/team.ts so the two never drift apart. */
+  /** Stable identifier for this internal team member. */
   slug: string;
   name: string;
   /** Derived for avatars. No photographs are invented. */
   initials: string;
   role: AdminRole;
-  /** Job title as published on the public team page. */
+  /** Job title shown in the admin team roster. */
   title: string;
   assignedTasks: number;
   completedTasks: number;
