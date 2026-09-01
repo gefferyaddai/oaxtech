@@ -42,6 +42,62 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        /*
+         * ====================================================================
+         * BASELINE SECURITY HEADERS — every route, public included
+         * ====================================================================
+         *
+         * Deliberately NOT including a Content-Security-Policy. A useful CSP
+         * for this app needs a per-request nonce for the two inline scripts
+         * (the splash-suppression stamp and the JSON-LD blocks), which a
+         * static header cannot carry — a `script-src 'self' 'unsafe-inline'`
+         * would be a CSP in name only. That belongs in middleware as a
+         * follow-up; shipping the honest subset now beats shipping a policy
+         * that advertises protection it does not provide.
+         */
+        source: "/:path*",
+        headers: [
+          /*
+           * Clickjacking. `frame-ancestors` is the modern control and covers
+           * more cases than X-Frame-Options, but the older header is still
+           * honoured by some corporate proxies, so both are set and agree.
+           */
+          { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+          { key: "X-Frame-Options", value: "DENY" },
+
+          /* Stop browsers second-guessing a declared Content-Type. */
+          { key: "X-Content-Type-Options", value: "nosniff" },
+
+          /*
+           * Send the full URL within our own origin, but only the origin when
+           * leaving it — outbound links never leak a path a visitor was on.
+           */
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+
+          /*
+           * Nothing on this site uses these. Denying them means an injected
+           * script or embedded frame cannot silently ask for them either.
+           */
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
+          },
+
+          /*
+           * Two years, subdomains included. `preload` is deliberately omitted:
+           * submitting to the preload list is effectively irreversible and
+           * should be a conscious decision once the domain has been serving
+           * HTTPS-only for a while, not a side effect of this config.
+           *
+           * Ignored by browsers over plain HTTP, so it is inert in local dev.
+           */
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains",
+          },
+        ],
+      },
+      {
         // Client portal is demo-only and must never be indexed.
         source: "/portal/:path*",
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
