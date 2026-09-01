@@ -8,7 +8,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { aboutHighlights, collaborationProcess, companyValues, differentiators } from "@/data/services";
-import { communityWork, missionVision, storyVideo } from "@/data/company";
+import { communityWork, hasStoryVideo, missionVision, storyVideo } from "@/data/company";
 import { buildMetadata } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
 
@@ -29,9 +29,17 @@ export default function AboutPage() {
         description={`${siteConfig.name} is a Calgary-based technology and digital-growth agency helping businesses and organizations turn ideas into practical digital solutions.`}
         actions={
           <>
-            <ButtonLink href="/learn-more" variant="dark" size="lg">
-              Learn More About Us
-            </ButtonLink>
+            {/* Until the story footage exists, this slot points at real work
+                rather than at a "footage pending" plate. See `hasStoryVideo`. */}
+            {hasStoryVideo ? (
+              <ButtonLink href="/learn-more" variant="dark" size="lg">
+                Learn More About Us
+              </ButtonLink>
+            ) : (
+              <ButtonLink href="/work" variant="dark" size="lg">
+                See Our Work
+              </ButtonLink>
+            )}
             <ButtonLink href="/contact" variant="outline" size="lg">
               Work With Us
             </ButtonLink>
@@ -235,9 +243,14 @@ export default function AboutPage() {
           <div className="mt-10 grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-14">
             <div>
               <p className="text-base leading-relaxed text-slate">{storyVideo.description}</p>
-              <ButtonLink href="/learn-more" variant="primary" className="mt-7" iconLeft="Play">
-                Watch Our Story
-              </ButtonLink>
+              {/* A Play button that leads to no video is the one promise this
+                  page must not make. The four covers below still describe what
+                  we're about, so the section reads without it. */}
+              {hasStoryVideo && (
+                <ButtonLink href="/learn-more" variant="primary" className="mt-7" iconLeft="Play">
+                  Watch Our Story
+                </ButtonLink>
+              )}
             </div>
             <ul className="grid gap-3 sm:grid-cols-2">
               {storyVideo.covers.map((cover) => (
