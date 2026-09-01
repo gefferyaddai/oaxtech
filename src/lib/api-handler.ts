@@ -6,6 +6,13 @@ import {
   verifySpamToken,
   type SubmissionOutcome,
 } from "@/lib/integrations";
+import {
+  PUBLIC_FORM_LIMIT,
+  clientIp,
+  isOverLimit,
+  pruneOccasionally,
+  recordHit,
+} from "@/lib/rate-limit";
 import { flattenFieldErrors } from "@/lib/validation/schemas";
 
 type Kind = "contact" | "quote" | "booking" | "newsletter";
@@ -21,11 +28,12 @@ interface HandlerOptions<T> {
 /**
  * One shared submission pipeline for every form.
  *
- * 1. Parse JSON safely.
- * 2. Re-validate server-side with the SAME schema the browser used — the
+ * 1. Refuse a caller that has already used its allowance.
+ * 2. Parse JSON safely.
+ * 3. Re-validate server-side with the SAME schema the browser used — the
  *    client check is convenience, this is the boundary.
- * 3. Reject honeypot hits and failed spam tokens.
- * 4. Attempt delivery, and report exactly what happened.
+ * 4. Reject honeypot hits and failed spam tokens.
+ * 5. Attempt delivery, and report exactly what happened.
  *
  * It never returns `delivered` unless a configured service confirmed it.
  */
@@ -33,6 +41,29 @@ export async function handleSubmission<T extends { company_website?: string; spa
   request: Request,
   { schema, kind, subject, body, replyTo }: HandlerOptions<T>,
 ): Promise<NextResponse<SubmissionOutcome>> {
+  /*
+   * Checked BEFORE the body is read, so a caller that is already over its
+   * limit costs a single indexed count and nothing else.
+   *
+   * The key is per IP and shared across all four forms — see PUBLIC_FORM_LIMIT.
+   * With no proxy header there is no IP to attribute (normal in local dev), and
+   * limiting is skipped rather than collapsing every caller into one bucket,
+   * which would let one visitor lock out everyone else.
+   */
+  const ip = clientIp(request);
+  const limitKey = ip ? `form:ip:${ip}` : null;
+
+  if (limitKey && (await isOverLimit(limitKey, PUBLIC_FORM_LIMIT))) {
+    return NextResponse.json(
+      {
+        status: "error",
+        detail:
+          "That's several messages in a short time. Please wait a few minutes and try again — or book a consultation instead.",
+      },
+      { status: 429, headers: { "Retry-After": String(PUBLIC_FORM_LIMIT.windowMinutes * 60) } },
+    );
+  }
+
   let raw: unknown;
   try {
     raw = await request.json();
@@ -52,6 +83,20 @@ export async function handleSubmission<T extends { company_website?: string; spa
   }
 
   const data = parsed.data;
+
+  /*
+   * Counted here — after the payload proved valid, before anything is written.
+   *
+   * Not on every request that arrives: a person correcting a validation error
+   * would burn their allowance on typos and get locked out mid-enquiry. A bot
+   * posting junk that never parses is already costing us nothing. What is
+   * worth limiting is well-formed submissions, which is exactly what a spam
+   * run produces.
+   */
+  if (limitKey) {
+    await recordHit(limitKey);
+    void pruneOccasionally(limitKey, PUBLIC_FORM_LIMIT);
+  }
 
   // Honeypot: a filled hidden field means a bot. Respond generically.
   if (data.company_website) {
