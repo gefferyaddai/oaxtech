@@ -30,8 +30,13 @@ export interface SocialLink {
 const SOCIAL_LINKS: SocialLink[] = [
   { label: "LinkedIn", url: "https://www.linkedin.com/company/oax-tech/" },
   { label: "Instagram", url: "https://www.instagram.com/oax.tech/" },
-  /** PLACEHOLDER: no X / Twitter profile confirmed yet. */
-  { label: "X / Twitter", url: null },
+  /*
+   * X / Twitter was removed rather than left as a `null` placeholder: an inert
+   * "Profile link to be added" row in the contact page's Connect block reads as
+   * an unfinished site, not as an honest one. The `Placeholder<string>` type is
+   * kept on the interface so a genuinely pending profile can still be declared
+   * that way — add the entry back with its real URL when one exists.
+   */
 ];
 
 export const siteConfig = {
