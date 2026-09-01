@@ -13,6 +13,9 @@
  *   SEED_ADMIN_PASSWORD=...  SEED_CLIENT_PASSWORD=...
  */
 
+// Must come first: populates process.env before anything reads it.
+import "./load-env";
+
 import { randomBytes, randomUUID } from "node:crypto";
 import { demoClients, demoTeam } from "@/data/demo-data";
 import { hashPassword, PASSWORD_MIN_LENGTH } from "@/lib/auth/password";
