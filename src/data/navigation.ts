@@ -46,7 +46,18 @@ export const primaryNav: NavGroup[] = [
 
 /** Secondary destinations kept out of the primary nav to avoid crowding. */
 export const utilityNav: NavLink[] = [
-  { label: "Learn More About Us", href: "/learn-more" },
+  /*
+   * "Learn More About Us" (/learn-more) is intentionally NOT linked here.
+   *
+   * The page is built around the recorded company story, and until
+   * `storyVideo.src` is set it renders a "footage pending" plate. Linking it
+   * from global navigation would send every visitor to a placeholder. The
+   * route stays live and reachable so the permanent /team -> /learn-more
+   * redirect still resolves rather than 404ing.
+   *
+   * RESTORE both entries (here and in footerNav "Company") the moment the
+   * footage and its captions land.
+   */
   { label: "Resources", href: "/resources" },
   { label: "Client Portal", href: "/portal/login" },
 ];
@@ -65,7 +76,7 @@ export const footerNav: { heading: string; links: NavLink[] }[] = [
     heading: "Company",
     links: [
       { label: "About Us", href: "/about" },
-      { label: "Learn More About Us", href: "/learn-more" },
+      /* See utilityNav — withheld until the story footage exists. */
       { label: "Our Process", href: "/about#our-process" },
       { label: "Work", href: "/work" },
       { label: "Pricing", href: "/pricing" },
