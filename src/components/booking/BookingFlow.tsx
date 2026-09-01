@@ -16,9 +16,9 @@ import { Button, ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { ErrorState } from "@/components/ui/States";
 import {
+  type DayAvailability,
   BOOKING_WINDOW,
   CONSULTATION_DETAILS,
-  IS_SAMPLE_AVAILABILITY,
   formatSlot,
   getMonthAvailability,
 } from "@/data/availability";
@@ -85,10 +85,93 @@ export function BookingFlow() {
     setValue("timeZone", timeZone);
   }, [service, selectedDate, selectedSlot, timeZone, setValue]);
 
-  const availability = useMemo(
-    () => getMonthAvailability(viewMonth.getFullYear(), viewMonth.getMonth()),
-    [viewMonth],
+  /**
+   * ==========================================================================
+   * LIVE AVAILABILITY
+   * ==========================================================================
+   *
+   * Seeded with the local sample grid so the calendar has structure on the
+   * very first paint, then replaced by whatever /api/availability returns for
+   * the month in view. The endpoint answers with real Cal.com slots when the
+   * calendar is configured and the sample grid when it is not, and says which
+   * it gave us — so `isSample` is learned from the server rather than compiled
+   * in, and connecting a calendar needs no change here.
+   *
+   * Fetching per month rather than all at once: availability changes while
+   * someone is deciding, and a month they never open should not be queried.
+   */
+  const [availability, setAvailability] = useState<DayAvailability[]>(() =>
+    getMonthAvailability(viewMonth.getFullYear(), viewMonth.getMonth()),
   );
+  const [isSample, setIsSample] = useState(true);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState<string>();
+
+  useEffect(() => {
+    // Wait for the browser's zone — asking before it resolves would query the
+    // wrong day boundaries for anyone outside the server's zone.
+    if (!timeZone) return;
+
+    const controller = new AbortController();
+    const year = viewMonth.getFullYear();
+    const month = viewMonth.getMonth();
+
+    setLoadingSlots(true);
+    setAvailabilityError(undefined);
+
+    const query = new URLSearchParams({
+      year: String(year),
+      month: String(month),
+      timeZone,
+    });
+
+    fetch(`/api/availability?${query}`, { signal: controller.signal })
+      .then(async (response) => {
+        const payload = (await response.json()) as {
+          isSample?: boolean;
+          days?: DayAvailability[];
+          error?: string;
+        };
+
+        if (!response.ok) {
+          // Configured but unreachable. Show nothing bookable and say so —
+          // never fall back to sample times dressed up as real ones.
+          setAvailability([]);
+          setIsSample(false);
+          setAvailabilityError(
+            "We couldn't load the live calendar just now. Please try again in a moment, or send us a message and we'll arrange a time.",
+          );
+          return;
+        }
+
+        setAvailability(payload.days ?? []);
+        setIsSample(payload.isSample !== false);
+      })
+      .catch((error: unknown) => {
+        if ((error as Error)?.name === "AbortError") return;
+        setAvailability([]);
+        setIsSample(false);
+        setAvailabilityError(
+          "We couldn't reach the booking calendar. Please try again, or send us a message and we'll arrange a time.",
+        );
+      })
+      .finally(() => {
+        // The abort path has already been superseded by a newer request, which
+        // owns the loading flag from here.
+        if (!controller.signal.aborted) setLoadingSlots(false);
+      });
+
+    return () => controller.abort();
+  }, [viewMonth, timeZone]);
+
+  /*
+   * A date chosen in one month must not stay selected once the visitor pages
+   * to another, or the summary would show a day that is no longer on screen.
+   */
+  useEffect(() => {
+    setSelectedDate("");
+    setSelectedSlot("");
+  }, [viewMonth]);
 
   const slots = useMemo(
     () => availability.find((d) => d.date === selectedDate)?.slots ?? [],
@@ -212,14 +295,27 @@ export function BookingFlow() {
         >
           <h2 className="font-display text-lg font-semibold text-ink">Select a Date and Time</h2>
 
-          {IS_SAMPLE_AVAILABILITY && (
+          {/* Three states, and they are mutually exclusive: the live calendar
+              is unreachable, the calendar isn't connected at all, or these are
+              real bookable times and no notice is needed. */}
+          {availabilityError ? (
             <div className="mt-4">
               <ErrorState
                 variant="config"
-                title="These are sample times"
-                description="This calendar isn't connected to a live booking system yet, so the times below are examples. We'll confirm a real time with you by email."
+                title="Couldn't load available times"
+                description={availabilityError}
               />
             </div>
+          ) : (
+            isSample && (
+              <div className="mt-4">
+                <ErrorState
+                  variant="config"
+                  title="These are sample times"
+                  description="This calendar isn't connected to a live booking system yet, so the times below are examples. We'll confirm a real time with you by email."
+                />
+              </div>
+            )
           )}
 
           <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr_0.8fr]">
@@ -311,13 +407,24 @@ export function BookingFlow() {
                 )}
               </p>
 
-              {!selectedDate ? (
+              {loadingSlots ? (
+                <p
+                  /* Polite, not assertive: the visitor is reading the calendar,
+                     and this should not interrupt what a screen reader is on. */
+                  aria-live="polite"
+                  className="mt-4 rounded-lg border border-dashed border-line-strong bg-mist p-4 text-sm text-slate"
+                >
+                  Checking available times…
+                </p>
+              ) : !selectedDate ? (
                 <p className="mt-4 rounded-lg border border-dashed border-line-strong bg-mist p-4 text-sm text-slate">
                   Pick a date to see times.
                 </p>
               ) : slots.length === 0 ? (
                 <p className="mt-4 rounded-lg border border-dashed border-line-strong bg-mist p-4 text-sm text-slate">
-                  No sample times on this date. Try another day.
+                  {isSample
+                    ? "No sample times on this date. Try another day."
+                    : "Nothing free on this date. Try another day."}
                 </p>
               ) : (
                 <ul className="mt-4 space-y-2">
