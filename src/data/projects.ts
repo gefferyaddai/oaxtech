@@ -76,6 +76,41 @@ export const projects: Project[] = [
     featured: true,
   },
   {
+    slug: "gcca-calgary",
+    name: "GCCA Calgary",
+    eyebrow: "Non-Profit Website",
+    /*
+     * "Websites" only. GHSA above also carries "Marketing & SEO"; that is not
+     * claimed here because no marketing or SEO engagement for this client has
+     * been confirmed, and a category is a claim about scope of work.
+     */
+    categories: ["Websites"],
+    summary:
+      "A website for the Guyana Canada Cultural Association (Calgary), a non-profit society founded in 1991 that celebrates Guyanese heritage and brings the community together across the city.",
+    tags: ["Web Design", "Development", "Non-Profit"],
+    /*
+     * Each highlight names a section that genuinely exists on the live site —
+     * events and Carifest, the membership tiers, and the heritage content. No
+     * visitor numbers, sign-up counts or engagement figures: the content rule
+     * at the top of this file applies to community work exactly as it does to
+     * commercial work.
+     */
+    highlights: [
+      { label: "Events & Carifest", description: "Year-round events, and the parade and festival.", icon: "CalendarRange" },
+      { label: "Membership", description: "Join or renew across the association's membership tiers.", icon: "UserPlus" },
+      { label: "Culture & Heritage", description: "Guyanese history and traditions, kept in one place.", icon: "HeartHandshake" },
+    ],
+    externalUrl: "https://gccacalgary.com",
+    externalLabel: "gccacalgary.com",
+    caseStudyHref: null,
+    /*
+     * Not featured. The homepage band is a three-column grid, and a fourth
+     * card would sit alone on a second row. Promoting this one means demoting
+     * another, which is an editorial call rather than a technical one.
+     */
+    featured: false,
+  },
+  {
     slug: "nasdaq-trading-automation",
     name: "NASDAQ Trading Automation",
     eyebrow: "AI & Automation",
@@ -266,14 +301,42 @@ export const spargoCaseStudy = {
 /* -------------------------------------------------------------------------- */
 
 /**
- * PLACEHOLDER LIST.
+ * Organisations named in the homepage client register.
  *
- * Only Spargo and GHSA are confirmed. The additional company names that appear
- * in the trust strip of the landing-page mockup are NOT confirmed clients and
- * are deliberately omitted. Add entries here only with written permission to
- * use the organisation's name.
+ * Add entries here only with permission to use the organisation's name. The
+ * additional company names that appear in the trust strip of the landing-page
+ * mockup were never confirmed clients and remain deliberately omitted.
+ *
+ * The register is drawn to four cells; any cell beyond this list renders as a
+ * hatched, labelled blank. Four entries fill the row exactly, so adding a
+ * fifth starts a second row that will need three more to look deliberate.
+ *
+ * NAMES ARE SET LARGE, UPPERCASE, IN THE DISPLAY FACE — up to 2rem in a
+ * quarter-width cell. Short names and acronyms sit in that composition
+ * comfortably; a long one wraps to three or four lines and drives the height
+ * of every cell in the row. That is why `label` exists: the register shows
+ * `label` when set, so a long legal name can still be recorded in `name`
+ * without the strip having to carry it.
  */
-export const trustedBy: { name: string }[] = [
+export interface TrustedOrganisation {
+  /** Full organisation name, as it should be written out. */
+  name: string;
+  /** Shorter form for the register, when the full name is too long to set. */
+  label?: string;
+}
+
+export const trustedBy: TrustedOrganisation[] = [
   { name: "Spargo" },
   { name: "GHSA" },
+  {
+    name: "Guyana Canada Cultural Association",
+    /*
+     * Set as the acronym, matching GHSA directly above it. Written out, this
+     * is four words and 34 characters against "SPARGO" — it would dominate the
+     * register and force the whole row taller. The full name is carried on the
+     * project entry and on /work, where there is room to set it properly.
+     */
+    label: "GCCA",
+  },
+  { name: "VG Digital" },
 ];
