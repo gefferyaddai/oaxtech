@@ -76,6 +76,19 @@ export const storyVideo: StoryVideo = {
   ],
 };
 
+/**
+ * Whether the recorded story actually exists yet.
+ *
+ * Every surface that LINKS TO or PROMISES the video is gated on this — the
+ * /about hero action and the "Watch Our Story" button, plus the global nav
+ * entries in `navigation.ts`. Dropping the footage in and setting `src` above
+ * restores all of them at once, with no other edit.
+ *
+ * The /learn-more route itself stays live regardless, so the permanent
+ * /team -> /learn-more redirect always resolves.
+ */
+export const hasStoryVideo: boolean = storyVideo.src !== null;
+
 /* -------------------------------------------------------------------------- */
 /* What we bring                                                              */
 /* -------------------------------------------------------------------------- */
