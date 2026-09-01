@@ -75,12 +75,38 @@ export function isDemoMode(): boolean {
 }
 
 /**
+ * Demo portal access is allowed only outside production.
+ *
+ * This mirrors `demoAccessAllowed()` in `src/lib/admin/auth.ts`, and exists
+ * for the same reason: it is the guard that stops an unconfigured deployment
+ * from handing a session to anyone who can reach the URL. The admin side had
+ * it and the portal did not, which meant a production deploy with AUTH_SECRET
+ * unset would refuse to open /admin while still opening /portal onto the
+ * demonstration client's projects, files and invoices.
+ *
+ * The fixture data behind it is illustrative rather than anyone's real
+ * information, so the exposure was limited — but "the sample data is fake" is
+ * not a access control, and the asymmetry would not survive the first time
+ * someone pointed the portal at a live client.
+ */
+export function demoAccessAllowed(): boolean {
+  return process.env.NODE_ENV !== "production";
+}
+
+/**
  * Demo adapter. Grants a clearly-labelled demo session without validating any
  * credentials, because validating credentials that don't exist would be
  * security theatre.
  */
 const demoAdapter: AuthAdapter = {
   async signIn() {
+    if (!demoAccessAllowed()) {
+      return {
+        ok: false,
+        message:
+          "Demo portal access is disabled in production. Set AUTH_SECRET and create a client account to sign in.",
+      };
+    }
     const store = await cookies();
     store.set(DEMO_COOKIE, "1", {
       httpOnly: true,
@@ -96,6 +122,9 @@ const demoAdapter: AuthAdapter = {
     store.delete({ name: DEMO_COOKIE, path: DEMO_COOKIE_PATH });
   },
   async getSession() {
+    // Also checked on read, not just on sign-in: a cookie minted before a
+    // deploy must not keep working after it.
+    if (!demoAccessAllowed()) return null;
     const store = await cookies();
     if (store.get(DEMO_COOKIE)?.value !== "1") return null;
     return { isDemo: true, label: "Demo Account", clientId: DEMO_CLIENT_ID };
