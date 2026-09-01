@@ -36,16 +36,22 @@ import { cn } from "@/lib/utils";
 /**
  * The client list, drawn as a register rather than a logo wall.
  *
- * There are no logo files, and only two organisations have confirmed
- * permission to be named. A two-logo "trusted by" strip reads as thin; the
- * same two names set large in the display face against ruled cells reads as a
- * register of record, which is both more honest and more confident.
+ * There are no logo files. A handful of small logos in a "trusted by" strip
+ * reads as thin; the same names set large in the display face against ruled
+ * cells reads as a register of record, which is both more honest and more
+ * confident.
+ *
+ * An entry may carry a shorter `label` for the register — see `trustedBy` in
+ * `src/data/projects.ts` for why. When it does, the full name is still what
+ * screen readers announce and what a hover reveals: the abbreviation is a
+ * typographic decision, and it should not be the only name a visitor who
+ * cannot see the composition ever gets.
  */
 export function ClientRegister({
   clients,
   className,
 }: {
-  clients: { name: string }[];
+  clients: { name: string; label?: string }[];
   className?: string;
 }) {
   return (
@@ -66,8 +72,16 @@ export function ClientRegister({
             <span aria-hidden="true" className="tally font-mono text-revision-text nums">
               {String(index + 1).padStart(2, "0")}
             </span>
-            <span className="font-display text-display-sm font-extrabold uppercase leading-none text-graphite transition-colors duration-200 group-hover:text-revision">
-              {client.name}
+            <span
+              /* The abbreviation is shown; the full name is what gets
+                 announced and what a hover surfaces. `title` alone would not
+                 be enough — it is not reliably reachable by keyboard or by
+                 assistive technology, so the accessible name is set outright. */
+              title={client.label ? client.name : undefined}
+              aria-label={client.label ? client.name : undefined}
+              className="font-display text-display-sm font-extrabold uppercase leading-none text-graphite transition-colors duration-200 group-hover:text-revision"
+            >
+              {client.label ?? client.name}
             </span>
           </li>
         ))}
