@@ -1,27 +1,19 @@
-import { Container } from "@/components/layout/Container";
-import { ErrorState } from "@/components/ui/States";
+import { LegalDocument } from "@/components/sections/LegalDocument";
+import { privacyPolicy } from "@/data/legal";
 import { buildMetadata } from "@/lib/metadata";
 
+/**
+ * Indexable. It was `noindex` only while the page was an empty stub — a real
+ * privacy policy should be findable, and a search engine that cannot see it
+ * cannot show it to someone checking whether we are legitimate.
+ */
 export const metadata = buildMetadata({
   title: "Privacy Policy",
-  description: "How OAX Tech handles personal information.",
+  description:
+    "What personal information OAX Tech collects through this website, why, who processes it, how long it is kept, and how to ask us to delete it.",
   path: "/privacy",
-  noIndex: true,
 });
 
 export default function Page() {
-  return (
-    <section className="section">
-      <Container narrow>
-        <h1 className="text-display-lg">Privacy Policy</h1>
-        <div className="mt-8 max-w-prose">
-          <ErrorState
-            variant="config"
-            title="This policy still needs to be written"
-            description="A privacy policy must reflect what your site actually collects and who processes it, so it can't be templated here without being misleading. This page exists so the link isn't broken, and is excluded from search indexing until real content replaces it."
-          />
-        </div>
-      </Container>
-    </section>
-  );
+  return <LegalDocument document={privacyPolicy} />;
 }
