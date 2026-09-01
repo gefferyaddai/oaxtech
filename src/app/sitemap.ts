@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { publishedArticles } from "@/data/articles";
+import { hasStoryVideo } from "@/data/company";
 import { siteConfig } from "@/lib/site";
 
 /**
@@ -17,7 +18,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/work", priority: 0.8, changeFrequency: "monthly" as const },
     { path: "/work/spargo", priority: 0.7, changeFrequency: "yearly" as const },
     { path: "/about", priority: 0.7, changeFrequency: "yearly" as const },
-    { path: "/learn-more", priority: 0.6, changeFrequency: "yearly" as const },
     { path: "/book", priority: 0.8, changeFrequency: "monthly" as const },
     { path: "/quote", priority: 0.8, changeFrequency: "monthly" as const },
     { path: "/contact", priority: 0.7, changeFrequency: "monthly" as const },
@@ -26,10 +26,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/terms", priority: 0.2, changeFrequency: "yearly" as const },
   ];
 
+  /*
+   * /learn-more is listed only once the story footage exists. Until then the
+   * page is a "footage pending" plate, and submitting a thin placeholder for
+   * indexing is worse than not submitting it — the route stays live for the
+   * permanent /team redirect either way. It also carries `noindex` while
+   * pending, so this keeps the sitemap and the page's own directive agreeing;
+   * a sitemap advertising a noindex URL is a crawl error, not a nuance.
+   */
+  const conditionalRoutes = hasStoryVideo
+    ? [{ path: "/learn-more", priority: 0.6, changeFrequency: "yearly" as const }]
+    : [];
+
   const lastModified = new Date();
 
   return [
-    ...staticRoutes.map((route) => ({
+    ...[...staticRoutes, ...conditionalRoutes].map((route) => ({
       url: `${siteConfig.url}${route.path === "/" ? "" : route.path}`,
       lastModified,
       changeFrequency: route.changeFrequency,
