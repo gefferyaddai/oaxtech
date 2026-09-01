@@ -11,6 +11,9 @@
  * running it twice leaves the same state rather than duplicating rows.
  */
 
+// Must come first: populates process.env before anything reads it.
+import "./load-env";
+
 import {
   demoActivity,
   demoApprovals,
