@@ -31,7 +31,13 @@ const NOT_CONFIGURED = (service: string): IntegrationResult => ({
 
 export const integrationStatus = {
   email: () => Boolean(process.env.EMAIL_API_KEY && process.env.EMAIL_TO_ADDRESS),
-  calendar: () => Boolean(process.env.CALENDAR_API_KEY),
+  /*
+   * Both halves are required. A key without an event type id cannot resolve
+   * which consultation is being booked, and Cal.com's rejection for a missing
+   * id reads like an auth failure — so it is treated as unconfigured here
+   * rather than surfacing a misleading error at booking time.
+   */
+  calendar: () => Boolean(process.env.CALENDAR_API_KEY && process.env.CALENDAR_EVENT_TYPE_ID),
   storage: () => Boolean(process.env.STORAGE_BUCKET && process.env.STORAGE_ACCESS_KEY),
   database: () => Boolean(process.env.DATABASE_URL),
   payments: () => Boolean(process.env.PAYMENTS_SECRET_KEY),
@@ -51,24 +57,65 @@ export interface EmailMessage {
   replyTo?: string;
 }
 
+/**
+ * Sends one notification to the OAX Tech inbox via Resend.
+ *
+ * `from` MUST be on a domain verified in the Resend dashboard — an unverified
+ * sender is the single most common reason this returns a 403 with everything
+ * else correct. It falls back to Resend's shared `onboarding@resend.dev`
+ * sender, which works immediately without domain verification but can only
+ * deliver to the account owner's own address. That fallback is a bridge for
+ * launch day, not a destination: mail from it will not reach a client.
+ *
+ * `replyTo` is what makes the notification useful — it carries the enquirer's
+ * address, so hitting reply in the inbox answers the person rather than the
+ * robot.
+ */
 export async function sendEmail(message: EmailMessage): Promise<IntegrationResult> {
   if (!integrationStatus.email()) return NOT_CONFIGURED("Email delivery");
 
-  // ---------------------------------------------------------------------
-  // Wire the real provider here (Resend, Postmark, SES, SendGrid...).
-  // Keep the shape: return { ok: true } only after the provider confirms.
-  // ---------------------------------------------------------------------
+  const from = process.env.EMAIL_FROM_ADDRESS || "OAX Tech <onboarding@resend.dev>";
+
   try {
-    // const res = await fetch("https://api.provider.com/send", { ... });
-    // if (!res.ok) return { ok: false, reason: "failed", detail: await res.text() };
-    void message;
-    return {
-      ok: false,
-      reason: "not_configured",
-      detail: "Email credentials are present but no provider client is wired up yet.",
-    };
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.EMAIL_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from,
+        to: [process.env.EMAIL_TO_ADDRESS],
+        subject: message.subject,
+        text: message.body,
+        ...(message.replyTo ? { reply_to: message.replyTo } : {}),
+      }),
+      // A hung provider must not hold the visitor's request open indefinitely.
+      signal: AbortSignal.timeout(10_000),
+    });
+
+    if (!response.ok) {
+      /*
+       * Read the provider's own message — Resend explains exactly what is
+       * wrong ("domain is not verified", "invalid api key") and that detail is
+       * what turns a failed launch-day send into a two-minute fix. It is
+       * surfaced to the caller, which logs it; it is never shown to a visitor.
+       */
+      const detail = await response.text().catch(() => "");
+      return {
+        ok: false,
+        reason: "failed",
+        detail: `Resend returned ${response.status}. ${detail}`.trim(),
+      };
+    }
+
+    return { ok: true };
   } catch (error) {
-    return { ok: false, reason: "failed", detail: (error as Error).message };
+    const detail =
+      (error as Error)?.name === "TimeoutError"
+        ? "Email provider did not respond within 10 seconds."
+        : (error as Error).message;
+    return { ok: false, reason: "failed", detail };
   }
 }
 
@@ -87,14 +134,64 @@ export interface BookingRequest {
   email: string;
 }
 
+/**
+ * Turns a local date + time + zone into the UTC instant Cal.com expects.
+ *
+ * Doing this with `new Date("2026-09-01T09:00")` would interpret the string in
+ * the SERVER's zone, not the visitor's — which on a host running UTC books
+ * every Calgary morning six hours early. So the offset for that specific zone
+ * on that specific date is measured (which also gets daylight saving right,
+ * since the offset is resolved on the date in question rather than today) and
+ * subtracted.
+ */
+function toUtcInstant(date: string, time: string, timeZone: string): string | null {
+  const naive = new Date(`${date}T${time}:00Z`);
+  if (Number.isNaN(naive.getTime())) return null;
+
+  // What clock time does `naive` show in the target zone? The difference
+  // between that and the input is the zone's offset at that moment.
+  const shown = new Date(naive.toLocaleString("en-US", { timeZone }));
+  const reference = new Date(naive.toLocaleString("en-US", { timeZone: "UTC" }));
+  const offsetMs = shown.getTime() - reference.getTime();
+
+  return new Date(naive.getTime() - offsetMs).toISOString();
+}
+
+/**
+ * Reserves the chosen slot on the real calendar.
+ *
+ * Returns `ok: true` only once Cal.com confirms the booking exists — a
+ * rejected slot, an expired key or a timeout all come back as a failure the
+ * booking UI reports honestly, because telling someone a consultation is
+ * booked when it is not is the worst outcome this flow has.
+ */
 export async function createCalendarBooking(request: BookingRequest): Promise<IntegrationResult> {
-  if (!integrationStatus.calendar()) return NOT_CONFIGURED("Calendar scheduling");
-  void request;
-  return {
-    ok: false,
-    reason: "not_configured",
-    detail: "Calendar credentials are present but no scheduling client is wired up yet.",
-  };
+  const { calcomConfig, createBooking } = await import("@/lib/integrations/calcom");
+
+  const config = calcomConfig();
+  if (!config) return NOT_CONFIGURED("Calendar scheduling");
+
+  const startIso = toUtcInstant(request.date, request.time, request.timeZone);
+  if (!startIso) {
+    return { ok: false, reason: "failed", detail: "That date and time could not be read." };
+  }
+
+  try {
+    const { uid } = await createBooking(config, {
+      startIso,
+      name: request.name,
+      email: request.email,
+      timeZone: request.timeZone,
+      notes: `Service of interest: ${request.service}`,
+    });
+    return { ok: true, detail: uid ? `Cal.com booking ${uid}` : undefined };
+  } catch (error) {
+    const detail =
+      (error as Error)?.name === "TimeoutError"
+        ? "The scheduling provider did not respond in time. Your slot was not reserved."
+        : (error as Error).message;
+    return { ok: false, reason: "failed", detail };
+  }
 }
 
 /* -------------------------------------------------------------------------- */
