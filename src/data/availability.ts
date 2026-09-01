@@ -1,22 +1,27 @@
 /**
  * ============================================================================
- * SAMPLE AVAILABILITY — NOT CONNECTED TO A REAL CALENDAR
+ * FALLBACK AVAILABILITY GRID
  * ============================================================================
  *
- * These are illustrative time slots used to demonstrate the booking interface.
- * They are NOT synced with anyone's calendar, and choosing one does not reserve
- * anything. The booking UI states this plainly to the visitor.
+ * Illustrative time slots, used in exactly two places:
  *
- * To go live:
- *   1. Set CALENDAR_API_KEY (see .env.example).
- *   2. Implement `createCalendarBooking` in src/lib/integrations/index.ts.
- *   3. Replace `getAvailableSlots` below with a real availability query.
+ *   1. The first paint of the booking calendar, so the grid has structure
+ *      before the live request resolves.
+ *   2. Deployments with no calendar configured, where `/api/availability`
+ *      serves this grid and flags the response `isSample: true` — and the
+ *      booking step renders a "these are sample times" notice.
  *
- * Until step 3 is done, `IS_SAMPLE_AVAILABILITY` stays true and every surface
- * that shows a time slot renders a "sample times" notice.
+ * These slots are NOT synced with anyone's calendar. Whether a visitor is
+ * looking at real availability is decided per request by the API route, not by
+ * a constant here — that is why the old `IS_SAMPLE_AVAILABILITY` export is
+ * gone. A compiled-in flag cannot answer a question whose answer depends on
+ * the environment, and while it existed it was hardcoded `true` and would have
+ * kept claiming "sample times" over a perfectly live calendar.
+ *
+ * Real availability comes from Cal.com — see `src/lib/integrations/calcom.ts`.
+ * To turn it on, set CALENDAR_API_KEY and CALENDAR_EVENT_TYPE_ID; nothing in
+ * this file needs to change.
  */
-
-export const IS_SAMPLE_AVAILABILITY = true;
 
 /** Times offered on an available weekday, 24h local. */
 export const SAMPLE_DAILY_SLOTS = ["09:00", "10:30", "13:00", "14:30", "16:00"] as const;
