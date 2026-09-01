@@ -14,6 +14,7 @@ import {
   collaborationPrinciples,
   companyStrengths,
   growWithUs,
+  hasStoryVideo,
   storyVideo,
   technicalExpertise,
 } from "@/data/company";
@@ -26,12 +27,23 @@ import { buildMetadata } from "@/lib/metadata";
  * one of the founders, on camera.
  *
  * /team permanently redirects here (next.config.ts) so existing links survive.
+ *
+ * INDEXED ONLY ONCE THE FOOTAGE EXISTS.
+ *
+ * The page's whole reason to be is the video. Until `storyVideo.src` is set it
+ * renders a "footage pending" plate, and a thin placeholder is the last thing
+ * that should be competing in search results for the company's own name — it
+ * would be the page Google shows for "OAX Tech story". The route stays live
+ * and returns 200 throughout, so the permanent /team redirect always resolves;
+ * it is simply not advertised. Dropping the recording in flips this, the
+ * sitemap entry and the navigation links together.
  */
 export const metadata = buildMetadata({
   title: "Learn More About Us",
   description:
     "Hear the OAX Tech story first-hand: where the company started, what we build, how we work, and who we build it for.",
   path: "/learn-more",
+  noIndex: !hasStoryVideo,
 });
 
 export default function LearnMorePage() {
