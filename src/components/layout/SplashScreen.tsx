@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import {
   EMBLEM,
@@ -102,8 +102,18 @@ const T = {
   wordDuration: 850,
   /** TECH trails OAX, and still lands with it. */
   techDelay: 100,
-  /** Completed lockup holds, then the ground lifts. */
-  exitStart: 2200,
+  /**
+   * Completed lockup holds, then the ground lifts.
+   *
+   * 2300ms is a deliberate choice: the full sequence is the first thing a
+   * visitor meets, and it is meant to land rather than flick past. The cost is
+   * real — this is the largest single LCP and bounce contributor on the page —
+   * and it is paid down by the once-per-session gate below, so a visitor sees
+   * it on their first load of a session and never again inside it.
+   *
+   * The site is held back until this moment; see REVEAL_AT.
+   */
+  exitStart: 2300,
   exitDuration: 420,
 } as const;
 
@@ -140,6 +150,76 @@ const REDUCED_TOTAL = 900;
  * a staff tool should not cost two and a half seconds.
  */
 const EXCLUDED = ["/admin"];
+
+/**
+ * ============================================================================
+ * ONCE PER SESSION
+ * ============================================================================
+ *
+ * The splash runs on document load, and a document load is not rare: a refresh,
+ * a link in from search, a return from an external tab, opening a shared URL.
+ * Without this gate a visitor who reads three pages and comes back tomorrow
+ * pays the sequence five times.
+ *
+ * `sessionStorage` rather than `localStorage` on purpose — the mark should
+ * still greet someone starting a genuinely new visit. It just should not
+ * re-introduce itself inside one.
+ *
+ * Every access is wrapped: Safari's private mode and "block all cookies" both
+ * make `sessionStorage` THROW on access rather than return null. An unguarded
+ * read there would take down the whole page. Failing to `false` means the
+ * splash plays — the harmless direction to fail in.
+ */
+const SEEN_KEY = "oax_splash_seen";
+
+/**
+ * ============================================================================
+ * HOLDING THE SITE BACK
+ * ============================================================================
+ *
+ * The page is not just covered during the splash — it is suppressed until the
+ * splash is finished, so the sequence owns the opening rather than sharing it
+ * with a site quietly assembling itself underneath.
+ *
+ * `data-splash-active` is stamped on <html> by the inline script in
+ * `layout.tsx` during head parse, and the rules it drives live in
+ * `globals.css`. This module's job is taking it off again.
+ *
+ * WHY THE CONTENT IS HIDDEN AND NOT UNMOUNTED
+ * Rendering the page only after the splash would leave it out of the
+ * server-rendered HTML entirely, which is the difference between a marketing
+ * site that ranks and one that does not. Every word stays in the markup from
+ * the first byte; only its opacity is touched. Screen readers are likewise
+ * left alone — someone using one has no reason to sit through an animation.
+ *
+ * WHY IT LIFTS AT `exitStart` AND NOT AT `TOTAL`
+ * The black ground fades out over `exitDuration`. Revealing the site when that
+ * fade BEGINS means the ground lifts to show a page that is already there.
+ * Waiting for the fade to finish would show 420ms of empty background first,
+ * and the reveal would land on nothing.
+ */
+const REVEAL_AT = T.exitStart;
+
+/** Takes the hold off. Safe to call repeatedly. */
+function revealSite(): void {
+  document.documentElement.removeAttribute("data-splash-active");
+}
+
+function hasSeenSplash(): boolean {
+  try {
+    return window.sessionStorage.getItem(SEEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markSplashSeen(): void {
+  try {
+    window.sessionStorage.setItem(SEEN_KEY, "1");
+  } catch {
+    /* Storage unavailable. The splash simply plays again next load. */
+  }
+}
 
 /* -------------------------------------------------------------------------- */
 /* Dark-ground palette                                                        */
@@ -357,7 +437,15 @@ const CSS = `
 
 @keyframes oax-splash-exit {
   from { opacity: 1; }
-  to   { opacity: 0; }
+  /* Hiding matters as much as fading here. React unmounts the overlay at
+     TOTAL, but with JavaScript disabled nothing ever does — the animation is
+     the only thing that retires it, and a fully transparent element still
+     covers the viewport and swallows every click. Ending hidden takes it out
+     of hit-testing, so a no-JS visitor gets a usable site rather than a page
+     that silently ignores them.
+
+     (No backticks in this comment: the whole block is a template literal.) */
+  to   { opacity: 0; visibility: hidden; }
 }
 
 /* The mark carries on past the viewer as the ground lifts, so the splash reads
@@ -388,6 +476,22 @@ export function SplashScreen() {
   );
 
   /*
+   * Whether this session has already seen the splash, read ONCE on the first
+   * client render and then frozen.
+   *
+   * A ref rather than state because it must not change what is rendered — the
+   * server has no `sessionStorage`, so branching the markup on it would be a
+   * hydration mismatch. And read once rather than per-effect because the first
+   * effect below WRITES the key: a second read would come back true on a first
+   * visit and wrongly skip the scroll lock while the splash was still up.
+   */
+  const seenRef = useRef<boolean | null>(null);
+  if (seenRef.current === null && typeof window !== "undefined") {
+    seenRef.current = hasSeenSplash();
+  }
+  const alreadySeen = seenRef.current === true;
+
+  /*
    * Runs once and never re-arms. The App Router keeps the root layout mounted
    * across client-side navigation, so once this settles to `false` it stays
    * there for the rest of the session and only a real document load — a fresh
@@ -399,24 +503,48 @@ export function SplashScreen() {
    * never meant to run.
    */
   useEffect(() => {
-    const timer = window.setTimeout(
+    // Seen already this session, or a surface that never takes a splash:
+    // retire immediately and make sure the site is not left held back.
+    if (alreadySeen || excluded) {
+      revealSite();
+      setActive(false);
+      return;
+    }
+
+    markSplashSeen();
+
+    const revealTimer = window.setTimeout(
+      revealSite,
+      reducedMotion ? REDUCED_TOTAL : REVEAL_AT,
+    );
+    const endTimer = window.setTimeout(
       () => setActive(false),
       reducedMotion ? REDUCED_TOTAL : TOTAL,
     );
-    return () => window.clearTimeout(timer);
-  }, [reducedMotion]);
+
+    return () => {
+      window.clearTimeout(revealTimer);
+      window.clearTimeout(endTimer);
+      /*
+       * Unmounting mid-sequence must never leave the hold in place — that
+       * would strand the visitor on a blank page with no timer left to fix it.
+       * Cheaper to always clear it than to reason about which unmount this is.
+       */
+      revealSite();
+    };
+  }, [reducedMotion, alreadySeen, excluded]);
 
   /* The page behind must not scroll under the overlay, and must keep the scroll
      position it had — so `overflow` is restored to whatever was there before
      rather than being cleared outright. */
   useEffect(() => {
-    if (!active || excluded) return;
+    if (!active || excluded || alreadySeen) return;
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = previous;
     };
-  }, [active, excluded]);
+  }, [active, excluded, alreadySeen]);
 
   if (!active || excluded) return null;
 
