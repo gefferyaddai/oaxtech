@@ -11,25 +11,33 @@ interface LogoProps {
   width?: number;
 }
 
+/** True aspect ratio of the lockup, from LOGO_VIEW_BOX (406.18 × 100). */
+const LOCKUP_RATIO = 4.0618;
+
 /**
  * SINGLE SWAP POINT FOR THE OAX TECH LOGO.
  *
- * The official logo ships as two files in /public/brand:
+ * The lockup ships as two vectors in /public/brand:
  *   - oax-logo.svg        (for light backgrounds)
- *   - oax-logo-white.png  (for dark backgrounds)
+ *   - oax-logo-white.svg  (for dark backgrounds — neutrals inverted, purple
+ *                          untouched, matching the splash screen)
  *
- * Both are currently PLACEHOLDERS. Replacing those two files with the
- * official vector artwork updates every instance across the site. The
- * logo is never recoloured, stretched or redrawn in code — width and
- * height stay proportional via `height: auto`.
+ * Both are GENERATED from the traced geometry in `src/lib/oax-logo.ts` by
+ * `npm run brand` — the same source the splash animation draws from, so the
+ * header mark and the splash mark can never drift apart. To swap in official
+ * artwork, replace the path strings in `oax-logo.ts` and re-run `npm run
+ * brand`; nothing in this file changes.
+ *
+ * The logo is never recoloured, stretched or redrawn here — width and height
+ * stay proportional via `height: auto`.
  */
 export function Logo({ variant = "dark", className, asStatic, width = 132 }: LogoProps) {
   const image = (
     <Image
-      src={variant === "light" ? "/brand/oax-logo-white.png" : "/brand/oax-logo.svg"}
+      src={variant === "light" ? "/brand/oax-logo-white.svg" : "/brand/oax-logo.svg"}
       alt="OAX Tech"
       width={width}
-      height={Math.round((width / 200) * 44)}
+      height={Math.round(width / LOCKUP_RATIO)}
       className={cn("h-auto w-auto", className)}
       style={{ width, height: "auto" }}
       priority
