@@ -129,6 +129,47 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en-CA">
       <body>
+        {/*
+          Sets the splash's two opening states on <html> during head parse,
+          BEFORE anything below is laid out. Both matching rule sets live in
+          globals.css, which is head-loaded and therefore already applied.
+
+            data-splash-seen    already shown this session — suppress it
+                                entirely, so a returning visitor never sees a
+                                single frame of a sequence they have watched.
+
+            data-splash-active  first load of the session — hold the site back
+                                until the splash finishes, so the sequence owns
+                                the opening instead of sharing it with a page
+                                assembling itself underneath. SplashScreen.tsx
+                                removes this as the black ground starts lifting.
+
+          The two are mutually exclusive by construction: the hold is applied
+          only when the splash has NOT been seen.
+
+          /admin is excluded here as well as in the component. Without that,
+          landing straight in a staff tool would cost 2.3s of blank screen —
+          and the hold is stamped before React has any say in it.
+
+          Inline and synchronous on purpose: next/script or an effect would
+          both run after first paint, which is exactly the frame being avoided.
+          It reads no user input and writes only attributes.
+
+          The try/catch is not decorative — Safari private mode and "block all
+          cookies" make sessionStorage THROW on access, and an unguarded read
+          here would leave every page held back with nothing to release it.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var d=document.documentElement," +
+              "s=sessionStorage.getItem('oax_splash_seen')==='1'," +
+              "a=location.pathname==='/admin'||location.pathname.indexOf('/admin/')===0;" +
+              "if(s)d.setAttribute('data-splash-seen','');" +
+              "if(!s&&!a)d.setAttribute('data-splash-active','');" +
+              "}catch(e){}",
+          }}
+        />
         <div hidden aria-hidden dangerouslySetInnerHTML={{ __html: DIRECTION_CONTRACT }} />
         {/* Runs on document load only, not on client-side navigation. Outside
             SiteChrome: the splash covers the client portal too, and is
