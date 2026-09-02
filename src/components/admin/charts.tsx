@@ -84,6 +84,20 @@ export function RevenueChart({ data }: { data: RevenuePoint[] }) {
   const months = range === "3M" ? 3 : range === "6M" ? 6 : 12;
   const visible = data.slice(-months);
 
+  /*
+   * Revenue is not derived from invoices yet, so with a database configured the
+   * series arrives empty. Drawing empty axes with a $0 total would read as "you
+   * earned nothing" rather than "this is not wired up", which is the more
+   * damaging of the two misreadings on a money panel.
+   */
+  if (data.length === 0) {
+    return (
+      <p className="py-8 text-center text-sm text-slate">
+        Revenue reporting isn&apos;t connected yet, so no figures are shown here.
+      </p>
+    );
+  }
+
   const total = visible.reduce((sum, point) => sum + point.revenue, 0);
   const outstanding = visible.reduce((sum, point) => sum + point.outstanding, 0);
 
