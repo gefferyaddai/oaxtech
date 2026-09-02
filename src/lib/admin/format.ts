@@ -127,7 +127,14 @@ export function greeting(now: Date = new Date()): string {
 }
 
 /** Percentage delta between two counts, or null when there's no baseline. */
+/**
+ * Null means "no comparison can be drawn", and the caller renders "No baseline"
+ * rather than a number. A negative `previous` is the caller's way of saying the
+ * earlier window is UNKNOWN, not that it was negative — without this branch an
+ * unknown baseline produces a confident-looking percentage swing computed from
+ * a figure nobody measured.
+ */
 export function percentChange(current: number, previous: number): number | null {
-  if (previous === 0) return null;
+  if (previous <= 0) return null;
   return Math.round(((current - previous) / previous) * 100);
 }
