@@ -51,7 +51,7 @@ function CredentialsSignIn() {
           name="email"
           type="email"
           autoComplete="email"
-          placeholder="you@oaxtech.com"
+          placeholder="you@oaxtech.dev"
           required
         />
         <FormField
@@ -127,7 +127,7 @@ function DemoSignIn({ demoAllowed }: { demoAllowed: boolean }) {
           label="Email"
           type="email"
           autoComplete="email"
-          placeholder="you@oaxtech.com"
+          placeholder="you@oaxtech.dev"
           disabled={demoMode}
           hint={demoMode ? "Disabled until authentication is connected." : undefined}
         />
