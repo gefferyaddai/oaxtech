@@ -1,3 +1,4 @@
+import { ArcEdge } from "@/components/ui/Drawing";
 import { Container } from "@/components/layout/Container";
 import { ContactForm } from "@/components/forms/ContactForm";
 import { CTASection } from "@/components/sections/CTASection";
@@ -198,7 +199,8 @@ export default async function ContactPage({
         </Container>
       </section>
 
-      <section className="section border-t border-line bg-mist" id="faq">
+      <ArcEdge from="sheet" to="sheet-sunk" />
+      <section className="section bg-mist" id="faq">
         <Container narrow>
           <SectionHeading
             no="C01"
@@ -208,6 +210,7 @@ export default async function ContactPage({
       </section>
 
       <CTASection
+        edgeFrom="sheet-sunk"
         title="Ready to Take the Next Step?"
         description="We're here to help you move your business forward with clarity and confidence."
         actions={
