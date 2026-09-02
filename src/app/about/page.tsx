@@ -1,3 +1,4 @@
+import { ArcEdge, BreakLine } from "@/components/ui/Drawing";
 import { Container } from "@/components/layout/Container";
 import { CTASection } from "@/components/sections/CTASection";
 import { PageHero } from "@/components/sections/PageHero";
@@ -48,13 +49,18 @@ export default function AboutPage() {
         visual={<AboutHeroVisual />}
       />
 
-      <section className="border-b border-line py-10">
+      <section className="py-10">
         <Container>
           <FeatureGrid items={aboutHighlights} columns={4} />
         </Container>
       </section>
 
       {/* Our story ---------------------------------------------------------- */}
+      <div className="bg-sheet">
+        <Container>
+          <BreakLine />
+        </Container>
+      </div>
       <section className="section">
         <Container>
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
@@ -127,7 +133,8 @@ export default function AboutPage() {
       </section>
 
       {/* Values ------------------------------------------------------------- */}
-      <section className="section border-y border-line bg-mist">
+      <ArcEdge from="sheet" to="sheet-sunk" flip />
+      <section className="section bg-mist">
         <Container>
           <SectionHeading
             no="A01"
@@ -137,6 +144,7 @@ export default function AboutPage() {
       </section>
 
       {/* Differentiators ---------------------------------------------------- */}
+      <ArcEdge from="sheet-sunk" to="sheet" />
       <section className="section">
         <Container>
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
@@ -212,6 +220,7 @@ export default function AboutPage() {
       </section>
 
       {/* Giving back -------------------------------------------------------- */}
+      <ArcEdge from="sheet" to="tint" flip />
       <section className="section bg-tint">
         <Container>
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
@@ -235,6 +244,7 @@ export default function AboutPage() {
           This slot used to hold a strip of team profile cards. It now points at
           the recorded story instead — the same "who are these people" question,
           answered by us rather than by five placeholder avatars. */}
+      <ArcEdge from="tint" to="sheet" />
       <section className="section">
         <Container>
           <SectionHeading
@@ -264,7 +274,8 @@ export default function AboutPage() {
         </Container>
       </section>
 
-      <section className="section border-t border-line bg-mist" id="our-process">
+      <ArcEdge from="sheet" to="sheet-sunk" flip />
+      <section className="section bg-mist" id="our-process">
         <Container>
           <SectionHeading
             no="A03"
@@ -274,6 +285,7 @@ export default function AboutPage() {
       </section>
 
       <CTASection
+        edgeFrom="sheet-sunk"
         title={
           <>
             Let&apos;s Build Something Meaningful Together
