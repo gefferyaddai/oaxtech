@@ -1,3 +1,4 @@
+import { ArcEdge, BreakLine } from "@/components/ui/Drawing";
 import { Container } from "@/components/layout/Container";
 import { CTASection } from "@/components/sections/CTASection";
 import { PageHero } from "@/components/sections/PageHero";
@@ -67,13 +68,18 @@ export default function LearnMorePage() {
         visual={<LearnMoreHeroVisual covers={storyVideo.covers} />}
       />
 
-      <section className="border-b border-line py-10">
+      <section className="py-10">
         <Container>
           <FeatureGrid items={companyStrengths} columns={4} variant="plain" />
         </Container>
       </section>
 
       {/* The video ---------------------------------------------------------- */}
+      <div className="bg-sheet">
+        <Container>
+          <BreakLine />
+        </Container>
+      </div>
       <section className="section" id="story">
         <Container>
           <SectionHeading
@@ -128,7 +134,8 @@ export default function LearnMorePage() {
       </section>
 
       {/* How we work -------------------------------------------------------- */}
-      <section className="section border-y border-line bg-mist">
+      <ArcEdge from="sheet" to="sheet-sunk" flip />
+      <section className="section bg-mist">
         <Container>
           <SectionHeading
             no="L02"
@@ -145,6 +152,7 @@ export default function LearnMorePage() {
       </section>
 
       {/* What we bring ------------------------------------------------------ */}
+      <ArcEdge from="sheet-sunk" to="sheet" />
       <section className="section">
         <Container>
           <SectionHeading
@@ -195,7 +203,8 @@ export default function LearnMorePage() {
       </section>
 
       {/* Principles --------------------------------------------------------- */}
-      <section className="section border-t border-line bg-mist">
+      <ArcEdge from="sheet" to="sheet-sunk" flip />
+      <section className="section bg-mist">
         <Container>
           <SectionHeading
             no="L04"
@@ -208,6 +217,7 @@ export default function LearnMorePage() {
       </section>
 
       {/* Grow with us ------------------------------------------------------- */}
+      <ArcEdge from="sheet-sunk" to="tint" />
       <section className="section bg-tint">
         <Container>
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
@@ -244,6 +254,7 @@ export default function LearnMorePage() {
       </section>
 
       <CTASection
+        edgeFrom="tint"
         title={
           <>
             Let&apos;s Build Something Great Together
