@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArcEdge, BreakLine } from "@/components/ui/Drawing";
 import { Container } from "@/components/layout/Container";
 import { CTASection } from "@/components/sections/CTASection";
 import { PageHero } from "@/components/sections/PageHero";
@@ -71,7 +72,7 @@ export default function SpargoCaseStudyPage() {
       />
 
       {/* Facts strip -------------------------------------------------------- */}
-      <section className="border-b border-line bg-cream py-6">
+      <section className="bg-cream py-6">
         <Container>
           <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {study.facts.map((fact) => (
@@ -90,6 +91,11 @@ export default function SpargoCaseStudyPage() {
       </section>
 
       {/* Client overview ---------------------------------------------------- */}
+      <div className="bg-sheet">
+        <Container>
+          <BreakLine />
+        </Container>
+      </div>
       <section className="section">
         <Container>
           <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
@@ -142,7 +148,8 @@ export default function SpargoCaseStudyPage() {
       </section>
 
       {/* Solution ----------------------------------------------------------- */}
-      <section className="section border-y border-line bg-mist">
+      <ArcEdge from="sheet" to="sheet-sunk" flip />
+      <section className="section bg-mist">
         <Container>
           <SectionHeading
             no="W01"
@@ -178,6 +185,7 @@ export default function SpargoCaseStudyPage() {
       </section>
 
       {/* Services + technologies -------------------------------------------- */}
+      <ArcEdge from="sheet-sunk" to="sheet" />
       <section className="section">
         <Container>
           <SectionHeading
@@ -210,7 +218,8 @@ export default function SpargoCaseStudyPage() {
       </section>
 
       {/* Screens ------------------------------------------------------------ */}
-      <section className="section border-y border-line bg-mist">
+      <ArcEdge from="sheet" to="sheet-sunk" flip />
+      <section className="section bg-mist">
         <Container>
           <SectionHeading
             no="W04"
@@ -235,6 +244,7 @@ export default function SpargoCaseStudyPage() {
       </section>
 
       {/* Challenges --------------------------------------------------------- */}
+      <ArcEdge from="sheet-sunk" to="sheet" />
       <section className="section">
         <Container>
           <SectionHeading
@@ -270,7 +280,8 @@ export default function SpargoCaseStudyPage() {
       </section>
 
       {/* Results — qualitative only ----------------------------------------- */}
-      <section className="section border-t border-line bg-mist">
+      <ArcEdge from="sheet" to="sheet-sunk" flip />
+      <section className="section bg-mist">
         <Container>
           <SectionHeading
             no="W06"
@@ -293,6 +304,7 @@ export default function SpargoCaseStudyPage() {
       </section>
 
       {/* Testimonial placeholder -------------------------------------------- */}
+      <ArcEdge from="sheet-sunk" to="sheet" />
       <section className="py-12 lg:py-16">
         <Container>
           <div className="grid grid-cols-1 items-center gap-8 rounded-3xl bg-tint p-8 sm:p-10 lg:grid-cols-[1.4fr_1fr]">
