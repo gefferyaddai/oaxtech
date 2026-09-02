@@ -52,7 +52,7 @@ export default async function AnalyticsPage() {
 
       <ul className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <li>
-          <MetricCard label="Revenue (6 months)" value={formatMoney(totalRevenue)} icon="TrendingUp" href="/admin/invoices" />
+          <MetricCard label="Revenue (6 months)" value={revenue.length ? formatMoney(totalRevenue) : "—"} icon="TrendingUp" href="/admin/invoices" />
         </li>
         <li>
           <MetricCard label="Total leads" value={leads.length} icon="Target" href="/admin/leads" />
