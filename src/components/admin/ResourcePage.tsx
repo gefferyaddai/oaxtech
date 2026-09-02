@@ -206,14 +206,29 @@ export function ResourcePage<T>({
           </button>
         }
       >
+        {/*
+          * This says the form is not built, NOT that the database is missing.
+          *
+          * It used to blame an unset DATABASE_URL, and that text is hardcoded —
+          * it never checked whether one was configured. In production, with
+          * Postgres connected and every list on this screen reading live rows,
+          * all twelve of these dialogs still told the operator there was no
+          * database. An admin that misreports its own state is worse than one
+          * that admits a gap, because the first thing it costs is the
+          * operator's trust in the panels that ARE correct.
+          *
+          * The real blocker is the same either way: no create form is wired to
+          * this section. Some sections have a server action waiting
+          * (`createLeadAction`, `createClientAction`, `createTaskAction`);
+          * others have no mutation at all yet.
+          */}
         <div className="rounded-lg border border-info/25 bg-info-soft p-3">
           <p className="flex items-start gap-2 text-sm text-charcoal">
             <Icon name="Info" className="mt-0.5 h-4 w-4 shrink-0 text-info" />
             <span>
-              No database is configured, so there is nowhere to save a new record yet. Set{" "}
-              <code className="rounded bg-paper px-1">DATABASE_URL</code> and implement the write
-              in <code className="rounded bg-paper px-1">src/lib/domain/repository.ts</code> to
-              enable this form.
+              Creating records from this screen isn&apos;t available yet. Records added
+              elsewhere — including anything submitted through the website — appear here
+              as normal.
             </span>
           </p>
         </div>
