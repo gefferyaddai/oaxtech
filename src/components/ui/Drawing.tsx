@@ -420,6 +420,173 @@ export function AngularEdge({
 }
 
 /* -------------------------------------------------------------------------- */
+/* Arc edge                                                                    */
+/* -------------------------------------------------------------------------- */
+
+const EDGE_BG = {
+  ink: "bg-ink",
+  revision: "bg-revision",
+  sheet: "bg-sheet",
+  "sheet-sunk": "bg-sheet-sunk",
+  /* The pale violet from the compatibility layer. Interior pages still use it
+     as a band, so an edge has to be able to leave one. */
+  tint: "bg-tint",
+} as const;
+
+const EDGE_FILL = {
+  ink: "text-ink",
+  revision: "text-revision",
+  sheet: "text-sheet",
+  "sheet-sunk": "text-sheet-sunk",
+  tint: "text-tint",
+} as const;
+
+export type EdgeGround = keyof typeof EDGE_BG;
+
+/**
+ * The curved counterpart to AngularEdge: a shallow arc where two grounds meet.
+ *
+ * A drawing is not all straight lines. A radius is as much a drafting primitive
+ * as a rule, and an arc is how a drawing shows a form that bends rather than
+ * one that breaks. The rule this page follows is that the FULL-BLEED BANDS bow
+ * and the paper sheets stay flat — so the square corner keeps meaning
+ * something, and curvature marks the bands that lift off the stock rather than
+ * being sprayed over everything.
+ *
+ * Unlike AngularEdge this takes BOTH grounds. An edge leaving a dark band has
+ * transparent area above the curve, and that area shows the page body, not the
+ * section overhead — so the outgoing ground has to be painted explicitly or the
+ * exit edge tears a paper-coloured gap out of the band it is leaving.
+ *
+ * `preserveAspectRatio="none"` stretches the curve to any width, which is safe
+ * here because the shape is a filled area with no stroke to distort.
+ *
+ * Place it immediately BETWEEN the two sections it joins.
+ */
+export function ArcEdge({
+  from,
+  to,
+  className,
+  flip,
+  rule,
+}: {
+  /** Ground of the section ABOVE. Painted flat behind the curve. */
+  from: EdgeGround;
+  /** Ground of the section BELOW. Carried by the arc itself. */
+  to: EdgeGround;
+  className?: string;
+  /** Bow downward (a trough) instead of upward (a crest). */
+  flip?: boolean;
+  /** Draw the arc as a visible line. On by default; pass false for a pure fill. */
+  rule?: boolean;
+}) {
+  const area = flip
+    ? "M0 80 L0 8 Q720 72 1440 8 L1440 80 Z"
+    : "M0 80 L0 52 Q720 -12 1440 52 L1440 80 Z";
+  const curve = flip ? "M0 8 Q720 72 1440 8" : "M0 52 Q720 -12 1440 52";
+
+  /*
+   * The arc is DRAWN, not merely implied by the colour change.
+   *
+   * Between the paper grounds the two values are #E4E5E8 and #D8DAE0 — close
+   * enough that a filled curve alone is invisible, which is why this treatment
+   * only registered on the homepage where it lands against ink and violet. A
+   * radius on a drawing is a line with a defined centre, so drawing it is both
+   * what makes the curve legible on the quiet grounds and the more correct
+   * thing to put on a drawing.
+   *
+   * The stroke is non-scaling: `preserveAspectRatio="none"` stretches the
+   * geometry to the viewport, which would otherwise smear a 1px line into a
+   * wedge that is thick in the middle and hairline at the edges.
+   */
+  const ruleTone = to === "ink" || to === "revision" ? "text-revision-onInk/45" : "text-graphite/30";
+
+  return (
+    <div
+      aria-hidden="true"
+      className={cn("h-10 w-full md:h-16 lg:h-20", EDGE_BG[from], EDGE_FILL[to], className)}
+    >
+      <svg
+        viewBox="0 0 1440 80"
+        preserveAspectRatio="none"
+        className="block h-full w-full"
+        focusable="false"
+      >
+        <path d={area} fill="currentColor" />
+        {rule !== false && (
+          <path
+            d={curve}
+            fill="none"
+            className={ruleTone}
+            stroke="currentColor"
+            strokeWidth={1}
+            vectorEffect="non-scaling-stroke"
+          />
+        )}
+      </svg>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Break line                                                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The drafting long-break line: a rule interrupted by a loop.
+ *
+ * On a real drawing it means "the view continues past this point, and the part
+ * omitted is more of the same" — which is exactly what a boundary between two
+ * sheets on the same ground is. It is the one curved element every engineering
+ * drawing already carries, so it breaks the stacked-rectangle rhythm without
+ * importing anything from outside the world.
+ *
+ * The glyph is a FIXED-WIDTH SVG between two flexible hairlines rather than one
+ * stretched drawing. A `preserveAspectRatio="none"` squiggle flattens into a
+ * wave on a wide viewport and bunches on a narrow one; this keeps the loop at
+ * its drawn proportions at every width, which is the whole point of a
+ * convention.
+ *
+ * `mark="datum"` swaps the loop for a centre mark — a circle with its centre
+ * lines extended past the circumference, the drafting note for a located axis.
+ */
+export function BreakLine({
+  tone = "sheet",
+  mark = "break",
+  className,
+}: {
+  tone?: "sheet" | "ink";
+  mark?: "break" | "datum";
+  className?: string;
+}) {
+  const rule = tone === "ink" ? "bg-ink-line" : "bg-line";
+  const glyph = tone === "ink" ? "text-revision-onInk" : "text-graphite";
+
+  return (
+    <div aria-hidden="true" className={cn("flex items-center gap-3", className)}>
+      <span className={cn("h-px flex-1", rule)} />
+      {mark === "datum" ? (
+        <svg width="30" height="26" viewBox="0 0 30 26" className={cn("shrink-0", glyph)} focusable="false">
+          <circle cx="15" cy="13" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.25" />
+          <path d="M15 1.5V24.5M2 13h26" stroke="currentColor" strokeWidth="0.75" strokeDasharray="3 2" />
+        </svg>
+      ) : (
+        <svg width="100" height="26" viewBox="0 0 100 26" className={cn("shrink-0", glyph)} focusable="false">
+          <path
+            d="M0 13c16 0 16-9 30-9s14 18 26 18 14-9 44-9"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.25"
+            strokeLinecap="round"
+          />
+        </svg>
+      )}
+      <span className={cn("h-px flex-1", rule)} />
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /* Sheet section                                                              */
 /* -------------------------------------------------------------------------- */
 
