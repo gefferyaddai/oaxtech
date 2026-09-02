@@ -319,12 +319,26 @@ export async function getActivity(limit?: number): Promise<ActivityEvent[]> {
   return limit ? events.slice(0, limit) : events;
 }
 
+/*
+ * These two were the last readers in this file with no `isLive()` guard, which
+ * meant a configured database swapped every other panel to real records while
+ * the dashboard and analytics charts kept serving fixtures — with the demo
+ * banner switched off, and under a notice claiming the figures came from this
+ * admin's own records.
+ *
+ * There is no query behind either one yet: revenue has to be derived from
+ * invoices, and lead source from a field the lead capture does not record. So
+ * live returns EMPTY rather than inventing a shape, and both charts draw their
+ * own "not available" state. A blank panel is a fact about what we know; a
+ * plausible curve is a claim, and this is the one place in the product where a
+ * wrong number would be read as money.
+ */
 export async function getRevenueSeries(): Promise<RevenuePoint[]> {
-  return copy(demoRevenueSeries);
+  return isLive() ? [] : copy(demoRevenueSeries);
 }
 
 export async function getLeadSources(): Promise<LeadSourcePoint[]> {
-  return copy(demoLeadSources);
+  return isLive() ? [] : copy(demoLeadSources);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -375,8 +389,13 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
 
   return {
     newLeads,
-    // Demo comparison window. With a database this becomes a dated query.
-    newLeadsPrevious: 1,
+    /*
+     * The previous window is not queried yet, so live reports it as unknown
+     * (-1) and the dashboard omits the trend rather than comparing against a
+     * hardcoded 1 — which produced a real-looking percentage swing out of a
+     * number nobody measured.
+     */
+    newLeadsPrevious: isLive() ? -1 : 1,
     consultations: consultations.length,
     activeProjects: projects.length,
     pendingApprovals: approvals.length,
