@@ -10,7 +10,7 @@ import { ProcessStepsRow } from "@/components/sections/ProcessSteps";
 import { ClientRegister, ResultsLedger, TestimonialCarousel } from "@/components/sections/Proof";
 import { FeatureGrid, ServiceCard } from "@/components/sections/ServiceCard";
 import { ButtonLink } from "@/components/ui/Button";
-import { AngularEdge, ArrowLink, TitleBlock } from "@/components/ui/Drawing";
+import { ArcEdge, ArrowLink, BreakLine, TitleBlock } from "@/components/ui/Drawing";
 import {
   ClipReveal,
   SheetIndexRail,
@@ -42,7 +42,7 @@ export const metadata = buildMetadata({
  */
 const SHEET_INDEX: SheetIndexEntry[] = [
   { id: "sheet-01", no: "01", label: "Cover" },
-  { id: "sheet-02", no: "02", label: "Client register" },
+  { id: "sheet-02", no: "02", label: "Featured client register" },
   { id: "sheet-03", no: "03", label: "Services" },
   { id: "sheet-04", no: "04", label: "About" },
   { id: "sheet-05", no: "05", label: "Process" },
@@ -93,7 +93,7 @@ export default function HomePage() {
       {/* SHEET 01 — Cover ------------------------------------------------- */}
       <HomeHero />
 
-      {/* SHEET 02 — Client register ---------------------------------------
+      {/* SHEET 02 — Featured client register ------------------------------
           A strip, not a full section: `.section` padding either side of a
           two-row register leaves a gap that reads as a mistake rather than
           as rhythm. */}
@@ -179,7 +179,7 @@ export default function HomePage() {
       </section>
 
       {/* SHEET 05 — Process spine, full-bleed ink -------------------------- */}
-      <AngularEdge tone="ink" />
+      <ArcEdge from="sheet" to="ink" />
       <section id="sheet-05" className="section surface-ink">
         <Container>
           <SectionHeading
@@ -194,6 +194,8 @@ export default function HomePage() {
           <ProcessStepsRow className="mt-14" steps={homeProcess} tone="paper" />
         </Container>
       </section>
+
+      <ArcEdge from="ink" to="sheet" flip />
 
       {/* SHEET 06 — Featured work ----------------------------------------- */}
       <section id="sheet-06" className="section bg-sheet">
@@ -224,7 +226,15 @@ export default function HomePage() {
           and approved in writing. The band is drawn as hatched empty cells
           rather than hidden or filled with plausible figures — see
           src/data/results.ts for the rule this enforces. */}
-      <section id="sheet-07" className="section border-t border-line bg-sheet">
+      {/* Two sheets share this ground, so the boundary is a long-break line
+          rather than a ground change: "the drawing continues". */}
+      <div className="bg-sheet">
+        <Container>
+          <BreakLine />
+        </Container>
+      </div>
+
+      <section id="sheet-07" className="section bg-sheet">
         <Container>
           <SectionHeading
             no="SHT 07"
@@ -245,7 +255,7 @@ export default function HomePage() {
       </section>
 
       {/* SHEET 08 — Positioning statement, full-bleed revision ------------- */}
-      <AngularEdge tone="revision" />
+      <ArcEdge from="sheet" to="revision" />
       <section id="sheet-08" className="relative bg-revision pb-20 pt-8 text-white lg:pb-28 lg:pt-12">
         <Container>
           <div className="mx-auto max-w-4xl text-center">
@@ -273,6 +283,8 @@ export default function HomePage() {
           </div>
         </Container>
       </section>
+
+      <ArcEdge from="revision" to="sheet-sunk" flip />
 
       {/* SHEET 09 — Pricing ------------------------------------------------ */}
       <section id="sheet-09" className="section bg-sheet-sunk">
