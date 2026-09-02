@@ -130,6 +130,40 @@ export const projects: Project[] = [
     caseStudyHref: null,
     featured: true,
   },
+  {
+    slug: "flxfleet",
+    name: "FlxFleet",
+    eyebrow: "Mobile Application",
+    /*
+     * An optimisation engagement on an app that already existed, not a build.
+     * The summary says so: claiming the product itself would overstate the
+     * scope of work, which is the same rule applied to GCCA's categories.
+     */
+    categories: ["Mobile Applications", "Software"],
+    summary:
+      "Optimisation work on the mobile app behind an on-demand logistics and moving services platform, covering app performance, the in-app payment structure and mobile security.",
+    tags: ["Mobile Optimization", "Payments", "Security"],
+    /*
+     * Qualitative only. No load times, transaction volumes, conversion figures
+     * or vulnerability counts — none have been supplied or measured, and the
+     * content rule at the top of this file applies to security work most of
+     * all, where a specific claim is also a disclosure.
+     */
+    highlights: [
+      { label: "App Optimization", description: "Improved performance across the mobile experience.", icon: "Gauge" },
+      { label: "Payment Structure", description: "Reworked how payments are handled in the app.", icon: "Wallet" },
+      { label: "Mobile Security", description: "Strengthened security on the mobile application.", icon: "ShieldCheck" },
+    ],
+    externalUrl: "https://flxfleet.ca",
+    externalLabel: "flxfleet.ca",
+    caseStudyHref: null,
+    /*
+     * Not featured, for the same grid reason recorded on GCCA above: the
+     * homepage band renders every `featured` project into a three-column grid,
+     * so a fourth would sit alone on a second row. It appears on /work.
+     */
+    featured: false,
+  },
 ];
 
 export function projectsByCategory(category: ProjectCategory | "All"): Project[] {
@@ -327,7 +361,13 @@ export interface TrustedOrganisation {
 
 export const trustedBy: TrustedOrganisation[] = [
   { name: "Spargo" },
-  { name: "GHSA" },
+  /*
+   * Set as the brand writes itself — one word, that capitalisation, per the
+   * organisation's own site. The register lists organisations, not domains, so
+   * the TLD is not carried here; flxfleet.ca is recorded on the project entry,
+   * which is where a visitor can click it.
+   */
+  { name: "FlxFleet" },
   {
     name: "Guyana Canada Cultural Association",
     /*
