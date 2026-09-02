@@ -1,3 +1,4 @@
+import { ArcEdge } from "@/components/ui/Drawing";
 import { Container } from "@/components/layout/Container";
 import { BookingFlow } from "@/components/booking/BookingFlow";
 import { CTASection } from "@/components/sections/CTASection";
@@ -46,7 +47,8 @@ export default function BookPage() {
         </Container>
       </section>
 
-      <section className="section border-y border-line bg-mist">
+      <ArcEdge from="sheet" to="sheet-sunk" />
+      <section className="section bg-mist">
         <Container>
           <SectionHeading
             no="B01"
@@ -55,6 +57,7 @@ export default function BookPage() {
         </Container>
       </section>
 
+      <ArcEdge from="sheet-sunk" to="sheet" flip />
       <section className="section" id="faq">
         <Container>
           <SectionHeading
