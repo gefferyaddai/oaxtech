@@ -1,5 +1,5 @@
 import { Container } from "@/components/layout/Container";
-import { CornerTicks, TitleBlock } from "@/components/ui/Drawing";
+import { ArcEdge, CornerTicks, TitleBlock, type EdgeGround } from "@/components/ui/Drawing";
 import { cn } from "@/lib/utils";
 
 interface CTASectionProps {
@@ -11,6 +11,13 @@ interface CTASectionProps {
   inset?: boolean;
   /** Sheet number shown in the closing title block. */
   sheetNo?: string;
+  /**
+   * Ground of the section directly above, so the closing band can arrive on an
+   * arc. Defaults to the paper ground, which is what most pages end on; pass
+   * the real one where a page closes on a different band or the arc tears a
+   * paper-coloured gap across the bottom of it.
+   */
+  edgeFrom?: EdgeGround;
 }
 
 /**
@@ -22,7 +29,7 @@ interface CTASectionProps {
  * of links. The hatching runs down the left edge the way a drawing marks the
  * bound edge of a sheet.
  */
-export function CTASection({ title, description, actions, className, inset, sheetNo = "SHT 99" }: CTASectionProps) {
+export function CTASection({ title, description, actions, className, inset, sheetNo = "SHT 99", edgeFrom = "sheet" }: CTASectionProps) {
   const body = (
     <div className="relative">
       <CornerTicks tone="revision" />
@@ -60,9 +67,21 @@ export function CTASection({ title, description, actions, className, inset, shee
     );
   }
 
+  /*
+   * The full-bleed variant is a band that leaves the paper, so it arrives on an
+   * arc — the same rule the homepage sets for the ink and revision bands. The
+   * inset variant above is a plate sitting ON the paper and keeps its square
+   * edges: curvature marks the bands that lift off the stock, nothing else.
+   *
+   * No exit arc: the footer is `surface-ink` too, so this band runs straight
+   * into it and a second curve would cut a paper seam into a continuous ground.
+   */
   return (
-    <section className={cn("surface-ink", className)}>
-      <Container className="py-0">{body}</Container>
-    </section>
+    <>
+      <ArcEdge from={edgeFrom} to="ink" />
+      <section className={cn("surface-ink", className)}>
+        <Container className="py-0">{body}</Container>
+      </section>
+    </>
   );
 }
