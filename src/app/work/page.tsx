@@ -1,3 +1,4 @@
+import { ArcEdge } from "@/components/ui/Drawing";
 import { Container } from "@/components/layout/Container";
 import { CTASection } from "@/components/sections/CTASection";
 import { PageHero } from "@/components/sections/PageHero";
@@ -46,7 +47,8 @@ export default function WorkPage() {
         </Container>
       </section>
 
-      <section className="section border-y border-line bg-mist">
+      <ArcEdge from="sheet" to="sheet-sunk" />
+      <section className="section bg-mist">
         <Container>
           <SectionHeading
             no="W01"
@@ -55,6 +57,7 @@ export default function WorkPage() {
         </Container>
       </section>
 
+      <ArcEdge from="sheet-sunk" to="tint" flip />
       <section className="section bg-tint">
         <Container>
           <SectionHeading
@@ -69,6 +72,7 @@ export default function WorkPage() {
       </section>
 
       {/* No client testimonials are published until they're approved in writing. */}
+      <ArcEdge from="tint" to="sheet" />
       <section className="section">
         <Container narrow>
           <SectionHeading
