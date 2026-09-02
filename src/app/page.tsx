@@ -203,7 +203,7 @@ export default function HomePage() {
             eyebrow="Featured work"
             title="Solutions we're proud of"
             align="left"
-            action={<ArrowLink href="/work">View all projects</ArrowLink>}
+            action={<ArrowLink href="/work">View our work</ArrowLink>}
           />
 
           <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
