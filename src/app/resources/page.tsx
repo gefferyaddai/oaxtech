@@ -1,3 +1,4 @@
+import { ArcEdge } from "@/components/ui/Drawing";
 import { Container } from "@/components/layout/Container";
 import { NewsletterForm } from "@/components/forms/NewsletterForm";
 import { CTASection } from "@/components/sections/CTASection";
@@ -32,7 +33,8 @@ export default function ResourcesPage() {
         </Container>
       </section>
 
-      <section className="section border-t border-line bg-mist">
+      <ArcEdge from="sheet" to="sheet-sunk" />
+      <section className="section bg-mist">
         <Container narrow>
           <div className="card mx-auto max-w-xl p-6 sm:p-8">
             <h2 className="font-display text-display-xs">Get new guides by email</h2>
@@ -47,6 +49,7 @@ export default function ResourcesPage() {
       </section>
 
       <CTASection
+        edgeFrom="sheet-sunk"
         title="Have a Question We Haven't Covered?"
         description="Ask us directly — we'd rather give you a straight answer than write around it."
         actions={
