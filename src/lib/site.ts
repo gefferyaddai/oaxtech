@@ -97,10 +97,15 @@ export const siteConfig = {
 
   /* --- NOT YET CONFIRMED — replace before launch -------------------------- */
   contact: {
-    /** PLACEHOLDER: business email address. */
-    email: null as Placeholder<string>,
-    /** PLACEHOLDER: business phone number. */
-    phone: null as Placeholder<string>,
+    /** Confirmed by the business 2026-09-02. */
+    email: "info@oaxtech.dev" as Placeholder<string>,
+    /**
+     * Confirmed by the business 2026-09-02. Stored in display form; `telHref()`
+     * strips everything but digits and `+`, so the leading +1 is what makes the
+     * tel: link dial correctly from outside Canada rather than only on a
+     * domestic handset.
+     */
+    phone: "+1 (825) 288-7601" as Placeholder<string>,
     /** PLACEHOLDER: business hours. Mockup shows "By appointment". */
     hours: "By appointment" as Placeholder<string>,
   },
