@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArcEdge, BreakLine } from "@/components/ui/Drawing";
 import { Container } from "@/components/layout/Container";
 import { CTASection } from "@/components/sections/CTASection";
 import { FAQAccordion } from "@/components/sections/FAQAccordion";
@@ -65,6 +66,11 @@ export default function PricingPage() {
 
       {/* Comparison table — scrolls horizontally on small screens rather than
           shrinking text below a readable size. */}
+      <div className="bg-sheet">
+        <Container>
+          <BreakLine />
+        </Container>
+      </div>
       <section className="pb-12 lg:pb-16">
         <Container>
           <h2 className="tally border-t-rule border-graphite pt-3 font-mono text-graphite">
@@ -115,7 +121,8 @@ export default function PricingPage() {
         </Container>
       </section>
 
-      <section className="section border-t border-line bg-mist">
+      <ArcEdge from="sheet" to="sheet-sunk" flip />
+      <section className="section bg-mist">
         <Container>
           <h2 className="tally border-t-rule border-graphite pt-3 font-mono text-graphite">
             Software packages
@@ -153,6 +160,7 @@ export default function PricingPage() {
       </section>
 
       {/* Custom software ---------------------------------------------------- */}
+      <ArcEdge from="sheet-sunk" to="sheet" />
       <section className="section">
         <Container>
           <div className="overflow-hidden rounded-3xl bg-space">
@@ -206,7 +214,8 @@ export default function PricingPage() {
       </section>
 
       {/* Payment information ------------------------------------------------ */}
-      <section className="section border-y border-line bg-mist">
+      <ArcEdge from="sheet" to="sheet-sunk" flip />
+      <section className="section bg-mist">
         <Container>
           <h2 className="tally border-t-rule border-graphite pt-3 font-mono text-graphite">
             Clear terms. No surprises.
@@ -226,6 +235,7 @@ export default function PricingPage() {
         </Container>
       </section>
 
+      <ArcEdge from="sheet-sunk" to="sheet" />
       <section className="section" id="faq">
         <Container>
           <h2 className="tally border-t-rule border-graphite pt-3 font-mono text-graphite">
