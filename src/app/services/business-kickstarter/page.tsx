@@ -4,7 +4,7 @@ import { CTASection } from "@/components/sections/CTASection";
 import { PageHero } from "@/components/sections/PageHero";
 import { ProcessStepsRow } from "@/components/sections/ProcessSteps";
 import { ButtonLink } from "@/components/ui/Button";
-import { ArrowLink, CornerTicks, TitleBlock } from "@/components/ui/Drawing";
+import { ArcEdge, ArrowLink, CornerTicks, TitleBlock } from "@/components/ui/Drawing";
 import { Icon } from "@/components/ui/Icon";
 import { SlideIn } from "@/components/ui/Motion";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -235,7 +235,8 @@ export default function BusinessKickstarterPage() {
       </section>
 
       {/* Payment plans ----------------------------------------------------- */}
-      <section className="section border-t border-line bg-sheet-sunk">
+      <ArcEdge from="sheet" to="sheet-sunk" />
+      <section className="section bg-sheet-sunk">
         <Container>
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20">
             <SlideIn from="left">
@@ -325,6 +326,7 @@ export default function BusinessKickstarterPage() {
       </section>
 
       {/* Process ----------------------------------------------------------- */}
+      <ArcEdge from="sheet-sunk" to="ink" flip />
       <section className="section surface-ink">
         <Container>
           <SectionHeading
@@ -340,6 +342,7 @@ export default function BusinessKickstarterPage() {
       </section>
 
       {/* Not sure which ----------------------------------------------------- */}
+      <ArcEdge from="ink" to="sheet" />
       <section className="section bg-sheet">
         <Container narrow>
           <SectionHeading
