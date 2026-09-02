@@ -222,8 +222,23 @@ export async function storeUpload(
 
 /**
  * Integration point for Turnstile / hCaptcha / reCAPTCHA.
- * With no provider configured this returns `true` so local development works,
- * but it logs loudly so the gap is visible before launch.
+ *
+ * No provider is wired up yet. Until one is, this FAILS OPEN: it returns
+ * `true` and logs, rather than rejecting the submission.
+ *
+ * That direction is deliberate. `src/lib/api-handler.ts` gates contact, quote,
+ * booking and newsletter on this one function, so failing closed here takes
+ * every form on the site down the moment SPAM_PROTECTION_SECRET is set — which
+ * is precisely when someone believes they have just made things safer, and the
+ * failure is invisible from the inside. A spam message that gets through costs
+ * one deletion; a rejected enquiry costs a client and never shows up in a log
+ * anyone is reading.
+ *
+ * The honeypot in `api-handler.ts` still runs regardless, so this is not the
+ * only defence.
+ *
+ * To implement: POST `token` to the provider's siteverify endpoint, return its
+ * verdict, and delete the fail-open branch below.
  */
 export async function verifySpamToken(token: string | undefined): Promise<boolean> {
   if (!integrationStatus.spamProtection()) {
@@ -232,9 +247,14 @@ export async function verifySpamToken(token: string | undefined): Promise<boolea
     }
     return true;
   }
-  if (!token) return false;
-  // const res = await fetch(VERIFY_URL, { method: "POST", body: ... });
-  return false;
+
+  void token;
+  console.error(
+    "[spam-protection] SPAM_PROTECTION_SECRET is set, but no provider is wired up. " +
+      "Submissions are passing UNVERIFIED. Implement verifySpamToken() or unset " +
+      "the variable.",
+  );
+  return true;
 }
 
 /* -------------------------------------------------------------------------- */

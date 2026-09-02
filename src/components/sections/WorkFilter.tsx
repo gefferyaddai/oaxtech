@@ -8,9 +8,9 @@ import { ButtonLink } from "@/components/ui/Button";
 import { PROJECT_CATEGORIES, type Project, type ProjectCategory } from "@/data/projects";
 import { withViewTransition } from "@/lib/view-transition";
 
-type Filter = "All Projects" | ProjectCategory;
+type Filter = "Featured Work" | ProjectCategory;
 
-const FILTERS: readonly Filter[] = ["All Projects", ...PROJECT_CATEGORIES] as const;
+const FILTERS: readonly Filter[] = ["Featured Work", ...PROJECT_CATEGORIES] as const;
 
 interface WorkFilterProps {
   projects: Project[];
@@ -24,10 +24,10 @@ interface WorkFilterProps {
  * reader users know the list changed.
  */
 export function WorkFilter({ projects }: WorkFilterProps) {
-  const [active, setActive] = useState<Filter>("All Projects");
+  const [active, setActive] = useState<Filter>("Featured Work");
 
   const counts = useMemo(() => {
-    const map: Record<string, number> = { "All Projects": projects.length };
+    const map: Record<string, number> = { "Featured Work": projects.length };
     for (const category of PROJECT_CATEGORIES) {
       map[category] = projects.filter((p) => p.categories.includes(category)).length;
     }
@@ -36,7 +36,7 @@ export function WorkFilter({ projects }: WorkFilterProps) {
 
   const visible = useMemo(
     () =>
-      active === "All Projects"
+      active === "Featured Work"
         ? projects
         : projects.filter((p) => p.categories.includes(active)),
     [active, projects],
@@ -54,7 +54,7 @@ export function WorkFilter({ projects }: WorkFilterProps) {
 
       <p className="sr-only" role="status" aria-live="polite">
         Showing {visible.length} {visible.length === 1 ? "project" : "projects"}
-        {active === "All Projects" ? "" : ` in ${active}`}.
+        {active === "Featured Work" ? "" : ` in ${active}`}.
       </p>
 
       {visible.length === 0 ? (
