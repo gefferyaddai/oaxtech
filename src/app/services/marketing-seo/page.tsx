@@ -8,7 +8,7 @@ import { ProcessStepsRow } from "@/components/sections/ProcessSteps";
 import { FeatureGrid } from "@/components/sections/ServiceCard";
 import { ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
-import { CornerTicks, TitleBlock } from "@/components/ui/Drawing";
+import { ArcEdge, BreakLine, CornerTicks, TitleBlock } from "@/components/ui/Drawing";
 import { SlideIn } from "@/components/ui/Motion";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { marketingFaqs } from "@/data/faqs";
@@ -122,12 +122,13 @@ export default function MarketingSeoPage() {
         visual={<MarketingHeroVisual />}
       />
 
-      <section className="border-b border-line bg-mist py-8">
+      <section className="bg-mist py-8">
         <Container>
           <FeatureGrid items={marketingPillars} columns={4} variant="plain" />
         </Container>
       </section>
 
+      <ArcEdge from="sheet-sunk" to="sheet" />
       <section className="section">
         <Container>
           <SectionHeading
@@ -150,7 +151,8 @@ export default function MarketingSeoPage() {
       </section>
 
       {/* Marketing consulting ----------------------------------------------- */}
-      <section className="section border-y border-line bg-mist" id="marketing-consulting">
+      <ArcEdge from="sheet" to="sheet-sunk" flip />
+      <section className="section bg-mist" id="marketing-consulting">
         <Container>
           <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
             <div>
@@ -206,6 +208,7 @@ export default function MarketingSeoPage() {
       </section>
 
       {/* SEO services -------------------------------------------------------- */}
+      <ArcEdge from="sheet-sunk" to="sheet" />
       <section className="section" id="seo-services">
         <Container>
           <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
@@ -260,6 +263,7 @@ export default function MarketingSeoPage() {
       </section>
 
       {/* Local SEO ----------------------------------------------------------- */}
+      <ArcEdge from="sheet" to="tint" flip />
       <section className="section bg-tint">
         <Container>
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
@@ -283,7 +287,8 @@ export default function MarketingSeoPage() {
         </Container>
       </section>
 
-      <section className="section border-y border-line bg-mist">
+      <ArcEdge from="tint" to="sheet-sunk" />
+      <section className="section bg-mist">
         <Container>
           <SectionHeading
             no="M02"
@@ -294,7 +299,8 @@ export default function MarketingSeoPage() {
 
       {/* Packages ------------------------------------------------------------ */}
       {/* Audits — fixed price, bought directly --------------------------- */}
-      <section className="section border-t border-line bg-sheet" id="audits">
+      <ArcEdge from="sheet-sunk" to="sheet" flip />
+      <section className="section bg-sheet" id="audits">
         <Container>
           <SectionHeading
             no="M03"
@@ -403,6 +409,11 @@ export default function MarketingSeoPage() {
         </Container>
       </section>
 
+      <div className="bg-sheet">
+        <Container>
+          <BreakLine />
+        </Container>
+      </div>
       <section className="section" id="packages">
         <Container>
           <SectionHeading
@@ -422,7 +433,8 @@ export default function MarketingSeoPage() {
       </section>
 
       {/* Sample report — clearly labelled illustrative ------------------------ */}
-      <section className="section border-t border-line bg-mist">
+      <ArcEdge from="sheet" to="sheet-sunk" flip />
+      <section className="section bg-mist">
         <Container>
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-14">
             <div>
@@ -486,6 +498,7 @@ export default function MarketingSeoPage() {
         </Container>
       </section>
 
+      <ArcEdge from="sheet-sunk" to="sheet" />
       <section className="section" id="faq">
         <Container>
           <SectionHeading
