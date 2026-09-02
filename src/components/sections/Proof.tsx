@@ -57,7 +57,7 @@ export function ClientRegister({
   return (
     <div className={cn("w-full", className)}>
       <div className="flex items-baseline justify-between border-b-rule border-graphite pb-2">
-        <span className="tally font-mono text-graphite">Client register</span>
+        <span className="tally font-mono text-graphite">Featured client register</span>
         <span className="tally font-mono text-faint nums">
           {String(clients.length).padStart(2, "0")} on record
         </span>
