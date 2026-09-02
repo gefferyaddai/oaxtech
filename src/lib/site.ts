@@ -39,6 +39,32 @@ const SOCIAL_LINKS: SocialLink[] = [
    */
 ];
 
+/**
+ * Canonical origin, with an empty value treated as absent.
+ *
+ * `??` alone is not enough here. It falls back only on null/undefined, and a
+ * host dashboard lets you save a variable with NO VALUE — which yields an empty
+ * string, sails past `??`, and reaches `new URL("")` in `app/layout.tsx` as
+ * `metadataBase`. That throws ERR_INVALID_URL during "Collecting page data" and
+ * fails the whole production build, with the error pointing at /_not-found
+ * rather than at the variable. An unset variable works; a variable set to
+ * nothing does not, which is the opposite of what anyone expects.
+ *
+ * Trailing slashes are stripped so canonical tags never come out doubled, and
+ * an unparseable value falls back rather than taking the build down.
+ */
+function siteUrl(): string {
+  const FALLBACK = "https://oaxtech.dev";
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (!raw) return FALLBACK;
+  try {
+    new URL(raw);
+  } catch {
+    return FALLBACK;
+  }
+  return raw.replace(/\/+$/, "");
+}
+
 export const siteConfig = {
   name: "OAX Tech",
   legalName: "OAX Tech",
@@ -50,7 +76,7 @@ export const siteConfig = {
    * Canonical origin. Override per environment with NEXT_PUBLIC_SITE_URL.
    * Used for canonical tags, Open Graph URLs, sitemap and robots.
    */
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://oaxtech.com",
+  url: siteUrl(),
 
   /* --- CONFIRMED ---------------------------------------------------------- */
   /** Year the business was established. Drives the copyright range and schema. */
