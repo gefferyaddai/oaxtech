@@ -616,6 +616,49 @@
     transform: translate(0, 0);
   }
 
+  /* ---------------------------------------------------------------------
+     PHOTOGRAPHIC PLATE
+     A photograph mounted on the sheet.
+
+     Technical documentation does not print photographs in full colour; it
+     SCREENS them, so the image sits in the same ink as the drawing around it.
+     That is what keeps a photograph from reading as pasted on: it is rendered
+     in the document's own two inks rather than dropped in as a foreign object.
+
+     Grayscale carries the tonal range, and the violet multiplies over it at
+     low opacity so the photograph belongs to the same palette as the rules and
+     the revision stamps. The image is never the loudest thing on the sheet.
+  --------------------------------------------------------------------- */
+  .photo-plate {
+    position: relative;
+    overflow: hidden;
+    background-color: theme("colors.sheet-deep");
+  }
+  .photo-plate img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.06);
+  }
+  /* The screen. `multiply` keeps the darks honest instead of flattening them
+     the way a flat overlay does. */
+  .photo-plate::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-color: theme("colors.revision.DEFAULT");
+    mix-blend-mode: multiply;
+    opacity: 0.18;
+  }
+  /* On the ink ground the same screen would crush the image to black, so the
+     violet lifts it instead of multiplying into it. */
+  .photo-plate-ink::after {
+    mix-blend-mode: screen;
+    opacity: 0.12;
+  }
+
   /* Tabular figures for every drawing number, price and count */
   .nums { font-variant-numeric: tabular-nums; }
 

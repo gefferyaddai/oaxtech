@@ -11,6 +11,9 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { outcomeAreas, projects } from "@/data/projects";
 import { capabilities } from "@/data/services";
 import { buildMetadata } from "@/lib/metadata";
+import logistics from "@/assets/10-logistics.jpg";
+import { PhotoPlate } from "@/components/ui/Photo";
+import community from "@/assets/12-community.jpg";
 
 export const metadata = buildMetadata({
   title: "Our Work",
@@ -54,6 +57,16 @@ export default function WorkPage() {
             no="W01"
             align="left" title="Explore by Capability" />
           <FeatureGrid items={capabilities} columns={5} className="mt-10" />
+          <PhotoPlate
+            className="mt-12"
+            src={logistics}
+            alt="A delivery van being loaded."
+            imageClassName="aspect-[21/8]"
+            sizes="(min-width: 1024px) 1100px, 100vw"
+            fig="FIG. W01"
+            caption="Logistics and moving — the sector behind the FlxFleet app."
+          />
+
         </Container>
       </section>
 
@@ -64,6 +77,16 @@ export default function WorkPage() {
             no="W02"
             align="left" title="Real Solutions. Meaningful Results." />
           <FeatureGrid items={outcomeAreas} columns={4} className="mt-10" />
+          <PhotoPlate
+            className="mt-12"
+            src={community}
+            alt="People gathered at a community event."
+            imageClassName="aspect-[21/8]"
+            sizes="(min-width: 1024px) 1100px, 100vw"
+            fig="FIG. W02"
+            caption="Community work: GHSA and GCCA Calgary."
+          />
+
           <p className="mt-8 text-center text-sm text-slate">
             We describe outcomes in terms of what a solution does. Measured figures appear here only
             once a client has confirmed them.

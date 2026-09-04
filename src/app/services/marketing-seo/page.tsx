@@ -35,6 +35,8 @@ import { marketingProcess } from "@/data/services";
 import { buildMetadata } from "@/lib/metadata";
 import { paymentsEnabled } from "@/lib/integrations";
 import { siteConfig } from "@/lib/site";
+import analytics from "@/assets/07-analytics.jpg";
+import { PhotoPlate } from "@/components/ui/Photo";
 
 export const metadata = buildMetadata({
   title: "Marketing & SEO",
@@ -283,6 +285,16 @@ export default function MarketingSeoPage() {
               </ButtonLink>
             </div>
             <FeatureGrid items={localSeoServices} columns={2} />
+          <PhotoPlate
+            className="mt-12"
+            src={analytics}
+            alt="An analytics dashboard on a monitor."
+            imageClassName="aspect-[21/8]"
+            sizes="(min-width: 1024px) 1100px, 100vw"
+            fig="FIG. M02"
+            caption="We report on what moved, not on what was busy."
+          />
+
           </div>
         </Container>
       </section>

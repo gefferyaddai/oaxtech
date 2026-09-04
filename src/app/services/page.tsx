@@ -14,6 +14,8 @@ import { buildMetadata } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
 import { layerFor } from "@/lib/layers";
 import { cn } from "@/lib/utils";
+import texture from "@/assets/13-texture.jpg";
+import { PhotoPlate } from "@/components/ui/Photo";
 
 export const metadata = buildMetadata({
   title: "Websites & Software",
@@ -139,6 +141,16 @@ export default function ServicesPage() {
             no="S01"
             align="left" title="Built for Businesses at Every Stage" />
           <FeatureGrid items={clientTypes} columns={5} className="mt-10" />
+          <PhotoPlate
+            className="mt-12"
+            src={texture}
+            alt="Technical drawing tools laid out on gridded paper."
+            imageClassName="aspect-[21/6]"
+            sizes="(min-width: 1024px) 1100px, 100vw"
+            fig="FIG. S01"
+            caption="Documented work: you get the drawing, not just the build."
+          />
+
         </Container>
       </section>
 

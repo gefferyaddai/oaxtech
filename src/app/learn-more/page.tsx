@@ -20,6 +20,8 @@ import {
   technicalExpertise,
 } from "@/data/company";
 import { buildMetadata } from "@/lib/metadata";
+import workspace from "@/assets/01-workspace.jpg";
+import { PhotoPlate } from "@/components/ui/Photo";
 
 /**
  * This page replaced /team. The old page led with five profile cards whose
@@ -89,6 +91,15 @@ export default function LearnMorePage() {
             title="The OAX Tech Story"
           />
 
+          <PhotoPlate
+            className="mb-12 mx-auto max-w-sm"
+            src={workspace}
+            alt="A desk mid-project, screen and notes in use."
+            imageClassName="aspect-[3/4]"
+            sizes="(min-width: 640px) 384px, 100vw"
+            fig="FIG. L02"
+            caption="Where the work actually happens."
+          />
           <div className="mt-10 grid gap-8 lg:grid-cols-[1.35fr_0.65fr] lg:gap-12">
             <StoryVideoPlate video={storyVideo} />
 
