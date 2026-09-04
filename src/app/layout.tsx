@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { SiteChrome } from "@/components/layout/SiteChrome";
@@ -192,6 +193,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           // Serialized from a typed object above; no user input is interpolated.
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }}
         />
+
+        {/*
+          Vercel Analytics.
+
+          Mounted in the ROOT LAYOUT rather than on one page: it records a view
+          per route, so anywhere it is absent is simply invisible in the
+          numbers. A homepage-only install would report every visitor as having
+          landed and never moved, which is worse than no analytics at all
+          because it looks like data.
+
+          No environment variable and no cookie banner: the script is injected
+          by the platform at deploy time and the product is cookieless, which
+          is why it needs neither NEXT_PUBLIC_ANALYTICS_ID nor consent plumbing.
+          It is inert in local development.
+        */}
+        <Analytics />
       </body>
     </html>
   );

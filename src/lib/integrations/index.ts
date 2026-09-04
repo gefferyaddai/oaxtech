@@ -42,7 +42,14 @@ export const integrationStatus = {
   database: () => Boolean(process.env.DATABASE_URL),
   payments: () => Boolean(process.env.PAYMENTS_SECRET_KEY),
   auth: () => Boolean(process.env.AUTH_SECRET),
-  analytics: () => Boolean(process.env.NEXT_PUBLIC_ANALYTICS_ID),
+  /*
+   * Vercel Analytics is mounted unconditionally in the root layout and needs no
+   * key, so this no longer asks whether a variable is set — it asks whether the
+   * app is running somewhere the platform actually injects the script. Locally
+   * the component is inert, and reporting "configured" there would promise
+   * numbers that are never collected.
+   */
+  analytics: () => process.env.VERCEL === "1",
   spamProtection: () => Boolean(process.env.SPAM_PROTECTION_SECRET),
 };
 

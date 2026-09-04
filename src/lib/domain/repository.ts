@@ -432,6 +432,6 @@ export function getSystemStatus(): SystemService[] {
     { label: "Calendar", configured: integrationStatus.calendar(), requires: "CALENDAR_API_KEY" },
     { label: "File storage", configured: integrationStatus.storage(), requires: "STORAGE_BUCKET, STORAGE_ACCESS_KEY" },
     { label: "Payments", configured: integrationStatus.payments(), requires: "PAYMENTS_SECRET_KEY" },
-    { label: "Analytics", configured: integrationStatus.analytics(), requires: "NEXT_PUBLIC_ANALYTICS_ID" },
+    { label: "Analytics", configured: integrationStatus.analytics(), requires: "Vercel Analytics — active on deployed environments, inert locally" },
   ];
 }

@@ -42,10 +42,9 @@ export default async function AnalyticsPage() {
         <div className="mt-4 flex items-start gap-2.5 rounded-lg border border-info/25 bg-info-soft p-3">
           <Icon name="Info" className="mt-0.5 h-4 w-4 shrink-0 text-info" />
           <p className="text-xs leading-relaxed text-charcoal">
-            No web-analytics provider is connected, so traffic and acquisition figures are not
-            available. The figures below are derived from records in this admin only. Set{" "}
-            <code className="rounded bg-paper px-1">NEXT_PUBLIC_ANALYTICS_ID</code> to add
-            traffic reporting.
+            Traffic and acquisition figures are not shown here. Vercel Analytics is collecting
+            them on the deployed site and reports in the Vercel dashboard, not in this admin —
+            the figures below are derived from records in this admin only.
           </p>
         </div>
       )}
