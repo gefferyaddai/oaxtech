@@ -28,6 +28,8 @@ import { homeProcess, services, valueProps } from "@/data/services";
 import { testimonials } from "@/data/testimonials";
 import { buildMetadata } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
+import whiteboard from "@/assets/03-whiteboard.jpg";
+import { PhotoPlate } from "@/components/ui/Photo";
 
 export const metadata = buildMetadata({
   title: `${siteConfig.name} — Websites, Software, Marketing & SEO in Calgary`,
@@ -92,6 +94,10 @@ export default function HomePage() {
 
       {/* SHEET 01 — Cover ------------------------------------------------- */}
       <HomeHero />
+
+      {/* The cover sheet is now a full-bleed band like the ink and revision
+          ones, so it leaves the same way they do: on an arc. */}
+      <ArcEdge from="ink" to="sheet" flip />
 
       {/* SHEET 02 — Featured client register ------------------------------
           A strip, not a full section: `.section` padding either side of a
@@ -173,6 +179,16 @@ export default function HomePage() {
 
             <SlideIn from="right" delay={120}>
               <FeatureGrid items={valueProps} columns={2} variant="plain" />
+              <PhotoPlate
+                className="mt-8"
+                src={whiteboard}
+                alt="Planning a build out on a whiteboard."
+                imageClassName="aspect-[4/3]"
+                sizes="(min-width: 1024px) 560px, 100vw"
+                fig="FIG. SHT 04"
+                caption="Every project starts on a wall before it starts in code."
+              />
+
             </SlideIn>
           </div>
         </Container>

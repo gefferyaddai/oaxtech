@@ -7,6 +7,8 @@ import { ResourcesBrowser } from "@/components/sections/ResourcesBrowser";
 import { ButtonLink } from "@/components/ui/Button";
 import { articles } from "@/data/articles";
 import { buildMetadata } from "@/lib/metadata";
+import writing from "@/assets/11-writing.jpg";
+import { PhotoPlate } from "@/components/ui/Photo";
 
 export const metadata = buildMetadata({
   title: "Resources",
@@ -36,6 +38,16 @@ export default function ResourcesPage() {
       <ArcEdge from="sheet" to="sheet-sunk" />
       <section className="section bg-mist">
         <Container narrow>
+          <PhotoPlate
+            className="mx-auto mb-10 max-w-xl"
+            src={writing}
+            alt="A notebook and pen on a desk, mid-sentence."
+            imageClassName="aspect-[16/6]"
+            sizes="(min-width: 640px) 576px, 100vw"
+            fig="FIG. R01"
+            caption="Guides written from work we have actually delivered."
+          />
+
           <div className="card mx-auto max-w-xl p-6 sm:p-8">
             <h2 className="font-display text-display-xs">Get new guides by email</h2>
             <p className="mt-2 text-sm leading-relaxed text-slate">

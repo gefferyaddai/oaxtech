@@ -18,6 +18,8 @@ import {
 import { homeProcess } from "@/data/services";
 import { buildMetadata } from "@/lib/metadata";
 import { cn } from "@/lib/utils";
+import codePoster from "@/assets/08-code-poster.jpg";
+import { PlateLoop } from "@/components/ui/Photo";
 
 export const metadata = buildMetadata({
   title: "Business Kickstarter Packages",
@@ -338,6 +340,17 @@ export default function BusinessKickstarterPage() {
             description="A Kickstarter package follows the process every project here follows — the difference is that the campaigns keep running after launch."
           />
           <ProcessStepsRow className="mt-14" steps={homeProcess} tone="paper" />
+          <PlateLoop
+            className="mx-auto mt-14 max-w-[16rem]"
+            src="/video/08-code.mp4"
+            poster={codePoster}
+            alt="Code being written on screen."
+            imageClassName="aspect-[9/16]"
+            tone="ink"
+            fig="FIG. K04"
+            caption="The build stage, as it actually looks."
+          />
+
         </Container>
       </section>
 

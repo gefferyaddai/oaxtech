@@ -11,6 +11,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { contactFaqs } from "@/data/faqs";
 import { buildMetadata } from "@/lib/metadata";
 import { PLACEHOLDER_LABELS, mailtoHref, siteConfig, telHref } from "@/lib/site";
+import calgary from "@/assets/04-calgary.jpg";
+import { PhotoPlate } from "@/components/ui/Photo";
 
 export const metadata = buildMetadata({
   title: "Contact",
@@ -60,6 +62,15 @@ export default async function ContactPage({
             <ContactForm defaultSubject={subject} />
 
             <div className="space-y-6">
+              <PhotoPlate
+                src={calgary}
+                alt="The Calgary skyline."
+                imageClassName="aspect-[16/9]"
+                sizes="(min-width: 1024px) 460px, 100vw"
+                fig="FIG. C01"
+                caption="Calgary, Alberta — where we are and who we build for."
+              />
+
               <div className="card p-5 sm:p-6">
                 <h2 className="font-display text-lg font-semibold text-ink">Contact Information</h2>
                 <ul className="mt-5 space-y-3">

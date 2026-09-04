@@ -12,6 +12,8 @@ import { aboutHighlights, collaborationProcess, companyValues, differentiators }
 import { communityWork, hasStoryVideo, missionVision, storyVideo } from "@/data/company";
 import { buildMetadata } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
+import collaboration from "@/assets/02-collaboration.jpg";
+import { PhotoPlate } from "@/components/ui/Photo";
 
 export const metadata = buildMetadata({
   title: "About Us",
@@ -101,6 +103,16 @@ export default function AboutPage() {
               </ol>
             </div>
           </div>
+
+          <PhotoPlate
+            className="mt-14"
+            src={collaboration}
+            alt="Two people working through a problem together at a laptop."
+            imageClassName="aspect-[16/7]"
+            sizes="(min-width: 1024px) 1100px, 100vw"
+            fig="FIG. A01"
+            caption="Clients work directly with the people building the project."
+          />
 
           {/* Mission and vision */}
           <div className="mt-14 grid gap-4 lg:grid-cols-2">

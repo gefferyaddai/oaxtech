@@ -11,6 +11,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { whatToExpect } from "@/data/availability";
 import { bookingFaqs } from "@/data/faqs";
 import { buildMetadata } from "@/lib/metadata";
+import meeting from "@/assets/05-meeting.jpg";
+import { PhotoPlate } from "@/components/ui/Photo";
 
 export const metadata = buildMetadata({
   title: "Book a Consultation",
@@ -54,6 +56,16 @@ export default function BookPage() {
             no="B01"
             align="left" title="What to Expect" />
           <FeatureGrid items={whatToExpect} columns={4} className="mt-10" />
+          <PhotoPlate
+            className="mt-12"
+            src={meeting}
+            alt="Two people talking across a table in a consultation."
+            imageClassName="aspect-[21/8]"
+            sizes="(min-width: 1024px) 1100px, 100vw"
+            fig="FIG. B02"
+            caption="A 30-minute conversation, no charge and no obligation."
+          />
+
         </Container>
       </section>
 

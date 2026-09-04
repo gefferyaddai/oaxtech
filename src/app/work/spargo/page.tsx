@@ -10,6 +10,9 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { spargoCaseStudy as study } from "@/data/projects";
 import { buildMetadata } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
+import grocery from "@/assets/09-grocery.jpg";
+import { PhotoPlate } from "@/components/ui/Photo";
+import mobile from "@/assets/06-mobile.jpg";
 
 export const metadata = buildMetadata({
   title: "Spargo Case Study",
@@ -154,6 +157,16 @@ export default function SpargoCaseStudyPage() {
           <SectionHeading
             no="W01"
             align="left" title="OAX Tech's Solution" />
+          <PhotoPlate
+            className="mt-12"
+            src={grocery}
+            alt="Supermarket shelves lined with priced stock."
+            imageClassName="aspect-[16/7]"
+            sizes="(min-width: 1024px) 1100px, 100vw"
+            fig="FIG. SP01"
+            caption="The problem Spargo solves sits on a shelf like this one."
+          />
+
           <div className="mt-10 grid grid-cols-1 items-center gap-8 lg:grid-cols-[1fr_auto_1fr] lg:gap-10">
             <ul className="space-y-6">
               {study.solution.slice(0, 2).map((item) => (
@@ -191,6 +204,16 @@ export default function SpargoCaseStudyPage() {
           <SectionHeading
             no="W02"
             align="left" title="Services Provided" />
+          <PhotoPlate
+            className="mt-12"
+            src={mobile}
+            alt="A phone held in one hand, app open."
+            imageClassName="aspect-[16/7]"
+            sizes="(min-width: 1024px) 1100px, 100vw"
+            fig="FIG. SP02"
+            caption="Built mobile-first, because that is where shoppers are."
+          />
+
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {study.servicesProvided.map((item) => (
               <li key={item.label} className="card p-5">
