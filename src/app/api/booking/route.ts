@@ -115,7 +115,38 @@ export async function POST(request: Request) {
     ].join("\n"),
   });
 
-  void Promise.allSettled([teamNotice, confirmation]);
+  /*
+   * Non-blocking, but NOT silent.
+   *
+   * These sends must not hold up or fail the response — the booking is already
+   * recorded. But discarding the result made a failing send indistinguishable
+   * from a working one: `sendEmail` returns the provider's own message
+   * ("domain is not verified", "invalid api key"), which is the single most
+   * useful string in the whole pipeline, and it was going straight in the bin.
+   *
+   * Logged with a stable prefix so it can be grepped in the platform's function
+   * logs, and it names WHICH of the two failed — the team notice and the
+   * customer confirmation fail for different reasons: the confirmation goes to
+   * an outside address, so it is the one that breaks when the sending domain is
+   * unverified, while the notice to our own inbox may still arrive.
+   */
+  void Promise.allSettled([teamNotice, confirmation]).then(([team, customer]) => {
+    for (const [label, outcome] of [
+      ["team-notice", team],
+      ["customer-confirmation", customer],
+    ] as const) {
+      if (outcome.status === "rejected") {
+        console.error(`[booking-email] ${label} threw:`, outcome.reason);
+      } else if (!outcome.value.ok) {
+        console.error(
+          `[booking-email] ${label} not sent — ${outcome.value.reason}:`,
+          outcome.value.detail ?? "(no detail returned)",
+        );
+      } else {
+        console.log(`[booking-email] ${label} sent`);
+      }
+    }
+  });
 
   if (!integrationStatus.calendar()) {
     // We have the request; nothing has reserved the time.
