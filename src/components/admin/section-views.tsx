@@ -67,6 +67,40 @@ export function LeadsView({
         </Link>
       ),
     },
+    /*
+     * Contact details belong in the LIST, not only on the detail page.
+     *
+     * The whole job on this screen is "who do I get back to, and how" — making
+     * that a click away meant the one thing the page exists for was the one
+     * thing it did not show. Both are live links, so acting on a lead is one
+     * tap from the row rather than a navigation.
+     */
+    {
+      key: "email",
+      header: "Email",
+      sortValue: (row) => row.email,
+      cell: (row) => (
+        <a href={`mailto:${row.email}`} className="text-cobalt hover:underline">
+          {row.email}
+        </a>
+      ),
+    },
+    {
+      key: "phone",
+      header: "Phone",
+      hideBelow: "lg",
+      cell: (row) =>
+        row.phone ? (
+          <a
+            href={`tel:${row.phone.replace(/[^\d+]/g, "")}`}
+            className="whitespace-nowrap text-cobalt hover:underline"
+          >
+            {row.phone}
+          </a>
+        ) : (
+          <Muted />
+        ),
+    },
     { key: "service", header: "Service", sortValue: (row) => row.service, hideBelow: "md", cell: (row) => <span className="text-slate">{row.service}</span> },
     { key: "budget", header: "Budget", hideBelow: "lg", cell: (row) => (row.budget ? <span className="whitespace-nowrap text-slate">{row.budget}</span> : <Muted />) },
     { key: "stage", header: "Stage", sortValue: (row) => row.stage, cell: (row) => <StatusBadge tone={row.stage === "Converted" ? "success" : "info"}>{row.stage}</StatusBadge> },
@@ -91,14 +125,17 @@ export function LeadsView({
       columns={columns}
       rowKey={(row) => row.id}
       searchable={(row) => `${row.name} ${row.company ?? ""} ${row.service} ${row.email}`}
-      searchPlaceholder="Search by name, company or service…"
+      searchPlaceholder="Search by name, company, service or email…"
       filter={{ label: "Filter by stage", options: LEAD_STAGES, allLabel: "All stages", match: (row) => row.stage }}
       createLabel="Add Lead"
       createDescription="Record an enquiry that arrived outside the website forms."
       emptyTitle="No leads yet"
       emptyDescription="Quote requests, contact messages and consultation bookings appear here automatically."
       emptyIcon="Target"
-      minWidth="56rem"
+      // Two more columns than before. Without the extra width the email wraps
+      // and the table stops being scannable; it scrolls inside its own
+      // container, so the page itself still never scrolls sideways.
+      minWidth="72rem"
       autoOpenCreate={autoOpenCreate}
     />
   );

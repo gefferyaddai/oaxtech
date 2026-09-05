@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createCalendarBooking, integrationStatus, persistSubmission } from "@/lib/integrations";
+import { createCalendarBooking, integrationStatus, persistSubmission, sendEmail } from "@/lib/integrations";
 import { bookingSchema, flattenFieldErrors } from "@/lib/validation/schemas";
 
 /**
@@ -44,6 +44,78 @@ export async function POST(request: Request) {
    * regardless.
    */
   const captured = await persistSubmission("booking", data);
+
+  /*
+   * Email, which this route previously did not send AT ALL.
+   *
+   * Contact and quote both go through `api-handler`, which notifies the team.
+   * Booking has its own route and skipped that entirely, so the highest-intent
+   * submission on the site was the only one nobody was told about.
+   *
+   * Two messages, and they are deliberately different:
+   *
+   *   - the TEAM gets the enquiry with reply-to set to the person, so hitting
+   *     reply answers them rather than the robot;
+   *   - the PERSON gets an acknowledgement, because a booking form that says
+   *     nothing afterwards reads as broken and the next thing they do is book
+   *     with somebody else.
+   *
+   * Neither send is awaited before the reply is built, and neither can fail the
+   * request: the booking is already recorded, and a mail provider having a bad
+   * minute must not turn a captured consultation into an error the visitor sees.
+   */
+  const slotReserved = integrationStatus.calendar();
+  const when = `${data.date} at ${data.time} (${data.timeZone})`;
+
+  const teamNotice = sendEmail({
+    subject: `Consultation request — ${data.name}`,
+    replyTo: data.email,
+    body: [
+      `${data.name} requested a consultation.`,
+      ``,
+      `Service:   ${data.service}`,
+      `Requested: ${when}`,
+      `Email:     ${data.email}`,
+      `Phone:     ${data.phone ?? "not provided"}`,
+      data.companyName ? `Company:   ${data.companyName}` : null,
+      data.budget ? `Budget:    ${data.budget}` : null,
+      ``,
+      data.description ? `Notes:\n${data.description}` : null,
+      ``,
+      slotReserved
+        ? `This slot was reserved on the calendar.`
+        : `NO slot has been reserved — calendar scheduling is not connected. Confirm the time with them directly.`,
+    ]
+      .filter((line) => line !== null)
+      .join("\n"),
+  });
+
+  /*
+   * The confirmation must not overstate what happened. With no calendar
+   * connected the time is a REQUEST, not a booking, and telling someone their
+   * slot is confirmed when nothing holds it is the one failure here that costs
+   * a client rather than an email.
+   */
+  const confirmation = sendEmail({
+    to: data.email,
+    subject: slotReserved
+      ? `Your consultation is booked — ${when}`
+      : `We received your consultation request`,
+    body: [
+      `Hi ${data.name},`,
+      ``,
+      slotReserved
+        ? `Your ${data.service} consultation is booked for ${when}. It is free and runs about 30 minutes.`
+        : `Thanks for asking for a ${data.service} consultation. You asked for ${when}, and we will confirm the exact time by email shortly — nothing is held in the calendar yet.`,
+      ``,
+      `If you need to change anything, just reply to this message.`,
+      ``,
+      `— OAX Tech`,
+      `Calgary, Alberta`,
+    ].join("\n"),
+  });
+
+  void Promise.allSettled([teamNotice, confirmation]);
 
   if (!integrationStatus.calendar()) {
     // We have the request; nothing has reserved the time.

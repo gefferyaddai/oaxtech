@@ -62,6 +62,17 @@ export interface EmailMessage {
   /** Plain-text body. Values are already validated and escaped upstream. */
   body: string;
   replyTo?: string;
+  /**
+   * Recipient. Defaults to EMAIL_TO_ADDRESS — the team inbox — which is what
+   * every enquiry notification wants.
+   *
+   * Pass an address to write to the ENQUIRER instead, e.g. a booking
+   * confirmation. Only ever pass an address the visitor themselves submitted
+   * and the schema has validated: this function will send wherever it is
+   * pointed, so an unvalidated value here is an open relay for whoever can
+   * reach the form.
+   */
+  to?: string;
 }
 
 /**
@@ -82,6 +93,8 @@ export async function sendEmail(message: EmailMessage): Promise<IntegrationResul
   if (!integrationStatus.email()) return NOT_CONFIGURED("Email delivery");
 
   const from = process.env.EMAIL_FROM_ADDRESS || "OAX Tech <onboarding@resend.dev>";
+  const to = message.to ?? process.env.EMAIL_TO_ADDRESS;
+  if (!to) return NOT_CONFIGURED("Email delivery");
 
   try {
     const response = await fetch("https://api.resend.com/emails", {
@@ -92,7 +105,7 @@ export async function sendEmail(message: EmailMessage): Promise<IntegrationResul
       },
       body: JSON.stringify({
         from,
-        to: [process.env.EMAIL_TO_ADDRESS],
+        to: [to],
         subject: message.subject,
         text: message.body,
         ...(message.replyTo ? { reply_to: message.replyTo } : {}),
